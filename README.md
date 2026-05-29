@@ -413,8 +413,4 @@ Check that procurement types are correct (`periodic_supply` vs `demand_driven`) 
 ---
 
 
----
 
-## License
-
-MIT License — see `LICENSE` for details.
