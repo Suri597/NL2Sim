@@ -348,7 +348,7 @@ python data_gen/format_dataset.py \
 
 Output files are saved next to the input with descriptive names:
 
-The 8-character ID at the end matches train and val as a pair.
+The 8-character ID at the start matches train and val as a pair.
 
 ### Step 2 — Upload to OpenAI for fine-tuning
 
