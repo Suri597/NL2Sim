@@ -277,7 +277,7 @@ pipeline_summary.json     ← full run summary
 
 ---
 
-## Synthetic data generation
+## Synthetic data generation (Optional, dataset already included. See instruction below for more information)
 
 NL2Sim includes a pipeline for generating synthetic (NL, JSON) training pairs for fine-tuning:
 
@@ -304,7 +304,105 @@ python data_gen/format_dataset.py \
     --input ../outputs/data_gen/dataset/dataset.jsonl \
     --split 0.8 --validate
 ```
+---
 
+## Using the dataset for fine-tuning
+
+The dataset is provided as a single JSONL file at `outputs/data_gen/dataset/dataset.jsonl`.
+Each line is one training instance in OpenAI fine-tuning format:
+
+```json
+{
+  "messages": [
+    {"role": "user",      "content": "instruction prefix + NL description + schema"},
+    {"role": "assistant", "content": "{...full JSON config with missing placeholders...}"}
+  ]
+}
+```
+
+### Step 1 — Sample and split
+
+Use `format_dataset.py` to randomly sample a subset and split into train/validation sets:
+
+```bash
+cd scripts
+
+# sample 800 from 1000, split 80/20 train/val, validate format
+python data_gen/format_dataset.py \
+    --input ../outputs/data_gen/dataset/dataset.jsonl \
+    --sample 800 \
+    --split 0.8 \
+    --validate
+
+# use all 1000, split 80/20
+python data_gen/format_dataset.py \
+    --input ../outputs/data_gen/dataset/dataset.jsonl \
+    --split 0.8 \
+    --validate
+
+# no split — single formatted file
+python data_gen/format_dataset.py \
+    --input ../outputs/data_gen/dataset/dataset.jsonl \
+    --no-split
+```
+
+Output files are saved next to the input with descriptive names:
+
+The 8-character ID at the end matches train and val as a pair.
+
+### Step 2 — Upload to OpenAI for fine-tuning
+
+```python
+from openai import OpenAI
+client = OpenAI()
+
+# upload train file
+train_file = client.files.create(
+    file=open("train_640samples_a3f2c1b4.jsonl", "rb"),
+    purpose="fine-tune"
+)
+
+# upload val file
+val_file = client.files.create(
+    file=open("val_160samples_a3f2c1b4.jsonl", "rb"),
+    purpose="fine-tune"
+)
+
+# start fine-tuning job
+job = client.fine_tuning.jobs.create(
+    training_file   = train_file.id,
+    validation_file = val_file.id,
+    model           = "gpt-4.1-2025-04-14",
+    hyperparameters = {
+        "n_epochs":        3,
+        "batch_size":      1,
+        "learning_rate_multiplier": 2,
+    },
+    seed = 1,
+)
+
+print(f"Fine-tuning job started: {job.id}")
+```
+
+### Step 3 — Update model in pipeline
+
+Once fine-tuning completes update the model in `scripts/nl_to_json.py`:
+
+```python
+MODEL = "ft:gpt-4.1-2025-04-14:personal:nl2sim:XXXXXXXX"
+```
+
+### format_dataset.py options
+
+| Flag | Default | Description |
+|---|---|---|
+| `--input` | required | Path to dataset.jsonl |
+| `--sample` | all | Randomly sample N records before splitting |
+| `--split` | 0.8 | Train/validation ratio |
+| `--no-split` | off | Save single file without splitting |
+| `--validate` | off | Validate OpenAI format before saving |
+| `--seed` | 42 | Random seed for sampling and splitting |
+| `--output-dir` | same as input | Directory to save output files |
 ---
 
 ## Environment variables
@@ -346,18 +444,6 @@ Check that procurement types are correct (`periodic_supply` vs `demand_driven`) 
 
 ---
 
-## Citation
-
-If you use NL2Sim in your research please cite:
-
-```
-@misc{nl2sim2026,
-  title  = {NL2Sim: Natural Language to Supply Chain Simulation},
-  author = {Surdeep Singh},
-  year   = {2026},
-  url    = {https://github.com/Suri597/NL2Sim}
-}
-```
 
 ---
 
