@@ -1,0 +1,157 @@
+{
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "lithium_cell": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 1772332,
+      "inventory_costs": {
+        "holding_cost": 7.66,
+        "shortage_cost": 29.315,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 216.939,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 28.0,
+          "b": 79.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "industrial_sensor"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "lithium_cell"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 22.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Sony Electronics",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 56.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1368120.0,
+          "b": 4031244.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2062.465,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 87.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ElectroParts"
+      ],
+      "facility": [
+        "Pilot Line",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ElectroParts",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 1,
+    "warm_up": 50
+  }
+}

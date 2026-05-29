@@ -1,0 +1,561 @@
+{
+  "config_info": [
+    {
+      "name": "Industrial Equipment",
+      "version": "1.0"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "carbon_fiber": 4,
+        "glass_fiber": 3,
+        "microprocessor": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "smartphone",
+      "bom": {
+        "microprocessor": 2,
+        "cooling_unit": 3,
+        "carbon_fiber": 4,
+        "glass_fiber": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 9.905,
+        "shortage_cost": 24.362,
+        "review_time": 26
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 44776.0,
+          "b": 77669.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 4.841,
+        "shortage_cost": 41.961,
+        "review_time": 3
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 907.56,
+          "b": 2081.64,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 0.208,
+        "shortage_cost": 0.0,
+        "review_time": 21
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 3708797,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 5.59,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 4155514,
+      "inventory_costs": {
+        "holding_cost": 3.602,
+        "shortage_cost": 6.607,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 325402,
+      "supplier_cost": 273.864,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 34.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 9.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 0,
+      "supplier_cost": 396.126,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 73.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 8.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 126724,
+      "supplier_cost": 335.502,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 66.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Quality Scanner",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.572,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "batching": {
+        "enabled": false,
+        "batch_size": 0,
+        "max_wait_time": 0
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 389.599,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 41.631,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      },
+      "operating_cost_per_time": 5.66
+    }
+  ],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "cooling_unit",
+        "glass_fiber",
+        "carbon_fiber",
+        "smartphone"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "microprocessor",
+          "cooling_unit",
+          "carbon_fiber",
+          "glass_fiber"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "resource_required": "Quality Scanner",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 29.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse",
+      "inventory_managed": [
+        "smartphone"
+      ],
+      "operation": {
+        "name": "",
+        "input": [],
+        "output": [],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 32.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1422271.0,
+          "b": 2981141.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4634.83,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 39.0,
+          "b": 83.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "HP Enterprise",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 30.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4276498.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 16.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1147.914,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 66.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "FastChip Corp.",
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "smartphone",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "warm_up": 30,
+    "replications": 10,
+    "random_seed": 88928
+  }
+}

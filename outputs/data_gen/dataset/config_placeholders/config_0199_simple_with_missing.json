@@ -1,0 +1,268 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "solder_paste": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 88074.0,
+          "b": 1097.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 28.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 0.134,
+        "shortage_cost": 8.934,
+        "review_time": 24
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 3358938,
+      "inventory_costs": {
+        "holding_cost": 9.931,
+        "shortage_cost": 42.514,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 710525,
+      "supplier_cost": 246.655,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 86.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "camera"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "solder_paste"
+        ],
+        "output": [
+          "camera"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 16.0,
+            "b": 27.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Broadcom Limited",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 19.0,
+          "b": 51.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4046530.0,
+          "b": 364293.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 25.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3214.795,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 82.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go."
+      ],
+      "facility": [
+        "Production Center",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Production Center",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "camera",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "warm_up": 50,
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

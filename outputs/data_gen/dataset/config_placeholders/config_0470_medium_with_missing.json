@@ -1,0 +1,436 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "battery_pack",
+      "bom": {
+        "plastic_pellet": 2,
+        "solder_paste": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "CPU",
+      "bom": {
+        "battery_pack": 1,
+        "plastic_pellet": 3,
+        "solder_paste": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 6.362,
+        "shortage_cost": "missing",
+        "review_time": 16
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 6697.0,
+          "b": 976.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 9.176,
+        "shortage_cost": 12.56,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "battery_pack",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4496812,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 196387,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 10.062,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 246.374,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 64.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 438.387,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 45.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "CPU",
+        "solder_paste",
+        "plastic_pellet",
+        "battery_pack"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "battery_pack",
+          "plastic_pellet",
+          "solder_paste"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 16.0,
+            "b": 23.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 32.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 146575.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 22.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1819.978,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Sony Electronics",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 26.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 554031.0,
+          "b": 1729938.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1432.337,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 55.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Main Factory",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 8.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "CPU",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

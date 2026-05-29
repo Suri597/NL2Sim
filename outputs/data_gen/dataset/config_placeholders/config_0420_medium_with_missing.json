@@ -1,0 +1,560 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "lithium_cell": 4,
+        "microprocessor": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "router",
+      "bom": {
+        "lithium_cell": 4,
+        "microprocessor": 2,
+        "motor_assembly": 4
+      }
+    },
+    {
+      "name": "EV_battery",
+      "bom": {
+        "motor_assembly": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 44761.0,
+          "b": 57810.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 4.318,
+        "shortage_cost": 12.84,
+        "review_time": 4
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 1174591,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 39.378,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4256538,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 25.381,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4783163,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 34.868,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Memory Star",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 275038,
+      "supplier_cost": 93.057,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 258.701,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 66.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 7.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 155959,
+      "supplier_cost": 70.85,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 73.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "microprocessor",
+        "motor_assembly",
+        "router"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "lithium_cell",
+          "microprocessor",
+          "motor_assembly"
+        ],
+        "output": [
+          "router"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 8.0,
+            "b": 29.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "motor_assembly",
+        "EV_battery"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "motor_assembly"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 26.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 32.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2636390.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 26.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2080.864,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "NXP Semiconductors",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 55.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 216516.0,
+          "b": 9735.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 500.697,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 30.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Memory Star",
+        "PolymerSource",
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Integration Center",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Memory Star",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "router",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "EV_battery",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 100,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

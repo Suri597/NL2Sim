@@ -1,0 +1,556 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "resin"
+    },
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "plastic_pellet": 4,
+        "resin": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "bom": {
+        "ceramic_substrate": 3,
+        "resin": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 77318.0,
+          "b": 7953.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 37.982,
+        "review_time": 22
+      }
+    },
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 1412.0,
+          "b": 188.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 21.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 33.654,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 246.09,
+          "b": 601.73,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 41.283,
+        "review_time": 5
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4590201,
+      "inventory_costs": {
+        "holding_cost": 5.301,
+        "shortage_cost": 29.644,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 952639,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 9.971,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 46.276,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 222.412,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 8.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 456.825,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 51.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "resin",
+        "plastic_pellet",
+        "camera"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "plastic_pellet",
+          "resin"
+        ],
+        "output": [
+          "camera"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 12.0,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "resin",
+        "GPU",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "ceramic_substrate",
+          "resin"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 9.0,
+            "b": 11.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 992789.0,
+          "b": 1022894.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4205.612,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 33.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 39.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 909459.0,
+          "b": 3354365.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 22.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4408.632,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37.0,
+          "b": 88.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlobalComponents",
+        "ElectroParts",
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Plant A",
+        "Pilot Line",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlobalComponents",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 10.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Plant A",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "camera",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "GPU",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "warm_up": 50,
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

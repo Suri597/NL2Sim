@@ -1,0 +1,159 @@
+{
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "aluminum_sheet": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 34368.0,
+          "b": 10065.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 27.838,
+        "review_time": 17
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 3332733
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 12.0
+        }
+      },
+      "supplier_cost": 92.096,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 89.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "aluminum_sheet"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "aluminum_sheet"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 23.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Siemens Digital",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3747769.0,
+          "b": 1002629.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1203.707,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 34.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Fab",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet"
+    },
+    {
+      "source": "Fab",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 1
+  }
+}

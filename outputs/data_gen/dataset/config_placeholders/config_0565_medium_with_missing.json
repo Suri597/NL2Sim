@@ -1,0 +1,643 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "memory_chip": 3,
+        "silicon_wafer": 5,
+        "steel_rod": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "steel_rod": 1,
+        "silicon_wafer": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "bom": {
+        "cooling_unit": 4,
+        "memory_chip": 4,
+        "silicon_wafer": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 2239.27,
+          "b": 6632.12,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 1.009,
+        "shortage_cost": "missing",
+        "review_time": 19
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 97454.0,
+          "b": 28444.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 28.308,
+        "review_time": 3
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 139064,
+      "inventory_costs": {
+        "holding_cost": 6.937,
+        "shortage_cost": 45.44,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 3473599,
+      "inventory_costs": {
+        "holding_cost": 4.695,
+        "shortage_cost": 2.778,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4280645,
+      "inventory_costs": {
+        "holding_cost": 0.793,
+        "shortage_cost": 4.886,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 29.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 321241,
+      "supplier_cost": 27.803,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 829358,
+      "supplier_cost": 458.135,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 32.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 455.42,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 51.0,
+          "b": 75.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Robot Arm",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.401,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": "missing",
+        "batch_size": "missing",
+        "max_wait_time": "missing"
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 305.552,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 40.881,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 17.527
+    }
+  ],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "silicon_wafer",
+        "EV_battery",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "steel_rod",
+          "silicon_wafer"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "resource_required": "Robot Arm",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 7.0,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "memory_chip",
+        "cooling_unit",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "cooling_unit",
+          "memory_chip",
+          "silicon_wafer"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 7.0,
+            "b": 28.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Samsung Electronics",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 49.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3164348.0,
+          "b": 454926.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 14.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4586.517,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Schneider Electric",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 24.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2375052.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 486.396,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 72.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co.",
+        "PolymerSource",
+        "Memory Star"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Fab",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 7.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "EV_battery",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "warm_up": "missing",
+    "replications": 1,
+    "random_seed": "missing"
+  }
+}

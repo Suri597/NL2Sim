@@ -1,0 +1,1029 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "copper_wire"
+    },
+    {
+      "name": "gold_wire"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "sensor_array",
+      "bom": {
+        "gold_wire": 5
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "copper_wire": 2,
+        "gold_wire": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "copper_wire": 4,
+        "sensor_array": 3,
+        "gold_wire": 1,
+        "cooling_unit": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "bom": {
+        "cooling_unit": 4
+      }
+    },
+    {
+      "name": "FPGA",
+      "bom": {
+        "gold_wire": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 741.79,
+          "b": 1999.96,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 1.966,
+        "shortage_cost": 27.315,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 7.35,
+        "shortage_cost": "missing",
+        "review_time": 21
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 2259604,
+      "inventory_costs": {
+        "holding_cost": 3.431,
+        "shortage_cost": 39.012,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 3161964,
+      "inventory_costs": {
+        "holding_cost": 8.396,
+        "shortage_cost": "missing",
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 436275,
+      "inventory_costs": {
+        "holding_cost": 4.719,
+        "shortage_cost": 4.602,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4831009,
+      "inventory_costs": {
+        "holding_cost": 3.084,
+        "shortage_cost": 24.371,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 3300037,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 23.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 338.72,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 32.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 11.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 408.965,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 684245,
+      "supplier_cost": 129.205,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 85.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 296.618,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 72.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 29.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 156357,
+      "supplier_cost": 116.522,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 53.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 822881,
+      "supplier_cost": 191.916,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 83.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 25.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 417.532,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 72.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 189.421,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 66.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Conveyor Belt",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.493,
+          "b": 6.288,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": "missing",
+        "batch_size": "missing",
+        "max_wait_time": "missing"
+      },
+      "failure": {
+        "enabled": "missing",
+        "uptime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 0.126
+    },
+    {
+      "name": "Quality Scanner",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.579,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": "missing",
+        "batch_size": "missing",
+        "max_wait_time": "missing"
+      },
+      "failure": {
+        "enabled": "missing",
+        "uptime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 3.682
+    }
+  ],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "gold_wire",
+        "sensor_array",
+        "cooling_unit",
+        "solar_panel",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "copper_wire",
+          "sensor_array",
+          "gold_wire",
+          "cooling_unit"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "resource_required": "Conveyor Belt",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 14.0,
+            "b": 15.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "cooling_unit"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "cooling_unit"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 14.0,
+            "b": 23.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "gold_wire",
+        "FPGA"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "gold_wire"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 10.0,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2935566.0,
+          "b": 576769.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1202.301,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 50.0,
+          "b": 62.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 55.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 507436.0,
+          "b": 121308.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4723.37,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 37.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "TechCorp",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 56.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1996383.0,
+          "b": 425874.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1464.949,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 48.0,
+          "b": 56.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks",
+        "GlobalComponents",
+        "MetalFab Inc.",
+        "ChipCo",
+        "FastChip Corp.",
+        "CarbonSupply Co.",
+        "ElectroParts",
+        "MegaSupply"
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "solar_panel",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "tablet",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "FPGA",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

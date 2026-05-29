@@ -1,0 +1,164 @@
+{
+  "raw_materials": [
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "silicon_wafer": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1499.12,
+          "b": 2976.4
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.294,
+        "shortage_cost": 28.49,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 1445543,
+      "inventory_costs": {
+        "holding_cost": 8.957,
+        "shortage_cost": 23.67,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 219.377,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 51.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "industrial_sensor",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "silicon_wafer"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 2.0,
+            "b": 24.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Schneider Electric",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 40.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 722995.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 19.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1255.538,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 10
+  }
+}

@@ -1,0 +1,268 @@
+{
+  "config_info": [
+    {
+      "name": "CPU Supply Chain",
+      "version": "1.0"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "router",
+      "bom": {
+        "glass_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 0.0,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 4512319,
+      "inventory_costs": {
+        "holding_cost": 5.301,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 24.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 765774,
+      "supplier_cost": 20.577,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 65.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "router",
+        "glass_fiber"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "glass_fiber"
+        ],
+        "output": [
+          "router"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 4.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse",
+      "inventory_managed": [
+        "router"
+      ],
+      "operation": {
+        "name": "",
+        "input": [],
+        "output": [],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 33.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2063267.0,
+          "b": 3553048.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 14.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 292.713,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 61.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Plant A",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Plant A",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "router",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 100,
+    "warm_up": 50,
+    "replications": 10,
+    "random_seed": 45082
+  }
+}

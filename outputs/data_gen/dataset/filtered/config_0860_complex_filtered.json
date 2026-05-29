@@ -1,0 +1,426 @@
+{
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "display_panel",
+      "bom": {
+        "lithium_cell": 2,
+        "carbon_fiber": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "carbon_fiber": 2,
+        "lithium_cell": 3
+      }
+    },
+    {
+      "name": "drone",
+      "bom": {
+        "display_panel": 4
+      }
+    },
+    {
+      "name": "camera",
+      "bom": {
+        "lithium_cell": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 28096.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.288,
+        "shortage_cost": 6.684,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 3188263
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 1552513,
+      "inventory_costs": {
+        "shortage_cost": 10.46,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 1226966,
+      "inventory_costs": {
+        "holding_cost": 1.05,
+        "shortage_cost": 32.468,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 1568337,
+      "inventory_costs": {
+        "holding_cost": 7.697,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "supplier_cost": 124.645,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 28.0,
+          "b": 49.0
+        }
+      }
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 388.605,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 18.0,
+          "b": 88.0
+        }
+      },
+      "supplier_capacity": 409171
+    }
+  ],
+  "resource": [
+    {
+      "name": "Test Equipment",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.128
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 70.683
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 9.567
+          }
+        }
+      },
+      "operating_cost_per_time": 18.757
+    },
+    {
+      "name": "Laser Cutter",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 3.295
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 42,
+        "max_wait_time": 9.086
+      },
+      "operating_cost_per_time": 2.842
+    }
+  ],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "solar_panel",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "carbon_fiber",
+          "lithium_cell"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 7.0,
+            "b": 23.0
+          }
+        },
+        "resource_required": "Test Equipment"
+      }
+    },
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "display_panel"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "display_panel"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 6.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "camera"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "lithium_cell"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 23.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 31.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 354657.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 22.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1321.97,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 42.0
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 32.0,
+          "b": 38.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4531175.0,
+          "b": 164587.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2893.76,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0
+        }
+      }
+    },
+    {
+      "name": "HP Enterprise",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 53.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1950192.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 26.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2161.611,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 53.0,
+          "b": 79.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co.",
+        "Process Go."
+      ],
+      "facility": [
+        "Pilot Line",
+        "Plant A",
+        "Main Factory",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "drone"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "camera"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 1
+  }
+}

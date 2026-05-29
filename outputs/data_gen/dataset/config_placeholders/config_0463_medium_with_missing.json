@@ -1,0 +1,390 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "sensor_array",
+      "bom": {
+        "carbon_fiber": 1,
+        "glass_fiber": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "glass_fiber": 4,
+        "sensor_array": 1,
+        "carbon_fiber": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 3519.64,
+          "b": 7996.2,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 6.453,
+        "review_time": 30
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 62827.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 27.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 2.086,
+        "shortage_cost": 32.801,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 2544766,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 35.905,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 3332075,
+      "inventory_costs": {
+        "holding_cost": 2.922,
+        "shortage_cost": "missing",
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ChipCo",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 28.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 807080,
+      "supplier_cost": 292.271,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 34.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 26.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 637945,
+      "supplier_cost": 70.781,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 61.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "carbon_fiber",
+        "glass_fiber",
+        "sensor_array",
+        "FPGA"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "glass_fiber",
+          "sensor_array",
+          "carbon_fiber"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 10.0,
+            "b": 21.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Broadcom Limited",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4593415.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 15.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2476.679,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 75.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ChipCo",
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ChipCo",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 11.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 4.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "FPGA",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "raw_materials": [
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "memory_chip": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 6.336,
+        "shortage_cost": 17.088,
+        "review_time": 29
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 1255906,
+      "inventory_costs": {
+        "holding_cost": 6.046,
+        "shortage_cost": 39.199,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "supplier_cost": 67.915,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "supplier_capacity": 625312
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "memory_chip"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "memory_chip"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 1.0,
+            "b": 17.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 757981.0,
+          "b": 2010348.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3619.704,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

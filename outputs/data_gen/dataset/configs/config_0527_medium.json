@@ -1,0 +1,515 @@
+{
+  "config_info": [
+    {
+      "name": "Consumer Goods Supply",
+      "version": "1.0"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "gold_wire"
+    },
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "circuit_board",
+      "bom": {
+        "gold_wire": 3,
+        "lithium_cell": 1,
+        "microprocessor": 2
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "lithium_cell": 3,
+        "gold_wire": 2,
+        "circuit_board": 3,
+        "microprocessor": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 4.691,
+        "shortage_cost": 43.729,
+        "review_time": 9
+      }
+    },
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 77792.0,
+          "b": 2171.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 29.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 0.702,
+        "shortage_cost": 0.0,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 47514.0,
+          "b": 128.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 6.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 7.742,
+        "shortage_cost": 10.472,
+        "review_time": 16
+      }
+    },
+    {
+      "name": "circuit_board",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 1515807,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 39.471,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 3146628,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 20.662,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ChipCo",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 195722,
+      "supplier_cost": 476.607,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 76.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 10.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 0,
+      "supplier_cost": 139.509,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 17.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 331983,
+      "supplier_cost": 468.749,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 31.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.412,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "batching": {
+        "enabled": false,
+        "batch_size": 0,
+        "max_wait_time": 0
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 128.581,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 18.186,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      },
+      "operating_cost_per_time": 6.378
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "gold_wire",
+        "circuit_board",
+        "lithium_cell",
+        "solar_panel"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "lithium_cell",
+          "gold_wire",
+          "circuit_board",
+          "microprocessor"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 9.0,
+            "b": 20.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse",
+      "inventory_managed": [
+        "solar_panel"
+      ],
+      "operation": {
+        "name": "",
+        "input": [],
+        "output": [],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 38.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4766021.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4522.288,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 89.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ChipCo",
+        "GlobalComponents",
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Main Factory",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ChipCo",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 7.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "solar_panel",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "warm_up": 0,
+    "replications": 5,
+    "random_seed": 91455
+  }
+}

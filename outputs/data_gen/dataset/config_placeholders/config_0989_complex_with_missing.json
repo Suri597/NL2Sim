@@ -1,0 +1,730 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "power_module",
+      "bom": {
+        "memory_chip": 3,
+        "solder_paste": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "solder_paste": 1,
+        "memory_chip": 4
+      }
+    },
+    {
+      "name": "FPGA",
+      "bom": {
+        "power_module": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 21188.0,
+          "b": 5445.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 44.266,
+        "review_time": 18
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 2637.83,
+          "b": 8629.07,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 1.967,
+        "shortage_cost": "missing",
+        "review_time": 9
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 314057,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4002903,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4566015,
+      "inventory_costs": {
+        "holding_cost": 7.565,
+        "shortage_cost": "missing",
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 27.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 284472,
+      "supplier_cost": 258.573,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 50.0,
+          "b": 68.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 233299,
+      "supplier_cost": 208.452,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 86.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 15.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 174154,
+      "supplier_cost": 133.69,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 46.0,
+          "b": 50.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 5.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 192388,
+      "supplier_cost": 160.337,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 86.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 650554,
+      "supplier_cost": 185.153,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 31.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 117.352,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 38.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Conveyor Belt",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.742,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": "missing",
+        "batch_size": "missing",
+        "max_wait_time": "missing"
+      },
+      "failure": {
+        "enabled": "missing",
+        "uptime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 1.156
+    }
+  ],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "memory_chip",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "solder_paste",
+          "memory_chip"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "resource_required": "Conveyor Belt",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 17.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "power_module",
+        "FPGA"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "power_module"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 29.0,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Sony Electronics",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2820774.0,
+          "b": 4091508.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3017.28,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 60.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Infineon Technologies",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 43.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2816724.0,
+          "b": 283415.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 855.059,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "ChipCo",
+        "PolymerSource",
+        "MetalFab Inc.",
+        "GlobalComponents",
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Production Center",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 13.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 7.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Production Center",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "medical_device",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Production Center",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "FPGA",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "warm_up": 50,
+    "replications": 5,
+    "random_seed": "missing"
+  }
+}

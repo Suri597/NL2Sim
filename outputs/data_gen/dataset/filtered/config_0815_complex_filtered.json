@@ -1,0 +1,346 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "frame_structure",
+      "bom": {
+        "glass_fiber": 1,
+        "memory_chip": 5
+      }
+    },
+    {
+      "name": "heat_sink",
+      "bom": {
+        "memory_chip": 3,
+        "glass_fiber": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "heat_sink": 1,
+        "frame_structure": 4,
+        "memory_chip": 2,
+        "glass_fiber": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2235.7,
+          "b": 6571.88
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 33.409,
+        "review_time": 3
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 63360.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 9.962,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 1619274,
+      "inventory_costs": {
+        "shortage_cost": 34.04,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 3471309,
+      "inventory_costs": {
+        "holding_cost": 0.467,
+        "shortage_cost": 1.431,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 3149984,
+      "inventory_costs": {
+        "shortage_cost": 44.514,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "supplier_cost": 241.635,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 89.0
+        }
+      },
+      "supplier_capacity": 275623
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 280.281,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 70.0
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "supplier_cost": 234.337,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_capacity": 901371
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.544,
+          "b": 6.588
+        }
+      },
+      "operating_cost_per_time": 13.089
+    },
+    {
+      "name": "Assembly Line",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 3.883
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 229.488
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 31.48
+          }
+        }
+      },
+      "operating_cost_per_time": 6.85
+    }
+  ],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "frame_structure",
+        "memory_chip",
+        "heat_sink",
+        "glass_fiber",
+        "EV_battery"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "heat_sink",
+          "frame_structure",
+          "memory_chip",
+          "glass_fiber"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 3.0
+          }
+        },
+        "resource_required": "Welding Station"
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 18.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4051378.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 22.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3231.578,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 52.0,
+          "b": 78.0
+        }
+      }
+    },
+    {
+      "name": "Infineon Technologies",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2157232.0,
+          "b": 643718.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 808.161,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc.",
+        "ChipCo",
+        "Memory Star"
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 1
+  }
+}

@@ -1,0 +1,603 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "gold_wire"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "gold_wire": 1,
+        "plastic_pellet": 3,
+        "ceramic_substrate": 3
+      }
+    },
+    {
+      "name": "smartphone",
+      "bom": {
+        "ceramic_substrate": 4,
+        "gold_wire": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 63003.0,
+          "b": 1152.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 6.791,
+        "shortage_cost": "missing",
+        "review_time": 29
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 4346.45,
+          "b": 7330.33,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 7.088,
+        "shortage_cost": 24.463,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 5.583,
+        "review_time": 11
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4272836,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 25.655,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 2921059,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 15.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 196.872,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 26.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 329.951,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 42.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 13.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 180421,
+      "supplier_cost": 219.882,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 58.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.864,
+          "b": 9.349,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": "missing",
+        "batch_size": "missing",
+        "max_wait_time": "missing"
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 248.349,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 12.752,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 1.881
+    }
+  ],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "SoC",
+        "gold_wire",
+        "plastic_pellet",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "gold_wire",
+          "plastic_pellet",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 27.0,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "gold_wire",
+        "ceramic_substrate",
+        "smartphone"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "ceramic_substrate",
+          "gold_wire"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 10.0,
+            "b": 14.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Dell Technologies",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1942553.0,
+          "b": 450961.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 16.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2679.68,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 76.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Ross Associates",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 19.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 207743.0,
+          "b": 383873.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 10.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 162.419,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 45.0,
+          "b": 46.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PrecisionParts",
+        "BatteryTech",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Production Center",
+        "Integration Center",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PrecisionParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Production Center",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "SoC",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "smartphone",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "warm_up": "missing",
+    "replications": 1,
+    "random_seed": "missing"
+  }
+}

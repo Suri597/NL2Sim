@@ -1,0 +1,294 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "resin"
+    },
+    {
+      "name": "solder_paste"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "resin": 1,
+        "solder_paste": 3,
+        "glass_fiber": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 99106.0,
+          "b": 1232.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 17.0
+        }
+      }
+    },
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 99081.0,
+          "b": 22107.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 8.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.022,
+        "shortage_cost": 20.234,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 82382.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 11.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.578,
+        "shortage_cost": 16.768,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 3913604,
+      "inventory_costs": {
+        "shortage_cost": 11.643,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 86.961,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 83.0
+        }
+      },
+      "supplier_capacity": 371049
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 20.0
+        }
+      },
+      "supplier_cost": 219.243,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 41.0,
+          "b": 77.0
+        }
+      },
+      "supplier_capacity": 67784
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 22.0
+        }
+      },
+      "supplier_cost": 78.157,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 76.0
+        }
+      },
+      "supplier_capacity": 332149
+    }
+  ],
+  "resource": [
+    {
+      "name": "Test Equipment",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.676
+        }
+      },
+      "operating_cost_per_time": 16.95
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "resin",
+        "glass_fiber",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "resin",
+          "solder_paste",
+          "glass_fiber"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 1.0,
+            "b": 27.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 27.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2293864.0,
+          "b": 4884377.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 22.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3929.136,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 40.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ElectroParts",
+        "NanoMaterials Inc.",
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Main Factory",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ElectroParts",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0
+        }
+      }
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "medical_device"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 1,
+    "warm_up": 50
+  }
+}

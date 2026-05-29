@@ -1,0 +1,256 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    },
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "epoxy_compound": 2,
+        "silicon_wafer": 3,
+        "microprocessor": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 9.607,
+        "shortage_cost": 45.117,
+        "review_time": 9
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2936.0,
+          "b": 8587.15
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 9.895,
+        "review_time": 13
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4053.67,
+          "b": 10994.54
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 9.683,
+        "shortage_cost": 23.157,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 3562766,
+      "inventory_costs": {
+        "shortage_cost": 0.851,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Memory Star",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "supplier_cost": 416.737,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37.0,
+          "b": 85.0
+        }
+      },
+      "supplier_capacity": 131853
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 19.0
+        }
+      },
+      "supplier_cost": 177.92,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 78.0
+        }
+      },
+      "supplier_capacity": 533733
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "supplier_cost": 308.851,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 74.0
+        }
+      },
+      "supplier_capacity": 272309
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "silicon_wafer",
+        "industrial_sensor",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "epoxy_compound",
+          "silicon_wafer",
+          "microprocessor"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 18.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3876041.0,
+          "b": 688124.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 22.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3731.719,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 37.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Memory Star",
+        "GlassCore Ltd.",
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Integration Center",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Memory Star",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 10
+  }
+}

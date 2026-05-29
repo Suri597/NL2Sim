@@ -1,0 +1,515 @@
+{
+  "config_info": [
+    {
+      "name": "Medical Device Manufacturing",
+      "version": "1.0"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "aluminum_sheet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "display_panel",
+      "bom": {
+        "aluminum_sheet": 3,
+        "carbon_fiber": 5,
+        "microprocessor": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "CPU",
+      "bom": {
+        "microprocessor": 1,
+        "carbon_fiber": 4,
+        "display_panel": 2,
+        "aluminum_sheet": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 70003.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 11.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 0.0,
+        "review_time": 13
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3847.0,
+          "b": 30653.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 26.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 8.077,
+        "shortage_cost": 31.603,
+        "review_time": 18
+      }
+    },
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 21291.0,
+          "b": 6192.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 2.422,
+        "shortage_cost": 29.333,
+        "review_time": 29
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 2912509,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 3285730,
+      "inventory_costs": {
+        "holding_cost": 4.569,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ChipCo",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 954464,
+      "supplier_cost": 480.446,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 79.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 12.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 0,
+      "supplier_cost": 393.556,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 49.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 24.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 0,
+      "supplier_cost": 9.744,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.474,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 18,
+        "max_wait_time": 7.83
+      },
+      "failure": {
+        "enabled": false,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      },
+      "operating_cost_per_time": 16.048
+    }
+  ],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "microprocessor",
+        "display_panel",
+        "CPU",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "microprocessor",
+          "carbon_fiber",
+          "display_panel",
+          "aluminum_sheet"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 10.0,
+            "b": 21.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse",
+      "inventory_managed": [
+        "CPU"
+      ],
+      "operation": {
+        "name": "",
+        "input": [],
+        "output": [],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Dell Technologies",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 48.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3343668.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 28.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1479.523,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 58.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ChipCo",
+        "FastChip Corp.",
+        "BatteryTech"
+      ],
+      "facility": [
+        "Fab",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ChipCo",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 11.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "CPU",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 200,
+    "warm_up": 0,
+    "replications": 1,
+    "random_seed": 93890
+  }
+}

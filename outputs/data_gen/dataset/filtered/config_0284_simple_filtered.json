@@ -1,0 +1,152 @@
+{
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "ceramic_substrate": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 39.253,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 974110
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 15.0
+        }
+      },
+      "supplier_cost": 114.248,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 48.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "camera",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "ceramic_substrate"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 12.0,
+            "b": 20.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 42.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2517246.0,
+          "b": 71344.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 15.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 3295.799,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 53.0,
+          "b": 70.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource"
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "camera"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "replications": 10,
+    "warm_up": 30
+  }
+}

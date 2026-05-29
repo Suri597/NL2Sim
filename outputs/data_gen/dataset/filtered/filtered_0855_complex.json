@@ -1,0 +1,294 @@
+{
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    },
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "frame_structure",
+      "bom": {
+        "aluminum_sheet": 2
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "carbon_fiber": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "lens_assembly": 3,
+        "carbon_fiber": 4,
+        "aluminum_sheet": 2,
+        "frame_structure": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 72864.0,
+          "b": 6250.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 46.355,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3181.56,
+          "b": 3853.23
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.303,
+        "shortage_cost": 30.222,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 2673224,
+      "inventory_costs": {
+        "holding_cost": 8.547,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 2373425,
+      "inventory_costs": {
+        "holding_cost": 8.028,
+        "shortage_cost": 43.434,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 3077197,
+      "inventory_costs": {
+        "holding_cost": 7.601,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 370.417,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 68.0
+        }
+      },
+      "supplier_capacity": 842472
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 25.0
+        }
+      },
+      "supplier_cost": 153.238,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 77.0
+        }
+      },
+      "supplier_capacity": 757684
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 7.0
+        }
+      },
+      "supplier_cost": 238.618,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 46.0
+        }
+      },
+      "supplier_capacity": 466454
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.553
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 84,
+        "max_wait_time": 4.379
+      },
+      "operating_cost_per_time": 13.152
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "frame_structure",
+        "carbon_fiber",
+        "lens_assembly",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "lens_assembly",
+          "carbon_fiber",
+          "aluminum_sheet",
+          "frame_structure"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 18.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Schneider Electric",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 202138.0,
+          "b": 1452729.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3966.783,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "GlobalComponents",
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Main Factory",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "medical_device"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 10
+  }
+}

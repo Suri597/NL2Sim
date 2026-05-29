@@ -1,0 +1,268 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "ceramic_substrate": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 2041.5,
+          "b": 2825.24,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 3.077,
+        "shortage_cost": 10.103,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 1917883,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 23.51,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 23.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 22.627,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 38.0,
+          "b": 52.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "ceramic_substrate"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 11.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 56.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4237404.0,
+          "b": 1046489.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 1591.724,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 62.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource"
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "solar_panel",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

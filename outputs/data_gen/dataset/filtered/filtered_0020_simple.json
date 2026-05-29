@@ -1,0 +1,156 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "tablet",
+      "bom": {
+        "plastic_pellet": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 3752967,
+      "inventory_costs": {
+        "holding_cost": 2.794,
+        "shortage_cost": 16.793,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 165.042,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 59.0
+        }
+      },
+      "supplier_capacity": 656751
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "plastic_pellet"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "plastic_pellet"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 2.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3467221.0,
+          "b": 294858.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 6.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1345.091,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 78.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 8.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "tablet"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 200,
+    "replications": 5
+  }
+}

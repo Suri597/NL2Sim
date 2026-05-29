@@ -1,0 +1,153 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "microprocessor": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 32.426,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 4844615,
+      "inventory_costs": {
+        "holding_cost": 7.574,
+        "shortage_cost": 13.823,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "supplier_cost": 58.662,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "laptop"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "microprocessor"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 13.0,
+            "b": 25.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 32.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1014954.0,
+          "b": 3644170.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 12.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 778.859,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "laptop"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 500,
+    "replications": 10
+  }
+}

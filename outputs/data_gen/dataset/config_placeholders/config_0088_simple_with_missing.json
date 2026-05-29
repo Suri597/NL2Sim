@@ -1,0 +1,268 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "ceramic_substrate": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 166.96,
+          "b": 422.75,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 7.179,
+        "shortage_cost": 44.257,
+        "review_time": 4
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 1816008,
+      "inventory_costs": {
+        "holding_cost": 0.853,
+        "shortage_cost": "missing",
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 340403,
+      "supplier_cost": 70.605,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "laptop",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "ceramic_substrate"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 15.0,
+            "b": 18.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Apple Supply",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 59.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2619828.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 14.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3529.737,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 33.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 12.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "laptop",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 365,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

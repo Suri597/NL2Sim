@@ -1,0 +1,164 @@
+{
+  "raw_materials": [
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "smartphone",
+      "bom": {
+        "memory_chip": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 54783.0,
+          "b": 88320.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 20.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.695,
+        "shortage_cost": 40.59,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 3796600,
+      "inventory_costs": {
+        "holding_cost": 5.923,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_cost": 175.445,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_capacity": 119514
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "smartphone"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "memory_chip"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 14.0,
+            "b": 15.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Schneider Electric",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 45.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 871066.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3245.181,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 57.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "smartphone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 5
+  }
+}

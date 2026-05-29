@@ -1,0 +1,647 @@
+{
+  "config_info": [
+    {
+      "name": "Semiconductor Production",
+      "version": "1.0"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "aluminum_sheet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "microprocessor": 1
+      }
+    },
+    {
+      "name": "sensor_array",
+      "bom": {
+        "aluminum_sheet": 4,
+        "microprocessor": 2
+      }
+    },
+    {
+      "name": "display_panel",
+      "bom": {
+        "aluminum_sheet": 1,
+        "microprocessor": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "display_panel": 3,
+        "sensor_array": 3,
+        "motor_assembly": 1,
+        "microprocessor": 1,
+        "aluminum_sheet": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 10.541,
+        "review_time": 24
+      }
+    },
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 10597.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 18.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 2.45,
+        "review_time": 23
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 3285858,
+      "inventory_costs": {
+        "holding_cost": 8.54,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 3171794,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 6.735,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 365386,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 125165,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 16.015,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 243535,
+      "supplier_cost": 266.942,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 68.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 13.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 881280,
+      "supplier_cost": 332.827,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 39.0,
+          "b": 73.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 19.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 0,
+      "supplier_cost": 309.3,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 55.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 24.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 332369,
+      "supplier_cost": 109.61,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 32.0,
+          "b": 81.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Injection Molder",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.48,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 53,
+        "max_wait_time": 14.868
+      },
+      "failure": {
+        "enabled": false,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      },
+      "operating_cost_per_time": 8.724
+    }
+  ],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "aluminum_sheet",
+        "microprocessor",
+        "display_panel",
+        "sensor_array",
+        "motor_assembly"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "display_panel",
+          "sensor_array",
+          "motor_assembly",
+          "microprocessor",
+          "aluminum_sheet"
+        ],
+        "output": [
+          "drone"
+        ],
+        "resource_required": "Injection Molder",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 27.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse",
+      "inventory_managed": [
+        "drone"
+      ],
+      "operation": {
+        "name": "",
+        "input": [],
+        "output": [],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 50.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 92542.0,
+          "b": 838283.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 22.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4807.102,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 51.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "Sony Electronics",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 245044.0,
+          "b": 1740905.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2782.238,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 71.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "BatteryTech",
+        "FastChip Corp.",
+        "ElectroParts",
+        "ChipCo"
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "BatteryTech",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 6.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "drone",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "warm_up": 0,
+    "replications": 10,
+    "random_seed": 41536
+  }
+}

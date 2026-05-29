@@ -1,0 +1,165 @@
+{
+  "raw_materials": [
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "carbon_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 364.45,
+          "b": 1930.13
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 6.825,
+        "shortage_cost": 33.783,
+        "review_time": 13
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 1179714,
+      "inventory_costs": {
+        "shortage_cost": 41.044,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 448.537,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 64.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "carbon_fiber"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 28.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 23.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1872676.0,
+          "b": 4402882.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 24.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2948.642,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 86.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Plant A",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "Plant A",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

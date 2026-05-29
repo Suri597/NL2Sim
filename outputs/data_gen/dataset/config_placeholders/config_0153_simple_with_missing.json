@@ -1,0 +1,268 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "plastic_pellet": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 58373.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 29.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 23.185,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4604378,
+      "inventory_costs": {
+        "holding_cost": 9.304,
+        "shortage_cost": 11.772,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 211.181,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 61.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "FPGA",
+        "plastic_pellet"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "plastic_pellet"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 1.0,
+            "b": 20.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Dell Technologies",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 32.0,
+          "b": 46.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 122735.0,
+          "b": 947067.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3790.144,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Integration Center",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "FPGA",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 200,
+    "warm_up": 50,
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

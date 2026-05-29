@@ -1,0 +1,561 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "glass_fiber": 3,
+        "memory_chip": 1,
+        "carbon_fiber": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "GPU",
+      "bom": {
+        "motor_assembly": 2,
+        "carbon_fiber": 4,
+        "glass_fiber": 1,
+        "memory_chip": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 3.462,
+        "shortage_cost": 45.62,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6015.0,
+          "b": 12044.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 23.269,
+        "review_time": 24
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17901.0,
+          "b": 42319.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 20.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 7.018,
+        "shortage_cost": "missing",
+        "review_time": 9
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 792473,
+      "inventory_costs": {
+        "holding_cost": 8.065,
+        "shortage_cost": 38.849,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 1451305,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 5.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 520561,
+      "supplier_cost": 363.354,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 67.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 19.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 73113,
+      "supplier_cost": 331.999,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 43.0,
+          "b": 71.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 739002,
+      "supplier_cost": 488.461,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 42.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Quality Scanner",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.139,
+          "b": 8.929,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": "missing",
+        "batch_size": "missing",
+        "max_wait_time": "missing"
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 341.013,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 13.901,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 7.258
+    }
+  ],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "GPU",
+        "memory_chip",
+        "glass_fiber",
+        "carbon_fiber",
+        "motor_assembly"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "motor_assembly",
+          "carbon_fiber",
+          "glass_fiber",
+          "memory_chip"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 15.0,
+            "b": 21.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 50.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4261519.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4714.181,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 23.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 844171.0,
+          "b": 1264115.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1094.36,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 33.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "ElectroParts",
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 10.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "GPU",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

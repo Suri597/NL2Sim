@@ -1,0 +1,737 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "epoxy_compound"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "battery_pack",
+      "bom": {
+        "silicon_wafer": 2,
+        "epoxy_compound": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "router",
+      "bom": {
+        "battery_pack": 4,
+        "epoxy_compound": 3
+      }
+    },
+    {
+      "name": "solar_panel",
+      "bom": {
+        "silicon_wafer": 1,
+        "epoxy_compound": 2,
+        "battery_pack": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "missing",
+        "parameters": {
+          "a": 4886.3,
+          "b": 8172.19,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 8.856,
+        "shortage_cost": "missing",
+        "review_time": 1
+      }
+    },
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 88132.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 0.893,
+        "shortage_cost": 40.993,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "battery_pack",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 3989637,
+      "inventory_costs": {
+        "holding_cost": 2.7,
+        "shortage_cost": 39.389,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 1560523,
+      "inventory_costs": {
+        "holding_cost": 2.526,
+        "shortage_cost": "missing",
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 2572553,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": 3.694,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 25.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 360837,
+      "supplier_cost": 374.291,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 15.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 136919,
+      "supplier_cost": 27.133,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 414.184,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 87.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 17.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 186.91,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 5.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": "missing",
+      "supplier_cost": 304.135,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 68.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Assembly Line",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.298,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 29,
+        "max_wait_time": 12.253
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 261.489,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 46.2,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 13.041
+    },
+    {
+      "name": "Conveyor Belt",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.38,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 55,
+        "max_wait_time": 14.84
+      },
+      "failure": {
+        "enabled": "missing",
+        "uptime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        },
+        "downtime": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      },
+      "operating_cost_per_time": 7.922
+    }
+  ],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "router",
+        "battery_pack",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "battery_pack",
+          "epoxy_compound"
+        ],
+        "output": [
+          "router"
+        ],
+        "resource_required": "Assembly Line",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 2.0,
+            "b": 26.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "battery_pack",
+        "epoxy_compound",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "silicon_wafer",
+          "epoxy_compound",
+          "battery_pack"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 14.0,
+            "b": 26.0,
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 37.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12214.0,
+          "b": 1076704.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 26.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 226.997,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "name": "Schneider Electric",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1837000.0,
+          "b": 46933.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 17.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4656.18,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 46.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "Memory Star",
+        "ChipCo",
+        "GlassCore Ltd.",
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Assembly Hub",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 8.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "router",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "solar_panel",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "warm_up": "missing",
+    "replications": 10,
+    "random_seed": "missing"
+  }
+}

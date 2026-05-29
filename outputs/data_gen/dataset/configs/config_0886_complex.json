@@ -1,0 +1,850 @@
+{
+  "config_info": [
+    {
+      "name": "Pharmaceutical Supply",
+      "version": "1.0"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    },
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "power_module",
+      "bom": {
+        "ceramic_substrate": 5
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "aluminum_sheet": 2,
+        "ceramic_substrate": 5
+      }
+    },
+    {
+      "name": "heat_sink",
+      "bom": {}
+    }
+  ],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "heat_sink": 1,
+        "lens_assembly": 4
+      }
+    },
+    {
+      "name": "GPU",
+      "bom": {
+        "power_module": 1,
+        "ceramic_substrate": 4
+      }
+    },
+    {
+      "name": "CPU",
+      "bom": {
+        "aluminum_sheet": 2,
+        "power_module": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1814.24,
+          "b": 3148.2,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 2.148,
+        "shortage_cost": 0.0,
+        "review_time": 16
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 3.078,
+        "shortage_cost": 38.955,
+        "review_time": 16
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 4432912,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 10.026,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 4968220,
+      "inventory_costs": {
+        "holding_cost": 4.762,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 1265591,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 36.601,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 1168830,
+      "inventory_costs": {
+        "holding_cost": 9.721,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 3938152,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 37.53,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 1207657,
+      "inventory_costs": {
+        "holding_cost": 6.886,
+        "shortage_cost": 46.329,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 0,
+      "supplier_cost": 359.631,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 32.0,
+          "b": 88.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 506397,
+      "supplier_cost": 307.977,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 51.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 10.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 883289,
+      "supplier_cost": 64.774,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 54.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 617227,
+      "supplier_cost": 166.332,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 29.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Injection Molder",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.551,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "batching": {
+        "enabled": false,
+        "batch_size": 0,
+        "max_wait_time": 0
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 129.122,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 28.56,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      },
+      "operating_cost_per_time": 17.2
+    }
+  ],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "drone",
+        "lens_assembly"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "heat_sink",
+          "lens_assembly"
+        ],
+        "output": [
+          "drone"
+        ],
+        "resource_required": "Injection Molder",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 9.0,
+            "b": 12.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "power_module",
+        "GPU",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "power_module",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 7.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "CPU",
+        "power_module"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "aluminum_sheet",
+          "power_module"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 14.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse",
+      "inventory_managed": [
+        "drone"
+      ],
+      "operation": {
+        "name": "",
+        "input": [],
+        "output": [],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 53.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 223801.0,
+          "b": 58761.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 27.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1773.093,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 41.0,
+          "b": 53.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "Samsung Electronics",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 58.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1618165.0,
+          "b": 4269294.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 25.536,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 38.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3613876.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3020.025,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "FastChip Corp.",
+        "GlobalComponents",
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Fab",
+        "Assembly Hub",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Fab",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "drone",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "GPU",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "CPU",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "warm_up": 50,
+    "replications": 10,
+    "random_seed": 54658
+  }
+}

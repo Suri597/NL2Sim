@@ -1,0 +1,162 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "plastic_pellet": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 9092.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.914,
+        "review_time": 6
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 854163,
+      "inventory_costs": {
+        "shortage_cost": 21.703,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 15.0
+        }
+      },
+      "supplier_cost": 164.587,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0
+        }
+      },
+      "supplier_capacity": 752255
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "plastic_pellet",
+        "camera"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "plastic_pellet"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 29.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1914887.0,
+          "b": 216739.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2583.675,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Integration Center",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "camera"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 365,
+    "replications": 5
+  }
+}

@@ -1,0 +1,348 @@
+{
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    },
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "copper_wire"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "glass_fiber": 4,
+        "copper_wire": 4,
+        "aluminum_sheet": 4
+      }
+    },
+    {
+      "name": "smartphone",
+      "bom": {
+        "aluminum_sheet": 3,
+        "glass_fiber": 4,
+        "copper_wire": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 14916.0,
+          "b": 660.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      }
+    },
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 8.983,
+        "shortage_cost": 1.27,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 1842442,
+      "inventory_costs": {
+        "holding_cost": 7.623,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 2842929,
+      "inventory_costs": {
+        "holding_cost": 5.117,
+        "shortage_cost": 11.526,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 111.719,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 64.0
+        }
+      },
+      "supplier_capacity": 5187
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 22.0
+        }
+      },
+      "supplier_cost": 56.824,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 76.0
+        }
+      },
+      "supplier_capacity": 611268
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 16.0
+        }
+      },
+      "supplier_cost": 66.967,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 69.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 8.229
+        }
+      },
+      "operating_cost_per_time": 17.727
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "glass_fiber",
+        "FPGA",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "glass_fiber",
+          "copper_wire",
+          "aluminum_sheet"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 28.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "glass_fiber",
+        "smartphone",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "aluminum_sheet",
+          "glass_fiber",
+          "copper_wire"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 15.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 57.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2761307.0,
+          "b": 383646.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 22.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2169.406,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 19.0,
+          "b": 69.0
+        }
+      }
+    },
+    {
+      "name": "NXP Semiconductors",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1934459.0,
+          "b": 323983.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 26.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4068.952,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 50.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlobalComponents",
+        "GlassCore Ltd.",
+        "ChipCo"
+      ],
+      "facility": [
+        "Main Factory",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlobalComponents",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet"
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 10.0
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "FPGA"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "smartphone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "replications": 5
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "ceramic_substrate": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4840.66,
+          "b": 14069.13
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.829,
+        "shortage_cost": 34.516,
+        "review_time": 11
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 4366892,
+      "inventory_costs": {
+        "shortage_cost": 22.953,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 499.141,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "ceramic_substrate"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 26.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Samsung Electronics",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 51.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2680885.0,
+          "b": 4593530.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 20.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1057.944,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 27.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Main Factory",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 10
+  }
+}

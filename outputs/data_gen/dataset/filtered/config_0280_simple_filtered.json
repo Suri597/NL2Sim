@@ -1,0 +1,159 @@
+{
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "lithium_cell": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4351.22,
+          "b": 11877.83
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 47.974,
+        "review_time": 26
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 159002,
+      "inventory_costs": {
+        "holding_cost": 5.695,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 22.0
+        }
+      },
+      "supplier_cost": 435.04,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 58.0
+        }
+      },
+      "supplier_capacity": 905082
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "lithium_cell"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 22.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3489742.0,
+          "b": 147605.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 26.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3716.267,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 22.0,
+          "b": 74.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "medical_device"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 365,
+    "replications": 1
+  }
+}

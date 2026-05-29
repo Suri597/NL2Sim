@@ -1,0 +1,268 @@
+{
+  "config_info": [
+    {
+      "name": "missing",
+      "version": "missing"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "solder_paste": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 28030.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": "missing",
+      "inventory_costs": {
+        "holding_cost": 9.072,
+        "shortage_cost": 23.792,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "missing",
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "initial_inventory": 4111166,
+      "inventory_costs": {
+        "holding_cost": "missing",
+        "shortage_cost": "missing",
+        "review_time": "missing"
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "supplier_capacity": 949913,
+      "supplier_cost": 483.563,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 39.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "FPGA"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "solder_paste"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 7.0,
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse",
+      "inventory_managed": [
+        "missing"
+      ],
+      "operation": {
+        "name": "missing",
+        "input": [],
+        "output": [],
+        "resource_required": "missing",
+        "operation_cycle": {
+          "distribution": "missing",
+          "parameters": {
+            "a": "missing",
+            "b": "missing",
+            "c": "missing",
+            "d": "missing",
+            "e": "missing"
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 59.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1716657.0,
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 16.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 3599.055,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 18.0,
+          "b": 23.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 8.0,
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "FPGA",
+      "transfer_time": {
+        "distribution": "missing",
+        "parameters": {
+          "a": "missing",
+          "b": "missing",
+          "c": "missing",
+          "d": "missing",
+          "e": "missing"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "warm_up": 50,
+    "replications": 1,
+    "random_seed": "missing"
+  }
+}

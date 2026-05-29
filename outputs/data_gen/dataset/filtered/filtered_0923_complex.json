@@ -1,0 +1,569 @@
+{
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "heat_sink",
+      "bom": {
+        "plastic_pellet": 1,
+        "solder_paste": 1,
+        "memory_chip": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "heat_sink": 2,
+        "plastic_pellet": 4
+      }
+    },
+    {
+      "name": "solar_panel",
+      "bom": {
+        "solder_paste": 2,
+        "heat_sink": 1
+      }
+    },
+    {
+      "name": "router",
+      "bom": {
+        "memory_chip": 4,
+        "solder_paste": 2,
+        "heat_sink": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 62276.0,
+          "b": 7569.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 14.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.106,
+        "shortage_cost": 5.88,
+        "review_time": 4
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 9.636,
+        "shortage_cost": 0.481,
+        "review_time": 21
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1195.25,
+          "b": 3012.83
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 39.571,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 6049,
+      "inventory_costs": {
+        "shortage_cost": 40.086,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 1075238,
+      "inventory_costs": {
+        "holding_cost": 6.698,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 543200,
+      "inventory_costs": {
+        "holding_cost": 8.755,
+        "shortage_cost": 33.596,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 1375100,
+      "inventory_costs": {
+        "holding_cost": 4.198,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "supplier_cost": 324.184,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_capacity": 80071
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 221.647,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 44.0
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "supplier_cost": 473.524,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 34.0
+        }
+      },
+      "supplier_capacity": 996550
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "supplier_cost": 232.642,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 39.0
+        }
+      },
+      "supplier_capacity": 361512
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 453.33,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 20.0,
+          "b": 51.0
+        }
+      },
+      "supplier_capacity": 94312
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 6.0
+        }
+      },
+      "supplier_cost": 27.948,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 24.0,
+          "b": 65.0
+        }
+      },
+      "supplier_capacity": 270966
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 4.739
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 15,
+        "max_wait_time": 3.186
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 268.639
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 34.285
+          }
+        }
+      },
+      "operating_cost_per_time": 17.695
+    }
+  ],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "plastic_pellet",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "heat_sink",
+          "plastic_pellet"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 15.0,
+            "b": 28.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "solder_paste",
+        "solar_panel"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "solder_paste",
+          "heat_sink"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 11.0,
+            "b": 11.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "solder_paste",
+        "memory_chip",
+        "router"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "memory_chip",
+          "solder_paste",
+          "heat_sink"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 15.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 52.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1600633.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 24.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 119.277,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 52.0
+        }
+      }
+    },
+    {
+      "name": "Schneider Electric",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 33.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2641824.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 20.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 378.643,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 54.0
+        }
+      }
+    },
+    {
+      "name": "HP Enterprise",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3543863.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 3935.364,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 39.0,
+          "b": 48.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "BatteryTech",
+        "Process Go.",
+        "CarbonSupply Co.",
+        "ElectroParts",
+        "Memory Star",
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Pilot Line",
+        "Main Factory",
+        "Fab",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "BatteryTech",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      }
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "medical_device"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "router"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "replications": 1
+  }
+}

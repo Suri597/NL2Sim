@@ -1,0 +1,369 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    },
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "display_panel",
+      "bom": {
+        "epoxy_compound": 3,
+        "lithium_cell": 2,
+        "memory_chip": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "lithium_cell": 4,
+        "memory_chip": 1
+      }
+    },
+    {
+      "name": "smartphone",
+      "bom": {
+        "display_panel": 1,
+        "epoxy_compound": 3,
+        "lithium_cell": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 75827.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 20.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 49.711,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4037.77,
+          "b": 11228.85
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 6.435,
+        "shortage_cost": 24.144,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2347.37,
+          "b": 4433.37
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.496,
+        "review_time": 22
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 4501929,
+      "inventory_costs": {
+        "holding_cost": 5.301,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 4468029
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 258271,
+      "inventory_costs": {
+        "shortage_cost": 2.454,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 21.0
+        }
+      },
+      "supplier_cost": 280.213,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 84.0
+        }
+      },
+      "supplier_capacity": 379073
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "supplier_cost": 126.818,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 32.0,
+          "b": 35.0
+        }
+      },
+      "supplier_capacity": 732193
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "supplier_cost": 125.529,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 70.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Laser Cutter",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.744
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 75,
+        "max_wait_time": 19.602
+      },
+      "operating_cost_per_time": 0.491
+    }
+  ],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "industrial_sensor",
+        "memory_chip"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "lithium_cell",
+          "memory_chip"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 9.0
+          }
+        },
+        "resource_required": "Laser Cutter"
+      }
+    },
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "smartphone",
+        "display_panel",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "display_panel",
+          "epoxy_compound",
+          "lithium_cell"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 7.0,
+            "b": 24.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Schneider Electric",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 56.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 933165.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4070.237,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 52.0
+        }
+      }
+    },
+    {
+      "name": "Lenovo Group",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 54.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 156048.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1185.622,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 27.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks",
+        "GlassCore Ltd.",
+        "ChipCo"
+      ],
+      "facility": [
+        "Plant A",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "smartphone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 10
+  }
+}

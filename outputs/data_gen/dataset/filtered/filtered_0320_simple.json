@@ -1,0 +1,162 @@
+{
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "GPU",
+      "bom": {
+        "aluminum_sheet": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4508.9,
+          "b": 8354.46
+        }
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 210851,
+      "inventory_costs": {
+        "holding_cost": 3.622,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 23.0
+        }
+      },
+      "supplier_cost": 107.865,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 78.0
+        }
+      },
+      "supplier_capacity": 251626
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "GPU"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "aluminum_sheet"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 16.0,
+            "b": 28.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Dell Technologies",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 15.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4860677.0,
+          "b": 1447425.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 20.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2618.627,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 76.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Main Factory",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 10.0
+        }
+      }
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 100,
+    "replications": 10
+  }
+}

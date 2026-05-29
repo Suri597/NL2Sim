@@ -1,0 +1,286 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "aluminum_sheet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "aluminum_sheet": 4,
+        "steel_rod": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 87722.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.239,
+        "shortage_cost": 6.575,
+        "review_time": 22
+      }
+    },
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 8.789,
+        "shortage_cost": 29.767,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 1152719,
+      "inventory_costs": {
+        "holding_cost": 4.333,
+        "shortage_cost": 0.341,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "supplier_cost": 147.167,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 81.0
+        }
+      },
+      "supplier_capacity": 942425
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_cost": 182.554,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 46.0,
+          "b": 79.0
+        }
+      },
+      "supplier_capacity": 172997
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "supplier_cost": 82.122,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 44.0,
+          "b": 48.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Conveyor Belt",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.076,
+          "b": 7.34
+        }
+      },
+      "operating_cost_per_time": 1.208
+    }
+  ],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "camera",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "aluminum_sheet",
+          "steel_rod"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 26.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 52.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4688802.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4265.097,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 46.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 35.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 348364.0,
+          "b": 2993162.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1139.481,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 51.0,
+          "b": 61.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc.",
+        "FastChip Corp.",
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Pilot Line",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      }
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "camera"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 1
+  }
+}

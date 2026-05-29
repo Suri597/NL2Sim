@@ -1,0 +1,321 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "CPU",
+      "bom": {
+        "silicon_wafer": 2
+      }
+    },
+    {
+      "name": "tablet",
+      "bom": {
+        "plastic_pellet": 1,
+        "silicon_wafer": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2518.15,
+          "b": 5174.8
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 3.002,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4122.44,
+          "b": 4254.73
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 3.055,
+        "shortage_cost": 8.386,
+        "review_time": 30
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "initial_inventory": 2346995,
+      "inventory_costs": {
+        "holding_cost": 3.911,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 3965013,
+      "inventory_costs": {
+        "holding_cost": 2.436,
+        "shortage_cost": 31.384,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ChipCo",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 179.25,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_cost": 196.189,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 83.0
+        }
+      },
+      "supplier_capacity": 979272
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "supplier_cost": 452.955,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 88.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Assembly Line",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.784
+        }
+      },
+      "operating_cost_per_time": 13.777
+    }
+  ],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "CPU",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "silicon_wafer"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 16.0,
+            "b": 22.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "plastic_pellet",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "plastic_pellet",
+          "silicon_wafer"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 2.0,
+            "b": 6.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Apple Supply",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 57.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2058709.0,
+          "b": 2415438.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 581.332,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 87.0
+        }
+      }
+    },
+    {
+      "name": "Broadcom Limited",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3932825.0,
+          "b": 553755.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 13.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1569.16,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 65.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ChipCo",
+        "FastChip Corp.",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Integration Center",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ChipCo",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "CPU"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "tablet"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 365,
+    "replications": 10
+  }
+}

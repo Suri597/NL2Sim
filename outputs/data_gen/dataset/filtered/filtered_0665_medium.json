@@ -1,0 +1,360 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "battery_pack",
+      "bom": {
+        "epoxy_compound": 4,
+        "memory_chip": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "battery_pack": 4,
+        "memory_chip": 1,
+        "epoxy_compound": 4
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "epoxy_compound": 1,
+        "battery_pack": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 39.687,
+        "review_time": 6
+      }
+    },
+    {
+      "name": "battery_pack",
+      "type": "intermediate_materials",
+      "initial_inventory": 2911204,
+      "inventory_costs": {
+        "holding_cost": 6.569,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 3335737,
+      "inventory_costs": {
+        "holding_cost": 8.974,
+        "shortage_cost": 44.935,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 3047841
+    }
+  ],
+  "supplier": [
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 20.0
+        }
+      },
+      "supplier_cost": 66.826,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 78.0
+        }
+      },
+      "supplier_capacity": 697989
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 409.307,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 15.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_cost": 126.695,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      },
+      "supplier_capacity": 50819
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.063
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 98,
+        "max_wait_time": 5.108
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 210.851
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 10.444
+          }
+        }
+      },
+      "operating_cost_per_time": 1.598
+    }
+  ],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "EV_battery",
+        "battery_pack",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "battery_pack",
+          "memory_chip",
+          "epoxy_compound"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 27.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "industrial_sensor",
+        "battery_pack",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "epoxy_compound",
+          "battery_pack"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 20.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 20.0,
+          "b": 45.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2033903.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2644.026,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 82.0
+        }
+      }
+    },
+    {
+      "name": "Siemens Digital",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 33.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 306330.0,
+          "b": 12391.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 11.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1036.583,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 41.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "BatteryTech",
+        "PolymerSource",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "BatteryTech",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

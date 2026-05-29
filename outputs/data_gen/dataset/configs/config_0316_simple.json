@@ -1,0 +1,268 @@
+{
+  "config_info": [
+    {
+      "name": "Industrial Equipment",
+      "version": "1.0"
+    }
+  ],
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "glass_fiber": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven",
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 0,
+      "inventory_costs": {
+        "holding_cost": 0.0,
+        "shortage_cost": 6.506,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "procurement_scheme": {
+        "type": "",
+        "distribution": "",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "initial_inventory": 42992,
+      "inventory_costs": {
+        "holding_cost": 0.659,
+        "shortage_cost": 0.0,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "supplier_capacity": 158326,
+      "supplier_cost": 418.396,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 51.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "glass_fiber",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "glass_fiber"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 18.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse",
+      "inventory_managed": [
+        "medical_device"
+      ],
+      "operation": {
+        "name": "",
+        "input": [],
+        "output": [],
+        "resource_required": "",
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "d": 0.0,
+            "e": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "customer": [
+    {
+      "name": "Apple Supply",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 23.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4554074.0,
+          "b": 598960.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4658.264,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 34.0,
+          "b": 78.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Integration Center",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "medical_device",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0,
+          "e": 0.0
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 500,
+    "warm_up": 0,
+    "replications": 10,
+    "random_seed": 44287
+  }
+}

@@ -1,0 +1,462 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "glass_fiber": 1
+      }
+    },
+    {
+      "name": "circuit_board",
+      "bom": {
+        "steel_rod": 2,
+        "glass_fiber": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "router",
+      "bom": {
+        "lens_assembly": 1,
+        "circuit_board": 4,
+        "glass_fiber": 3,
+        "steel_rod": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 54871.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.857,
+        "shortage_cost": 18.832,
+        "review_time": 16
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 4.068,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 3146282,
+      "inventory_costs": {
+        "shortage_cost": 19.034,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "circuit_board",
+      "type": "intermediate_materials",
+      "initial_inventory": 4491295,
+      "inventory_costs": {
+        "holding_cost": 5.504,
+        "shortage_cost": 16.049,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 2105922
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_cost": 226.074,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 87.0
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_cost": 299.247,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 64.0
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 25.0
+        }
+      },
+      "supplier_cost": 478.835,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 58.0
+        }
+      },
+      "supplier_capacity": 958031
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_cost": 463.795,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0
+        }
+      },
+      "supplier_capacity": 290631
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 26.0
+        }
+      },
+      "supplier_cost": 213.098,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 57.0
+        }
+      }
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_cost": 347.895,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_capacity": 563474
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 14.0
+        }
+      },
+      "supplier_cost": 435.286,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      },
+      "supplier_capacity": 136808
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_cost": 422.945,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      },
+      "supplier_capacity": 949809
+    }
+  ],
+  "resource": [
+    {
+      "name": "Packaging Machine",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.538
+        }
+      },
+      "operating_cost_per_time": 5.126
+    }
+  ],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "circuit_board",
+        "steel_rod",
+        "glass_fiber",
+        "router",
+        "lens_assembly"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "lens_assembly",
+          "circuit_board",
+          "glass_fiber",
+          "steel_rod"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 12.0
+          }
+        },
+        "resource_required": "Packaging Machine"
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1999774.0,
+          "b": 338149.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1115.913,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 79.0
+        }
+      }
+    },
+    {
+      "name": "Infineon Technologies",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1665940.0,
+          "b": 3255569.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 28.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3645.598,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 48.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "Memory Star",
+        "ChipCo",
+        "CarbonSupply Co.",
+        "ElectroParts",
+        "NanoMaterials Inc.",
+        "MetalFab Inc.",
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      }
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      }
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      }
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "router"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 10
+  }
+}

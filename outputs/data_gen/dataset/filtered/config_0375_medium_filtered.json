@@ -1,0 +1,269 @@
+{
+  "raw_materials": [
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "lithium_cell": 1,
+        "silicon_wafer": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "lithium_cell": 1,
+        "motor_assembly": 3,
+        "silicon_wafer": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2657.7,
+          "b": 4991.04
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 14.727,
+        "review_time": 30
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 50315.0,
+          "b": 83968.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 14.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 27.817,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 3290821,
+      "inventory_costs": {
+        "shortage_cost": 13.256,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 200658,
+      "inventory_costs": {
+        "shortage_cost": 1.17,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Memory Star",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 15.0
+        }
+      },
+      "supplier_cost": 337.341,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 66.0
+        }
+      },
+      "supplier_capacity": 88001
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 5.0
+        }
+      },
+      "supplier_cost": 478.424,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 48.0
+        }
+      },
+      "supplier_capacity": 167743
+    }
+  ],
+  "resource": [
+    {
+      "name": "Quality Scanner",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 0.629,
+          "b": 4.39
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 277.264
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 25.47
+          }
+        }
+      },
+      "operating_cost_per_time": 2.192
+    }
+  ],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "motor_assembly",
+        "SoC",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "lithium_cell",
+          "motor_assembly",
+          "silicon_wafer"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 5.0,
+            "b": 23.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Samsung Electronics",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 33.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 718477.0,
+          "b": 1875032.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2686.105,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Memory Star",
+        "Process Go."
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Memory Star",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 10
+  }
+}

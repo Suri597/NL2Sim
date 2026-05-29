@@ -1,0 +1,159 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "CPU",
+      "bom": {
+        "resin": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 203.93,
+          "b": 874.49
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 3.63,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "initial_inventory": 4221943,
+      "inventory_costs": {
+        "holding_cost": 5.677,
+        "shortage_cost": 25.417,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_cost": 251.044,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 45.0,
+          "b": 64.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "CPU",
+        "resin"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "resin"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 7.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Samsung Electronics",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 44.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1242053.0,
+          "b": 192961.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 267.888,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 41.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "CPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "replications": 1,
+    "warm_up": 50
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "raw_materials": [
+    {
+      "name": "gold_wire"
+    },
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "sensor_array",
+      "bom": {
+        "ceramic_substrate": 3,
+        "gold_wire": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "gold_wire": 1,
+        "sensor_array": 3,
+        "ceramic_substrate": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4877.15,
+          "b": 14023.0
+        }
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 93010.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 22.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.356,
+        "shortage_cost": 15.364,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "initial_inventory": 1948439,
+      "inventory_costs": {
+        "holding_cost": 4.779,
+        "shortage_cost": 21.31,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 1966395,
+      "inventory_costs": {
+        "shortage_cost": 16.931,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "supplier_cost": 337.531,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "supplier_capacity": 915313
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "supplier_cost": 366.182,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 76.0
+        }
+      },
+      "supplier_capacity": 474460
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "FPGA",
+        "gold_wire",
+        "sensor_array",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "gold_wire",
+          "sensor_array",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 12.0,
+            "b": 28.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Sony Electronics",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2104278.0,
+          "b": 3550023.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2574.48,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 39.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co.",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Main Factory",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 4.0
+        }
+      }
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "FPGA"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

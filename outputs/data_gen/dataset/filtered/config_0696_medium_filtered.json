@@ -1,0 +1,347 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "tablet",
+      "bom": {
+        "glass_fiber": 2
+      }
+    },
+    {
+      "name": "laptop",
+      "bom": {
+        "silicon_wafer": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4222.94,
+          "b": 9496.16
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.834,
+        "shortage_cost": 24.762,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 0.983,
+        "shortage_cost": 41.203,
+        "review_time": 24
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 2478973,
+      "inventory_costs": {
+        "shortage_cost": 23.061,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 2390130,
+      "inventory_costs": {
+        "holding_cost": 5.528,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_cost": 134.073,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 83.0
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "supplier_cost": 415.972,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 64.0
+        }
+      },
+      "supplier_capacity": 922025
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 384.356,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 43.0
+        }
+      },
+      "supplier_capacity": 408738
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.444,
+          "b": 9.113
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 37,
+        "max_wait_time": 2.783
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 345.722
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 27.561
+          }
+        }
+      },
+      "operating_cost_per_time": 1.837
+    }
+  ],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "glass_fiber"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "glass_fiber"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 11.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "laptop",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "silicon_wafer"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 26.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 28.0,
+          "b": 55.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1924561.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2922.757,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 89.0
+        }
+      }
+    },
+    {
+      "name": "TechCorp",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 31.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3290375.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 28.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2094.483,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "Memory Star",
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Pilot Line",
+        "Manufacturing Site",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 11.0
+        }
+      }
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "tablet"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "laptop"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 5
+  }
+}

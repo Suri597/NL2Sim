@@ -1,0 +1,159 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "microprocessor": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 337.81,
+          "b": 1669.25
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 30.485,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 1307201,
+      "inventory_costs": {
+        "holding_cost": 5.688,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 251.429,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 74.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "laptop"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "microprocessor"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 2.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 59.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 14030.0,
+          "b": 332.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 18.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4731.911,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 48.0,
+          "b": 49.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "laptop"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 500,
+    "replications": 1,
+    "warm_up": 30
+  }
+}

@@ -1,0 +1,224 @@
+{
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "carbon_fiber": 4,
+        "solder_paste": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "solder_paste": 2,
+        "lens_assembly": 2,
+        "carbon_fiber": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4888.72,
+          "b": 11981.07
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 0.208,
+        "review_time": 9
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 1.257,
+        "review_time": 11
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 1697213,
+      "inventory_costs": {
+        "holding_cost": 6.436,
+        "shortage_cost": 24.033,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 672060,
+      "inventory_costs": {
+        "holding_cost": 9.708,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 15.0
+        }
+      },
+      "supplier_cost": 425.389,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 86.0
+        }
+      },
+      "supplier_capacity": 443443
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 28.0
+        }
+      },
+      "supplier_cost": 404.77,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 74.0
+        }
+      },
+      "supplier_capacity": 414493
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "EV_battery",
+        "solder_paste",
+        "lens_assembly",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "solder_paste",
+          "lens_assembly",
+          "carbon_fiber"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 8.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 44.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2634200.0,
+          "b": 3233149.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 26.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3100.7,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 55.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Integration Center",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

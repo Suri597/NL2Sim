@@ -1,0 +1,155 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "microprocessor": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 6.799,
+        "shortage_cost": 36.93,
+        "review_time": 23
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 3950012,
+      "inventory_costs": {
+        "holding_cost": 6.534,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_cost": 179.784,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 46.0,
+          "b": 73.0
+        }
+      },
+      "supplier_capacity": 425723
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "FPGA"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "microprocessor"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 8.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 41.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 175113.0,
+          "b": 20271.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 13.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 1299.151,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 71.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Fab",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlobalComponents",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Fab",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "FPGA"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 5
+  }
+}

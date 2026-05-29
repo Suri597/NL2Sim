@@ -1,0 +1,155 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "microprocessor": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 7.297,
+        "shortage_cost": 14.1,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 656207,
+      "inventory_costs": {
+        "holding_cost": 6.706,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "supplier_cost": 490.164,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 35.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "microprocessor"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "microprocessor"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 19.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Bosch Automotive",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2442262.0,
+          "b": 4152371.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 18.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4865.192,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 85.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Fab",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Fab",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 10
+  }
+}

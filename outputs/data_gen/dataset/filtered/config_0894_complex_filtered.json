@@ -1,0 +1,520 @@
+{
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "circuit_board",
+      "bom": {
+        "steel_rod": 1,
+        "lithium_cell": 2,
+        "carbon_fiber": 3
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "carbon_fiber": 1,
+        "lithium_cell": 4,
+        "steel_rod": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "smartphone",
+      "bom": {
+        "steel_rod": 4,
+        "carbon_fiber": 2,
+        "circuit_board": 2,
+        "cooling_unit": 1,
+        "lithium_cell": 2
+      }
+    },
+    {
+      "name": "tablet",
+      "bom": {
+        "cooling_unit": 4,
+        "lithium_cell": 1,
+        "carbon_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 60636.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 29.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.349,
+        "shortage_cost": 19.433,
+        "review_time": 17
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 37302.0,
+          "b": 7600.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 20.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 27.861,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 2.882,
+        "shortage_cost": 31.973,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "circuit_board",
+      "type": "intermediate_materials",
+      "initial_inventory": 1283472
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "initial_inventory": 4062578,
+      "inventory_costs": {
+        "holding_cost": 0.945,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 4525841,
+      "inventory_costs": {
+        "holding_cost": 0.475,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 4086571
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "supplier_cost": 366.597,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 58.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_cost": 170.764,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 73.0
+        }
+      },
+      "supplier_capacity": 130581
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 24.0
+        }
+      },
+      "supplier_cost": 217.741,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 50.0
+        }
+      },
+      "supplier_capacity": 797828
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_cost": 436.53,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 71.0
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 192.028,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 442.928,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 29.0
+        }
+      },
+      "supplier_capacity": 138588
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 26.0
+        }
+      },
+      "supplier_cost": 448.081,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 24.0,
+          "b": 59.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Laser Cutter",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.175,
+          "b": 7.793
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 155.532
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 48.176
+          }
+        }
+      },
+      "operating_cost_per_time": 16.875
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "circuit_board",
+        "cooling_unit",
+        "steel_rod",
+        "lithium_cell",
+        "carbon_fiber",
+        "smartphone"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "steel_rod",
+          "carbon_fiber",
+          "circuit_board",
+          "cooling_unit",
+          "lithium_cell"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 17.0
+          }
+        },
+        "resource_required": "Laser Cutter"
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "tablet",
+        "cooling_unit",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "cooling_unit",
+          "lithium_cell",
+          "carbon_fiber"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 14.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 561029.0,
+          "b": 4366466.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 19.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4794.687,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 80.0
+        }
+      }
+    },
+    {
+      "name": "NXP Semiconductors",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 32.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3005340.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 58.881,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 61.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "BatteryTech",
+        "ChipCo",
+        "MegaSupply",
+        "PrecisionParts",
+        "ElectroParts",
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Main Factory",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "smartphone"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "tablet"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 5
+  }
+}

@@ -1,0 +1,404 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "carbon_fiber": 1,
+        "steel_rod": 3,
+        "glass_fiber": 4
+      }
+    },
+    {
+      "name": "power_module",
+      "bom": {
+        "glass_fiber": 2
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "carbon_fiber": 2,
+        "lens_assembly": 4,
+        "power_module": 2,
+        "glass_fiber": 2,
+        "steel_rod": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 23.392,
+        "review_time": 6
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 150.53,
+          "b": 640.75
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.77,
+        "shortage_cost": 40.439,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 72619.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 23.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 9.402,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 1301575,
+      "inventory_costs": {
+        "shortage_cost": 47.4,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "initial_inventory": 245968,
+      "inventory_costs": {
+        "holding_cost": 8.002,
+        "shortage_cost": 42.798,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 2085775,
+      "inventory_costs": {
+        "holding_cost": 6.429,
+        "shortage_cost": 12.178,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 15.0
+        }
+      },
+      "supplier_cost": 467.445,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 37.0
+        }
+      },
+      "supplier_capacity": 449207
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_cost": 42.164,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 41.0
+        }
+      },
+      "supplier_capacity": 911030
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 19.0
+        }
+      },
+      "supplier_cost": 42.397,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 57.0
+        }
+      },
+      "supplier_capacity": 495630
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 30.042,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 63.0
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 56.281,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 83.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.181,
+          "b": 2.204
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 30,
+        "max_wait_time": 19.777
+      },
+      "operating_cost_per_time": 19.448
+    }
+  ],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "steel_rod",
+        "glass_fiber",
+        "carbon_fiber",
+        "power_module",
+        "FPGA",
+        "lens_assembly"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "carbon_fiber",
+          "lens_assembly",
+          "power_module",
+          "glass_fiber",
+          "steel_rod"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 26.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Ross Associates",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2742762.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 3.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4906.379,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 19.0,
+          "b": 23.0
+        }
+      }
+    },
+    {
+      "name": "Lenovo Group",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1989767.0,
+          "b": 3393285.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 15.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4805.198,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 77.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ElectroParts",
+        "BatteryTech",
+        "SiliconWorks",
+        "GlobalComponents",
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Production Center",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ElectroParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 5.0
+        }
+      }
+    },
+    {
+      "source": "Production Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "FPGA"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "replications": 10
+  }
+}

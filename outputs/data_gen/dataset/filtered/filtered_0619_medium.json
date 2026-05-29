@@ -1,0 +1,293 @@
+{
+  "raw_materials": [
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "memory_chip": 4,
+        "silicon_wafer": 3
+      }
+    },
+    {
+      "name": "GPU",
+      "bom": {
+        "silicon_wafer": 1,
+        "memory_chip": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3614.11,
+          "b": 11778.71
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.257,
+        "review_time": 4
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 94685.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 16.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 15.279,
+        "review_time": 7
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 3991745,
+      "inventory_costs": {
+        "holding_cost": 8.301,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 1011370
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 493.816,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "supplier_capacity": 145987
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "supplier_cost": 427.612,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 67.0
+        }
+      },
+      "supplier_capacity": 994201
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "SoC",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "memory_chip",
+          "silicon_wafer"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 21.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "GPU",
+        "memory_chip",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "silicon_wafer",
+          "memory_chip"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 27.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 52.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1209462.0,
+          "b": 3208498.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3809.165,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 79.0
+        }
+      }
+    },
+    {
+      "name": "Apple Supply",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3787047.0,
+          "b": 370259.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 3135.948,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 63.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "PolymerSource"
+      ],
+      "facility": [
+        "Main Factory",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "SoC"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 1,
+    "warm_up": 30
+  }
+}

@@ -1,0 +1,304 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    },
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "display_panel",
+      "bom": {
+        "memory_chip": 3,
+        "epoxy_compound": 4,
+        "microprocessor": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "display_panel": 4,
+        "memory_chip": 4,
+        "microprocessor": 3,
+        "epoxy_compound": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 10058.0,
+          "b": 253.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 22.0
+        }
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 39.77,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3640.22,
+          "b": 8645.94
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.459,
+        "shortage_cost": 6.931,
+        "review_time": 16
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 978226,
+      "inventory_costs": {
+        "shortage_cost": 12.387,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 1982953,
+      "inventory_costs": {
+        "holding_cost": 5.696,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "supplier_cost": 294.273,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 57.0
+        }
+      },
+      "supplier_capacity": 599102
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 26.0
+        }
+      },
+      "supplier_cost": 157.242,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_capacity": 726006
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 120.107,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 31.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "microprocessor",
+        "display_panel",
+        "epoxy_compound",
+        "memory_chip"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "display_panel",
+          "memory_chip",
+          "microprocessor",
+          "epoxy_compound"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 15.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Samsung Electronics",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3915040.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 27.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2322.808,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37.0,
+          "b": 52.0
+        }
+      }
+    },
+    {
+      "name": "Schneider Electric",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 43.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3080913.0,
+          "b": 387050.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 11.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 850.595,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 50.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ElectroParts",
+        "ChipCo",
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Pilot Line",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ElectroParts",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 5
+  }
+}

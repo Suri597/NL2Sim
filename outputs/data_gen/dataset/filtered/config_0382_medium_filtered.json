@@ -1,0 +1,258 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "steel_rod": 1,
+        "carbon_fiber": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "lens_assembly": 2,
+        "steel_rod": 1,
+        "carbon_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3986.08,
+          "b": 7320.05
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.047,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 52884.0,
+          "b": 1219.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.712,
+        "shortage_cost": 38.215,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 4652435,
+      "inventory_costs": {
+        "holding_cost": 0.505,
+        "shortage_cost": 8.405,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 4508809,
+      "inventory_costs": {
+        "holding_cost": 0.771,
+        "shortage_cost": 22.436,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "supplier_cost": 165.704,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 138.413,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 50.0,
+          "b": 70.0
+        }
+      },
+      "supplier_capacity": 334935
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 73.036,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 79.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "medical_device",
+        "lens_assembly",
+        "carbon_fiber",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "lens_assembly",
+          "steel_rod",
+          "carbon_fiber"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 24.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 30.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2344116.0,
+          "b": 3194500.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 16.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1459.708,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 79.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks",
+        "PrecisionParts",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Main Factory",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "medical_device"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 10
+  }
+}

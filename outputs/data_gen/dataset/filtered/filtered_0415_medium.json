@@ -1,0 +1,333 @@
+{
+  "raw_materials": [
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "router",
+      "bom": {
+        "lithium_cell": 1,
+        "memory_chip": 2,
+        "microprocessor": 3
+      }
+    },
+    {
+      "name": "SoC",
+      "bom": {
+        "microprocessor": 1,
+        "memory_chip": 4,
+        "lithium_cell": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 39537.0,
+          "b": 88116.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 6.692,
+        "shortage_cost": 41.045,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 4.599,
+        "shortage_cost": 37.134,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 35.668,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 2314017,
+      "inventory_costs": {
+        "holding_cost": 3.221,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 1577428
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 21.0
+        }
+      },
+      "supplier_cost": 455.961,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 44.0,
+          "b": 80.0
+        }
+      },
+      "supplier_capacity": 415806
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 24.0
+        }
+      },
+      "supplier_cost": 104.581,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 70.0
+        }
+      },
+      "supplier_capacity": 486133
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "supplier_cost": 138.244,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 76.0
+        }
+      },
+      "supplier_capacity": 234633
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "microprocessor",
+        "memory_chip",
+        "router"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "lithium_cell",
+          "memory_chip",
+          "microprocessor"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 14.0,
+            "b": 22.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "microprocessor",
+        "memory_chip",
+        "SoC"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "microprocessor",
+          "memory_chip",
+          "lithium_cell"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 24.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Sony Electronics",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 36.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 378633.0,
+          "b": 862344.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 32.82,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      }
+    },
+    {
+      "name": "Ross Associates",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 52.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3292899.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4481.386,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc.",
+        "Memory Star",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Assembly Hub",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "router"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 500,
+    "replications": 10
+  }
+}

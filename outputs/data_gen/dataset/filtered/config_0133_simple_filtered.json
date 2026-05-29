@@ -1,0 +1,151 @@
+{
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "GPU",
+      "bom": {
+        "solder_paste": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 4.953,
+        "review_time": 9
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 3367204,
+      "inventory_costs": {
+        "shortage_cost": 35.184,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "supplier_cost": 429.668,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 82.0
+        }
+      },
+      "supplier_capacity": 95627
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "GPU"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "solder_paste"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 9.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Broadcom Limited",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 57.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 586807.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2475.782,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 87.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 10
+  }
+}

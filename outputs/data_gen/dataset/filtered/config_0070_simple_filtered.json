@@ -1,0 +1,163 @@
+{
+  "raw_materials": [
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "memory_chip": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3784.57,
+          "b": 10427.16
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 3.095,
+        "shortage_cost": 31.096,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 4888433,
+      "inventory_costs": {
+        "holding_cost": 1.967,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 21.0
+        }
+      },
+      "supplier_cost": 188.803,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 51.0
+        }
+      },
+      "supplier_capacity": 810382
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "SoC"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "memory_chip"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 8.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 33.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4132176.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 3001.779,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 73.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      }
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 500,
+    "replications": 10
+  }
+}

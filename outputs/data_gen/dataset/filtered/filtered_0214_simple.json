@@ -1,0 +1,163 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "smartphone",
+      "bom": {
+        "microprocessor": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 22697.0,
+          "b": 98428.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 10.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 9.125,
+        "shortage_cost": 28.671,
+        "review_time": 23
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 4304466
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_cost": 376.859,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 74.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "smartphone"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "microprocessor"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 15.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Bosch Automotive",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 20.0,
+          "b": 20.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2307760.0,
+          "b": 4395392.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 11.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2949.57,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 22.0,
+          "b": 35.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Production Center",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PrecisionParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Production Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "smartphone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 5
+  }
+}

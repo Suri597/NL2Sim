@@ -1,0 +1,286 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "glass_fiber": 4
+      }
+    },
+    {
+      "name": "GPU",
+      "bom": {
+        "steel_rod": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 41797.0,
+          "b": 45812.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 22.0
+        }
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 0.718,
+        "review_time": 13
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 1933201,
+      "inventory_costs": {
+        "shortage_cost": 1.441,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 3636941,
+      "inventory_costs": {
+        "holding_cost": 1.067,
+        "shortage_cost": 1.78,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 25.0
+        }
+      },
+      "supplier_cost": 223.151,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_capacity": 617925
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 23.0
+        }
+      },
+      "supplier_cost": 122.245,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 83.0
+        }
+      },
+      "supplier_capacity": 809304
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "glass_fiber",
+        "SoC"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "glass_fiber"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 29.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "GPU",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "steel_rod"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 16.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4654116.0,
+          "b": 874047.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1966.798,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 30.0
+        }
+      }
+    },
+    {
+      "name": "Broadcom Limited",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 52.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 854246.0,
+          "b": 3395698.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 16.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2712.605,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 21.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co.",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Main Factory",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "SoC"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 500,
+    "replications": 1
+  }
+}

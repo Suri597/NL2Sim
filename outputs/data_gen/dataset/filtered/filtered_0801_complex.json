@@ -1,0 +1,492 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "heat_sink",
+      "bom": {
+        "glass_fiber": 2,
+        "carbon_fiber": 2
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "carbon_fiber": 1,
+        "heat_sink": 1,
+        "glass_fiber": 2
+      }
+    },
+    {
+      "name": "laptop",
+      "bom": {
+        "glass_fiber": 3,
+        "heat_sink": 3,
+        "carbon_fiber": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 23367.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 3.887,
+        "shortage_cost": 4.813,
+        "review_time": 5
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3395.82,
+          "b": 4059.48
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 3.931,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 2481191
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 1236117,
+      "inventory_costs": {
+        "holding_cost": 4.527,
+        "shortage_cost": 32.444,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 4326052,
+      "inventory_costs": {
+        "shortage_cost": 33.325,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ChipCo",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 471.953,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 73.0
+        }
+      },
+      "supplier_capacity": 768623
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 22.0
+        }
+      },
+      "supplier_cost": 49.744,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      }
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 493.204,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 59.0
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "supplier_cost": 141.1,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 47.0
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 26.0
+        }
+      },
+      "supplier_cost": 162.33,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 61.0
+        }
+      }
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "supplier_cost": 43.279,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 45.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 169.314,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 38.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 292.349,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 83.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Test Equipment",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.978
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 87,
+        "max_wait_time": 4.977
+      },
+      "operating_cost_per_time": 1.906
+    }
+  ],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "SoC",
+        "glass_fiber",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "carbon_fiber",
+          "heat_sink",
+          "glass_fiber"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 4.0
+          }
+        },
+        "resource_required": "Test Equipment"
+      }
+    },
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "laptop",
+        "glass_fiber",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "glass_fiber",
+          "heat_sink",
+          "carbon_fiber"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 23.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 51.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2369901.0,
+          "b": 352567.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3217.777,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 55.0
+        }
+      }
+    },
+    {
+      "name": "Lenovo Group",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2695344.0,
+          "b": 4157929.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 8.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1925.885,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 19.0,
+          "b": 86.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ChipCo",
+        "PolymerSource",
+        "MetalFab Inc.",
+        "PrecisionParts",
+        "CarbonSupply Co.",
+        "NanoMaterials Inc.",
+        "BatteryTech",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Pilot Line",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ChipCo",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 3.0
+        }
+      }
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 7.0
+        }
+      }
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "SoC"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "laptop"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "replications": 5,
+    "warm_up": 50
+  }
+}

@@ -1,0 +1,339 @@
+{
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "plastic_pellet": 1,
+        "ceramic_substrate": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "bom": {
+        "microprocessor": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 81647.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 49.89,
+        "review_time": 26
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1218.19,
+          "b": 4523.23
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 32.561,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 1095532
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 3326022,
+      "inventory_costs": {
+        "holding_cost": 1.65,
+        "shortage_cost": 27.967,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "supplier_cost": 451.352,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 60.0
+        }
+      },
+      "supplier_capacity": 19214
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "supplier_cost": 418.599,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 42.0
+        }
+      },
+      "supplier_capacity": 198048
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 29.0
+        }
+      },
+      "supplier_cost": 383.316,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 51.0,
+          "b": 82.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Packaging Machine",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.526
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 87,
+        "max_wait_time": 3.961
+      },
+      "operating_cost_per_time": 6.433
+    }
+  ],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "plastic_pellet",
+        "ceramic_substrate",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "plastic_pellet",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 21.0
+          }
+        },
+        "resource_required": "Packaging Machine"
+      }
+    },
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "microprocessor"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "microprocessor"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 29.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Dell Technologies",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 53.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2900305.0,
+          "b": 4322702.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 18.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 674.413,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 89.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 40.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2553278.0,
+          "b": 3083102.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1366.537,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 61.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "ChipCo",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Pilot Line",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "medical_device"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "replications": 10
+  }
+}

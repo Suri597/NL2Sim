@@ -1,0 +1,159 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "microprocessor": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4251.98,
+          "b": 6239.65
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.505,
+        "shortage_cost": 19.215,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 1055523,
+      "inventory_costs": {
+        "holding_cost": 1.56,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 16.0
+        }
+      },
+      "supplier_cost": 333.663,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "microprocessor"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "microprocessor"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 5.0,
+            "b": 19.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 58.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4223373.0,
+          "b": 679996.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3004.786,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 45.0,
+          "b": 83.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Integration Center",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlobalComponents",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

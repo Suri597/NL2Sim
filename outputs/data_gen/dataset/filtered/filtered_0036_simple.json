@@ -1,0 +1,161 @@
+{
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "lithium_cell": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4036.67,
+          "b": 11923.77
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.272,
+        "shortage_cost": 12.809,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 2482710,
+      "inventory_costs": {
+        "shortage_cost": 32.487,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 21.0
+        }
+      },
+      "supplier_cost": 490.792,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 61.0
+        }
+      },
+      "supplier_capacity": 868530
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "EV_battery"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "lithium_cell"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 12.0,
+            "b": 15.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Siemens Digital",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 45.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3566409.0,
+          "b": 587650.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4504.482,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 80.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 100,
+    "replications": 5
+  }
+}

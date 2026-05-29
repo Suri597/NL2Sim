@@ -1,0 +1,152 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "epoxy_compound": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1564.07,
+          "b": 3118.99
+        }
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 4999433,
+      "inventory_costs": {
+        "shortage_cost": 29.307,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 140.462,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 74.0
+        }
+      },
+      "supplier_capacity": 228257
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "SoC",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "epoxy_compound"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 4.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2880385.0,
+          "b": 3231936.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2700.725,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "replications": 10
+  }
+}

@@ -1,0 +1,350 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "solder_paste"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "power_module",
+      "bom": {
+        "solder_paste": 3,
+        "plastic_pellet": 2
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "power_module": 4,
+        "plastic_pellet": 1,
+        "solder_paste": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "bom": {
+        "solder_paste": 4,
+        "power_module": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3517.61,
+          "b": 8121.75
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 7.571,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4519.48,
+          "b": 6909.37
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 44.663,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "initial_inventory": 1104749,
+      "inventory_costs": {
+        "shortage_cost": 30.256,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 3042963,
+      "inventory_costs": {
+        "shortage_cost": 46.217,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 2007960,
+      "inventory_costs": {
+        "shortage_cost": 26.447,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ChipCo",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 14.0
+        }
+      },
+      "supplier_cost": 295.316,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 86.0
+        }
+      },
+      "supplier_capacity": 638858
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 440.748,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 39.0
+        }
+      },
+      "supplier_capacity": 984695
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "supplier_cost": 454.814,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 56.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Assembly Line",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.758
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 59,
+        "max_wait_time": 5.086
+      },
+      "operating_cost_per_time": 3.995
+    }
+  ],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "power_module",
+        "solder_paste",
+        "plastic_pellet",
+        "laptop"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "power_module",
+          "plastic_pellet",
+          "solder_paste"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 8.0,
+            "b": 21.0
+          }
+        },
+        "resource_required": "Assembly Line"
+      }
+    },
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "power_module",
+        "solder_paste",
+        "SoC"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "solder_paste",
+          "power_module"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 18.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 24.0,
+          "b": 30.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2748551.0,
+          "b": 4571760.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 27.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 448.681,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 57.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 44.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1852209.0,
+          "b": 4681693.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3729.021,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 83.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ChipCo",
+        "NanoMaterials Inc.",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Fab",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ChipCo",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "laptop"
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

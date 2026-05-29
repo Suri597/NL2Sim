@@ -1,0 +1,574 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "circuit_board",
+      "bom": {
+        "steel_rod": 5,
+        "lithium_cell": 1
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "resin": 2,
+        "silicon_wafer": 5,
+        "lithium_cell": 3
+      }
+    },
+    {
+      "name": "frame_structure",
+      "bom": {
+        "silicon_wafer": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "steel_rod": 3,
+        "resin": 3,
+        "lithium_cell": 1,
+        "silicon_wafer": 4
+      }
+    },
+    {
+      "name": "SoC",
+      "bom": {
+        "cooling_unit": 3,
+        "frame_structure": 1,
+        "circuit_board": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 45.352,
+        "review_time": 11
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16906.0,
+          "b": 44995.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.46,
+        "shortage_cost": 7.329,
+        "review_time": 5
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36551.0,
+          "b": 90291.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 21.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.938,
+        "shortage_cost": 26.705,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 88393.0,
+          "b": 5511.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 29.0
+        }
+      }
+    },
+    {
+      "name": "circuit_board",
+      "type": "intermediate_materials",
+      "initial_inventory": 2830469,
+      "inventory_costs": {
+        "holding_cost": 4.894,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "initial_inventory": 289516
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 22299,
+      "inventory_costs": {
+        "holding_cost": 2.029,
+        "shortage_cost": 25.663,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 2665369,
+      "inventory_costs": {
+        "holding_cost": 9.959,
+        "shortage_cost": 6.942,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 4858798,
+      "inventory_costs": {
+        "shortage_cost": 32.266,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 50.62,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 45.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 27.0
+        }
+      },
+      "supplier_cost": 268.769,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 66.0
+        }
+      },
+      "supplier_capacity": 333683
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_cost": 427.723,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 68.0
+        }
+      },
+      "supplier_capacity": 306346
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 114.576,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 52.0
+        }
+      },
+      "supplier_capacity": 761654
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 25.0
+        }
+      },
+      "supplier_cost": 106.474,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 15.0
+        }
+      },
+      "supplier_capacity": 945547
+    }
+  ],
+  "resource": [
+    {
+      "name": "Assembly Line",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.961
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 32,
+        "max_wait_time": 12.639
+      },
+      "operating_cost_per_time": 12.727
+    },
+    {
+      "name": "Laser Cutter",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 4.555
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 43,
+        "max_wait_time": 16.536
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 468.574
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 24.236
+          }
+        }
+      },
+      "operating_cost_per_time": 8.325
+    }
+  ],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "silicon_wafer",
+        "lithium_cell",
+        "steel_rod",
+        "resin",
+        "EV_battery"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "steel_rod",
+          "resin",
+          "lithium_cell",
+          "silicon_wafer"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 17.0
+          }
+        },
+        "resource_required": "Assembly Line"
+      }
+    },
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "frame_structure",
+        "circuit_board",
+        "cooling_unit",
+        "SoC"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "cooling_unit",
+          "frame_structure",
+          "circuit_board"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 8.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3099842.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 21.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2270.243,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 69.0
+        }
+      }
+    },
+    {
+      "name": "TechCorp",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 36.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2445389.0,
+          "b": 4396390.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 16.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4547.375,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 84.0
+        }
+      }
+    },
+    {
+      "name": "Sony Electronics",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 49.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2315529.0,
+          "b": 4769199.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 14.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 101.922,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 74.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MegaSupply",
+        "BatteryTech",
+        "CarbonSupply Co.",
+        "MetalFab Inc.",
+        "ChipCo"
+      ],
+      "facility": [
+        "Fab",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MegaSupply",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      }
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      }
+    },
+    {
+      "source": "Fab",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    },
+    {
+      "source": "Fab",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

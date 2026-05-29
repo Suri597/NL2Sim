@@ -1,0 +1,322 @@
+{
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    },
+    {
+      "name": "resin"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "frame_structure",
+      "bom": {
+        "resin": 5,
+        "aluminum_sheet": 2,
+        "memory_chip": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "resin": 3,
+        "frame_structure": 3,
+        "memory_chip": 1,
+        "aluminum_sheet": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 145.19,
+          "b": 340.7
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.908,
+        "shortage_cost": 49.146,
+        "review_time": 21
+      }
+    },
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 22011.0,
+          "b": 47907.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 10.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 3.499,
+        "review_time": 17
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 4637728,
+      "inventory_costs": {
+        "holding_cost": 4.225,
+        "shortage_cost": 17.188,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 2794599,
+      "inventory_costs": {
+        "holding_cost": 2.611,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 9.0
+        }
+      },
+      "supplier_cost": 197.636,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 35.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 13.343,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "supplier_cost": 105.125,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 78.0
+        }
+      },
+      "supplier_capacity": 295537
+    }
+  ],
+  "resource": [
+    {
+      "name": "Quality Scanner",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.764
+        }
+      },
+      "operating_cost_per_time": 8.733
+    }
+  ],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "frame_structure",
+        "memory_chip",
+        "solar_panel",
+        "resin"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "resin",
+          "frame_structure",
+          "memory_chip",
+          "aluminum_sheet"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 27.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Schneider Electric",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 34312.0,
+          "b": 1224657.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2523.542,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 85.0
+        }
+      }
+    },
+    {
+      "name": "ABB Industrial",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3036291.0,
+          "b": 59975.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 13.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 907.555,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 34.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co.",
+        "FastChip Corp.",
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Plant A",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 12.0
+        }
+      }
+    },
+    {
+      "source": "Plant A",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 10
+  }
+}

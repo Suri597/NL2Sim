@@ -1,0 +1,161 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "epoxy_compound": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 5.988,
+        "review_time": 7
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 1034330,
+      "inventory_costs": {
+        "holding_cost": 5.296,
+        "shortage_cost": 8.578,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 6.54,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "supplier_capacity": 406991
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "SoC",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "epoxy_compound"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 14.0,
+            "b": 20.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Bosch Automotive",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 54.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4738385.0,
+          "b": 818602.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 12.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 1407.264,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 67.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Pilot Line",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PrecisionParts",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      }
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "replications": 5
+  }
+}

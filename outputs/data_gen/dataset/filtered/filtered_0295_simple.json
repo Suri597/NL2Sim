@@ -1,0 +1,165 @@
+{
+  "raw_materials": [
+    {
+      "name": "copper_wire"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "copper_wire": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 48454.0,
+          "b": 10615.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 0.289,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 597173,
+      "inventory_costs": {
+        "holding_cost": 7.915,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 26.0
+        }
+      },
+      "supplier_cost": 247.571,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 56.0
+        }
+      },
+      "supplier_capacity": 235298
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "copper_wire"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 15.0,
+            "b": 29.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Bosch Automotive",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 56.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2496484.0,
+          "b": 4390654.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 10.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2379.841,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Fab",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire"
+    },
+    {
+      "source": "Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 10
+  }
+}

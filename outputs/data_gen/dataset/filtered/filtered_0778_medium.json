@@ -1,0 +1,243 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "aluminum_sheet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "aluminum_sheet": 3,
+        "resin": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "lens_assembly": 3,
+        "aluminum_sheet": 3,
+        "resin": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37978.0,
+          "b": 59828.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.815,
+        "review_time": 8
+      }
+    },
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3128.38,
+          "b": 6560.81
+        }
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 3643723,
+      "inventory_costs": {
+        "holding_cost": 4.983,
+        "shortage_cost": 19.307,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 1684789
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_cost": 415.625,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 55.0
+        }
+      }
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "supplier_cost": 260.884,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 34.0
+        }
+      },
+      "supplier_capacity": 328120
+    }
+  ],
+  "resource": [
+    {
+      "name": "Quality Scanner",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.834
+        }
+      },
+      "operating_cost_per_time": 17.818
+    }
+  ],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "aluminum_sheet",
+        "resin",
+        "lens_assembly"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "lens_assembly",
+          "aluminum_sheet",
+          "resin"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 7.0,
+            "b": 29.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3606429.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 24.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 965.342,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 87.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc.",
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Processing Unit",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 11.0
+        }
+      }
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 200,
+    "replications": 5
+  }
+}

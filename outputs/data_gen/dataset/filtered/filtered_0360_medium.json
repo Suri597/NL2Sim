@@ -1,0 +1,259 @@
+{
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "heat_sink",
+      "bom": {
+        "lithium_cell": 1,
+        "silicon_wafer": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "silicon_wafer": 4,
+        "heat_sink": 2,
+        "lithium_cell": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 5.087,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 36434.0,
+          "b": 6158.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 9.387,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 4871304,
+      "inventory_costs": {
+        "shortage_cost": 6.403,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 2449739,
+      "inventory_costs": {
+        "holding_cost": 9.929,
+        "shortage_cost": 36.601,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 100.345,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 73.0
+        }
+      },
+      "supplier_capacity": 383641
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 151.66,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 57.0
+        }
+      },
+      "supplier_capacity": 452699
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 20.0
+        }
+      },
+      "supplier_cost": 212.053,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "lithium_cell",
+        "industrial_sensor",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "silicon_wafer",
+          "heat_sink",
+          "lithium_cell"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 23.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3948938.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2222.465,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 62.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MegaSupply",
+        "BatteryTech",
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Main Factory",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MegaSupply",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 2.0
+        }
+      }
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 50
+  }
+}

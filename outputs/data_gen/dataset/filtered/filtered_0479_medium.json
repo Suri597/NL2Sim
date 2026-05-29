@@ -1,0 +1,247 @@
+{
+  "raw_materials": [
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "resin"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "GPU",
+      "bom": {
+        "microprocessor": 2,
+        "silicon_wafer": 1,
+        "resin": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 3.247,
+        "shortage_cost": 48.726,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3889.18,
+          "b": 9308.89
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.841,
+        "shortage_cost": 20.118,
+        "review_time": 24
+      }
+    },
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 2640224,
+      "inventory_costs": {
+        "holding_cost": 7.497,
+        "shortage_cost": 46.719,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 27.0
+        }
+      },
+      "supplier_cost": 372.982,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 80.0
+        }
+      },
+      "supplier_capacity": 629830
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "supplier_cost": 359.541,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "supplier_cost": 76.948,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 10.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "resin",
+        "GPU",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "microprocessor",
+          "silicon_wafer",
+          "resin"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 17.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Sony Electronics",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 43.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2245005.0,
+          "b": 597086.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3484.072,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 31.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "MetalFab Inc.",
+        "BatteryTech"
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      }
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

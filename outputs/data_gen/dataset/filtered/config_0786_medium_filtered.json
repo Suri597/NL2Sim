@@ -1,0 +1,324 @@
+{
+  "raw_materials": [
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "epoxy_compound"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "steel_rod": 1,
+        "memory_chip": 3
+      }
+    },
+    {
+      "name": "camera",
+      "bom": {
+        "epoxy_compound": 3,
+        "memory_chip": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 66612.0,
+          "b": 7529.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2513.29,
+          "b": 7782.39
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.136,
+        "shortage_cost": 35.729,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 3890870
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 4745203,
+      "inventory_costs": {
+        "holding_cost": 6.164,
+        "shortage_cost": 38.934,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "supplier_cost": 235.028,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 44.0
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "supplier_cost": 408.178,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_capacity": 885803
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 24.0
+        }
+      },
+      "supplier_cost": 192.365,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 53.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "EV_battery",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "steel_rod",
+          "memory_chip"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 26.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "camera",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "epoxy_compound",
+          "memory_chip"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 7.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 582083.0,
+          "b": 81548.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 16.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2110.239,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 64.0
+        }
+      }
+    },
+    {
+      "name": "Broadcom Limited",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 21.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1800984.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 1815.502,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "ChipCo",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Integration Center",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 7.0
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "camera"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 500,
+    "replications": 1
+  }
+}

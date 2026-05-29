@@ -1,0 +1,161 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "plastic_pellet": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 951.28,
+          "b": 2762.12
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.073,
+        "shortage_cost": 9.174,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 4940654,
+      "inventory_costs": {
+        "holding_cost": 4.753,
+        "shortage_cost": 37.526,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Memory Star",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 4.805,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 34.0,
+          "b": 68.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "industrial_sensor",
+        "plastic_pellet"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "plastic_pellet"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 1.0,
+            "b": 20.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Broadcom Limited",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 23.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 438563.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 13.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 81.272,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 73.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Memory Star"
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Memory Star",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "replications": 5,
+    "warm_up": 50
+  }
+}

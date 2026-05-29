@@ -1,0 +1,301 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "circuit_board",
+      "bom": {
+        "glass_fiber": 1,
+        "ceramic_substrate": 1,
+        "lithium_cell": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "smartphone",
+      "bom": {
+        "ceramic_substrate": 1,
+        "circuit_board": 4,
+        "lithium_cell": 3,
+        "glass_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47278.0,
+          "b": 49279.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.931,
+        "review_time": 18
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 184.52,
+          "b": 958.49
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 45.86,
+        "review_time": 11
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 361.54,
+          "b": 1280.02
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.26,
+        "shortage_cost": 34.669,
+        "review_time": 4
+      }
+    },
+    {
+      "name": "circuit_board",
+      "type": "intermediate_materials",
+      "initial_inventory": 1402603,
+      "inventory_costs": {
+        "holding_cost": 7.097,
+        "shortage_cost": 40.536,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 1086373,
+      "inventory_costs": {
+        "holding_cost": 7.17,
+        "shortage_cost": 21.106,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 78.986,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 53.0
+        }
+      },
+      "supplier_capacity": 811633
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 19.0
+        }
+      },
+      "supplier_cost": 207.156,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_cost": 400.5,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 63.0
+        }
+      },
+      "supplier_capacity": 761164
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "circuit_board",
+        "ceramic_substrate",
+        "lithium_cell",
+        "glass_fiber",
+        "smartphone"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "ceramic_substrate",
+          "circuit_board",
+          "lithium_cell",
+          "glass_fiber"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 9.0,
+            "b": 18.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2904966.0,
+          "b": 4939175.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 23.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 194.291,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 72.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "PolymerSource",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Integration Center",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 12.0
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "smartphone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

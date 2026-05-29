@@ -1,0 +1,276 @@
+{
+  "raw_materials": [
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "memory_chip"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "memory_chip": 1,
+        "carbon_fiber": 2
+      }
+    },
+    {
+      "name": "router",
+      "bom": {
+        "carbon_fiber": 3,
+        "memory_chip": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2925.93,
+          "b": 6503.5
+        }
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 603.31,
+          "b": 1082.28
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.966,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 4326016
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 2667684,
+      "inventory_costs": {
+        "shortage_cost": 14.059,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 23.0
+        }
+      },
+      "supplier_cost": 306.471,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 67.0
+        }
+      },
+      "supplier_capacity": 466670
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 384.855,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 57.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "camera",
+        "memory_chip",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "memory_chip",
+          "carbon_fiber"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 13.0,
+            "b": 14.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "router",
+        "memory_chip",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "carbon_fiber",
+          "memory_chip"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 13.0,
+            "b": 24.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 33.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2796161.0,
+          "b": 449670.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2848.79,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      }
+    },
+    {
+      "name": "Broadcom Limited",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 52.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4681219.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1485.841,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 80.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Main Factory",
+        "Integration Center",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "router"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 500,
+    "replications": 10
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "EV_battery",
+      "bom": {
+        "resin": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 95309.0,
+          "b": 17541.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 19.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.361,
+        "shortage_cost": 25.462,
+        "review_time": 18
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 676338,
+      "inventory_costs": {
+        "holding_cost": 5.924,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ChipCo",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 482.45,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "resin",
+        "EV_battery"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "resin"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 1.0,
+            "b": 6.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 24.0,
+          "b": 59.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3574811.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4293.464,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 46.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ChipCo"
+      ],
+      "facility": [
+        "Main Factory",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ChipCo",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "replications": 5
+  }
+}

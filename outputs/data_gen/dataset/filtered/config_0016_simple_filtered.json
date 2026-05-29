@@ -1,0 +1,150 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "CPU",
+      "bom": {
+        "glass_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 41.629,
+        "review_time": 26
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "initial_inventory": 4109465
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 24.0
+        }
+      },
+      "supplier_cost": 12.069,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 86.0
+        }
+      },
+      "supplier_capacity": 998910
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "CPU",
+        "glass_fiber"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "glass_fiber"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 14.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 40.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4927151.0,
+          "b": 1156872.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 24.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2476.521,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 85.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "CPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 10,
+    "warm_up": 30
+  }
+}

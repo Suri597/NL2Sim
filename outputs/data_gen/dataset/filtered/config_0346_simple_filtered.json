@@ -1,0 +1,162 @@
+{
+  "raw_materials": [
+    {
+      "name": "carbon_fiber"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "GPU",
+      "bom": {
+        "carbon_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 1.917,
+        "shortage_cost": 29.986,
+        "review_time": 22
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 2945450,
+      "inventory_costs": {
+        "shortage_cost": 27.998,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "supplier_cost": 335.471,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 34.0,
+          "b": 62.0
+        }
+      },
+      "supplier_capacity": 908899
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "GPU",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "carbon_fiber"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 14.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1404754.0,
+          "b": 4464388.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 14.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2735.332,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 89.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Pilot Line",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 365,
+    "replications": 5
+  }
+}

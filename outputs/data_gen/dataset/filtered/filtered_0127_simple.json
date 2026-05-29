@@ -1,0 +1,166 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "plastic_pellet": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1483.03,
+          "b": 3244.47
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.356,
+        "shortage_cost": 12.625,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 2040694,
+      "inventory_costs": {
+        "holding_cost": 8.117,
+        "shortage_cost": 34.451,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_cost": 54.645,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 68.0
+        }
+      },
+      "supplier_capacity": 131343
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "FPGA",
+        "plastic_pellet"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "plastic_pellet"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 26.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 58.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3448634.0,
+          "b": 119419.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1263.927,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "FPGA"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

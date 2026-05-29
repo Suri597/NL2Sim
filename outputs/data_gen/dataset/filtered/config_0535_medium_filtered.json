@@ -1,0 +1,343 @@
+{
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "copper_wire"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "heat_sink",
+      "bom": {
+        "copper_wire": 3,
+        "ceramic_substrate": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "copper_wire": 4,
+        "heat_sink": 3,
+        "ceramic_substrate": 2
+      }
+    },
+    {
+      "name": "SoC",
+      "bom": {
+        "ceramic_substrate": 1,
+        "heat_sink": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 19955.0,
+          "b": 5843.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 3.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.956,
+        "shortage_cost": 30.767,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 3.595,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 1958149,
+      "inventory_costs": {
+        "holding_cost": 1.453,
+        "shortage_cost": 27.016,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 112790,
+      "inventory_costs": {
+        "holding_cost": 5.176,
+        "shortage_cost": 3.441,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 657131,
+      "inventory_costs": {
+        "shortage_cost": 8.126,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "supplier_cost": 151.1,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 79.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 92.408,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 53.0,
+          "b": 54.0
+        }
+      },
+      "supplier_capacity": 346235
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 434.8,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 81.0
+        }
+      },
+      "supplier_capacity": 353656
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "medical_device",
+        "ceramic_substrate",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "copper_wire",
+          "heat_sink",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 10.0,
+            "b": 11.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "SoC",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "ceramic_substrate",
+          "heat_sink"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 29.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Samsung Electronics",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 52.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2322456.0,
+          "b": 4698464.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 27.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1800.023,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      }
+    },
+    {
+      "name": "NXP Semiconductors",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 94289.0,
+          "b": 3771883.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4373.648,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 52.0,
+          "b": 79.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "GlobalComponents",
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "medical_device"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 5
+  }
+}

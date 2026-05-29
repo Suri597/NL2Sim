@@ -1,0 +1,274 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "resin"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "battery_pack",
+      "bom": {
+        "plastic_pellet": 1,
+        "resin": 4,
+        "solder_paste": 2
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "resin": 3,
+        "plastic_pellet": 3,
+        "battery_pack": 3,
+        "solder_paste": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 6.357,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 22370.0,
+          "b": 5375.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 35.423,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 908.81,
+          "b": 2082.62
+        }
+      }
+    },
+    {
+      "name": "battery_pack",
+      "type": "intermediate_materials",
+      "initial_inventory": 2628765
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 187196,
+      "inventory_costs": {
+        "shortage_cost": 4.558,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 149.416,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_capacity": 169638
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 28.0
+        }
+      },
+      "supplier_cost": 403.464,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 51.0
+        }
+      }
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_cost": 179.895,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 60.0
+        }
+      },
+      "supplier_capacity": 746746
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "battery_pack",
+        "solder_paste",
+        "resin",
+        "plastic_pellet",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "resin",
+          "plastic_pellet",
+          "battery_pack",
+          "solder_paste"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 26.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1283850.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4733.474,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 65.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlobalComponents",
+        "PrecisionParts",
+        "SiliconWorks"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlobalComponents",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 10.0
+        }
+      }
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "medical_device"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 50
+  }
+}

@@ -1,0 +1,501 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "circuit_board",
+      "bom": {
+        "memory_chip": 4,
+        "lithium_cell": 4,
+        "ceramic_substrate": 4,
+        "microprocessor": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "memory_chip": 4,
+        "ceramic_substrate": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "bom": {
+        "circuit_board": 1,
+        "microprocessor": 4
+      }
+    },
+    {
+      "name": "drone",
+      "bom": {
+        "lithium_cell": 3,
+        "memory_chip": 4,
+        "circuit_board": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9628.0,
+          "b": 25897.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 15.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.773,
+        "shortage_cost": 47.553,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 1.933,
+        "review_time": 6
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3499.4,
+          "b": 5607.8
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.732,
+        "review_time": 16
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4660.67,
+          "b": 9283.97
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.99,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "circuit_board",
+      "type": "intermediate_materials",
+      "initial_inventory": 1134597
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 4983049
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 920695,
+      "inventory_costs": {
+        "shortage_cost": 43.332,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 1317954,
+      "inventory_costs": {
+        "holding_cost": 0.38,
+        "shortage_cost": 38.808,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 11.0
+        }
+      },
+      "supplier_cost": 9.09,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 38.0,
+          "b": 49.0
+        }
+      },
+      "supplier_capacity": 791902
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_cost": 192.918,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 26.0
+        }
+      },
+      "supplier_capacity": 512398
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_cost": 36.323,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 77.0
+        }
+      }
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 22.0
+        }
+      },
+      "supplier_cost": 227.206,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 51.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.358
+        }
+      },
+      "operating_cost_per_time": 10.385
+    },
+    {
+      "name": "Robot Arm",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.185
+        }
+      },
+      "operating_cost_per_time": 8.46
+    }
+  ],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "ceramic_substrate",
+        "FPGA"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "memory_chip",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 9.0
+          }
+        },
+        "resource_required": "Welding Station"
+      }
+    },
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "microprocessor",
+        "circuit_board"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "circuit_board",
+          "microprocessor"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 3.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "lithium_cell",
+        "memory_chip",
+        "circuit_board",
+        "drone"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "lithium_cell",
+          "memory_chip",
+          "circuit_board"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 11.0,
+            "b": 26.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Apple Supply",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 31.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 546167.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1576.481,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      }
+    },
+    {
+      "name": "Infineon Technologies",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 59.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4718114.0,
+          "b": 568563.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1284.074,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    },
+    {
+      "name": "Samsung Electronics",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 55.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2296953.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2402.138,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "MetalFab Inc.",
+        "Process Go.",
+        "MegaSupply"
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      }
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "FPGA"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 5,
+    "warm_up": 50
+  }
+}

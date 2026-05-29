@@ -1,0 +1,305 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "solder_paste"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "frame_structure",
+      "bom": {
+        "solder_paste": 4,
+        "resin": 2,
+        "memory_chip": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "solder_paste": 2,
+        "memory_chip": 2,
+        "frame_structure": 1,
+        "resin": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 28.045,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 58617.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    },
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 925220,
+      "inventory_costs": {
+        "shortage_cost": 3.749,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 417333
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 413.034,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 70.0
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_cost": 321.901,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 39.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_cost": 458.668,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 17.0
+        }
+      },
+      "supplier_capacity": 675033
+    }
+  ],
+  "resource": [
+    {
+      "name": "Packaging Machine",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.931
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 17,
+        "max_wait_time": 7.924
+      },
+      "operating_cost_per_time": 19.096
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "laptop",
+        "frame_structure",
+        "memory_chip",
+        "solder_paste",
+        "resin"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "solder_paste",
+          "memory_chip",
+          "frame_structure",
+          "resin"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 27.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 32.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3705196.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 324.193,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 39.0,
+          "b": 48.0
+        }
+      }
+    },
+    {
+      "name": "Sony Electronics",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 38.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1871544.0,
+          "b": 3144171.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3656.446,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 54.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "PrecisionParts",
+        "FastChip Corp."
+      ],
+      "facility": [
+        "Main Factory",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "laptop"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "replications": 1,
+    "warm_up": 30
+  }
+}

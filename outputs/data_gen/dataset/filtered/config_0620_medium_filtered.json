@@ -1,0 +1,297 @@
+{
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    },
+    {
+      "name": "microprocessor"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "power_module",
+      "bom": {
+        "microprocessor": 5,
+        "aluminum_sheet": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "microprocessor": 1,
+        "power_module": 3
+      }
+    },
+    {
+      "name": "CPU",
+      "bom": {
+        "aluminum_sheet": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3166.31,
+          "b": 6042.18
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 26.072,
+        "review_time": 7
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 5.857,
+        "shortage_cost": 9.181,
+        "review_time": 7
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "initial_inventory": 2658923,
+      "inventory_costs": {
+        "holding_cost": 5.375,
+        "shortage_cost": 49.735,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 2790587,
+      "inventory_costs": {
+        "holding_cost": 9.096,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "initial_inventory": 1821357,
+      "inventory_costs": {
+        "holding_cost": 4.524,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_cost": 157.509,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 19.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 8.0
+        }
+      },
+      "supplier_cost": 321.622,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "supplier_capacity": 537683
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "power_module",
+        "microprocessor",
+        "FPGA"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "microprocessor",
+          "power_module"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 5.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "CPU"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "aluminum_sheet"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 13.0,
+            "b": 19.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 43.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 592313.0,
+          "b": 3966777.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 26.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4353.08,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 46.0
+        }
+      }
+    },
+    {
+      "name": "Ross Associates",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 21.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4792381.0,
+          "b": 229778.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2945.885,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 52.0,
+          "b": 60.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Plant A",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "FPGA"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "CPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 1,
+    "warm_up": 30
+  }
+}

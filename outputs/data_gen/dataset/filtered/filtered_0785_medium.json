@@ -1,0 +1,316 @@
+{
+  "raw_materials": [
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "smartphone",
+      "bom": {
+        "silicon_wafer": 4
+      }
+    },
+    {
+      "name": "tablet",
+      "bom": {
+        "ceramic_substrate": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 944.42,
+          "b": 2472.45
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.284,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 19061.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.826,
+        "shortage_cost": 25.05,
+        "review_time": 21
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 2762769
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 846444,
+      "inventory_costs": {
+        "holding_cost": 1.345,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 28.0
+        }
+      },
+      "supplier_cost": 453.611,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 34.0
+        }
+      },
+      "supplier_capacity": 986472
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "supplier_cost": 16.88,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 43.0,
+          "b": 70.0
+        }
+      },
+      "supplier_capacity": 250347
+    }
+  ],
+  "resource": [
+    {
+      "name": "Test Equipment",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 4.124
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 76,
+        "max_wait_time": 6.516
+      },
+      "operating_cost_per_time": 0.308
+    }
+  ],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "smartphone",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "silicon_wafer"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 8.0
+          }
+        },
+        "resource_required": "Test Equipment"
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "ceramic_substrate"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 14.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Schneider Electric",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 42.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2477705.0,
+          "b": 213103.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 526.833,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      }
+    },
+    {
+      "name": "Sony Electronics",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 35.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 617848.0,
+          "b": 2145890.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1112.748,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Plant A",
+        "Integration Center",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 10.0
+        }
+      }
+    },
+    {
+      "source": "Plant A",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "smartphone"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "tablet"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 5
+  }
+}

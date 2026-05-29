@@ -1,0 +1,468 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "copper_wire"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "heat_sink",
+      "bom": {
+        "copper_wire": 4,
+        "steel_rod": 1
+      }
+    },
+    {
+      "name": "frame_structure",
+      "bom": {
+        "steel_rod": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "tablet",
+      "bom": {
+        "copper_wire": 4,
+        "frame_structure": 3,
+        "steel_rod": 3
+      }
+    },
+    {
+      "name": "router",
+      "bom": {
+        "steel_rod": 4,
+        "heat_sink": 1,
+        "frame_structure": 2,
+        "copper_wire": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 47181.0,
+          "b": 6701.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 9.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 6.729,
+        "shortage_cost": 19.834,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 71301.0,
+          "b": 5294.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 27.298,
+        "review_time": 17
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 1289118,
+      "inventory_costs": {
+        "shortage_cost": 34.862,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 4096039,
+      "inventory_costs": {
+        "holding_cost": 6.275,
+        "shortage_cost": 7.076,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 4673941
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 2761337,
+      "inventory_costs": {
+        "holding_cost": 8.489,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 24.0
+        }
+      },
+      "supplier_cost": 198.957,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 86.0
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 250.918,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 88.0
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 460.276,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_capacity": 900499
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 12.711,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 62.0
+        }
+      },
+      "supplier_capacity": 192923
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 350.527,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 81.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Injection Molder",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.516,
+          "b": 9.403
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 448.568
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 36.932
+          }
+        }
+      },
+      "operating_cost_per_time": 12.739
+    },
+    {
+      "name": "Quality Scanner",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.085
+        }
+      },
+      "operating_cost_per_time": 8.297
+    }
+  ],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "steel_rod",
+        "frame_structure",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "copper_wire",
+          "frame_structure",
+          "steel_rod"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 25.0
+          }
+        },
+        "resource_required": "Injection Molder"
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "frame_structure",
+        "steel_rod",
+        "heat_sink",
+        "router",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "steel_rod",
+          "heat_sink",
+          "frame_structure",
+          "copper_wire"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 14.0,
+            "b": 23.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 35.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3543267.0,
+          "b": 25420.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 103.917,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 33.0
+        }
+      }
+    },
+    {
+      "name": "Sony Electronics",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 40.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2602174.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2414.744,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 41.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "BatteryTech",
+        "Memory Star",
+        "ChipCo",
+        "MetalFab Inc.",
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Integration Center",
+        "Assembly Hub",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "BatteryTech",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 10.0
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "tablet"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "router"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 365,
+    "replications": 5
+  }
+}

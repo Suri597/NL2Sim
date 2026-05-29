@@ -1,0 +1,335 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "plastic_pellet": 2
+      }
+    },
+    {
+      "name": "FPGA",
+      "bom": {
+        "steel_rod": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 26590.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 27.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.633,
+        "shortage_cost": 29.569,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 44149.0,
+          "b": 2320.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 28.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 1.311,
+        "review_time": 8
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 1298738,
+      "inventory_costs": {
+        "holding_cost": 4.018,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 4565330,
+      "inventory_costs": {
+        "holding_cost": 0.634,
+        "shortage_cost": 39.513,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "supplier_cost": 390.911,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_capacity": 799857
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "supplier_cost": 298.503,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 51.0
+        }
+      },
+      "supplier_capacity": 992013
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 14.0
+        }
+      },
+      "supplier_cost": 221.632,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "plastic_pellet",
+        "camera"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "plastic_pellet"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 27.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "FPGA",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "steel_rod"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 8.0,
+            "b": 22.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 59.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1887480.0,
+          "b": 3740547.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 17.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4393.113,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 18.0,
+          "b": 51.0
+        }
+      }
+    },
+    {
+      "name": "Apple Supply",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 41.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1740572.0,
+          "b": 3056451.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2519.117,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 56.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "MetalFab Inc.",
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Fab",
+        "Processing Unit",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      }
+    },
+    {
+      "source": "Fab",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "FPGA"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 10
+  }
+}

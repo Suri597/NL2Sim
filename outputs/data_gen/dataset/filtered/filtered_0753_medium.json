@@ -1,0 +1,325 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "epoxy_compound"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "smartphone",
+      "bom": {
+        "epoxy_compound": 3,
+        "glass_fiber": 2,
+        "plastic_pellet": 3
+      }
+    },
+    {
+      "name": "solar_panel",
+      "bom": {
+        "plastic_pellet": 3,
+        "glass_fiber": 4,
+        "epoxy_compound": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 5.271,
+        "review_time": 3
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 845.78,
+          "b": 3423.93
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.764,
+        "review_time": 5
+      }
+    },
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4786.93,
+          "b": 11316.01
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.112,
+        "shortage_cost": 48.175,
+        "review_time": 18
+      }
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 642888,
+      "inventory_costs": {
+        "holding_cost": 7.321,
+        "shortage_cost": 21.807,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 2427819,
+      "inventory_costs": {
+        "holding_cost": 5.499,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 26.0
+        }
+      },
+      "supplier_cost": 44.684,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 41.0
+        }
+      }
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "supplier_cost": 245.743,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 57.0
+        }
+      },
+      "supplier_capacity": 958604
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "supplier_cost": 8.899,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 50.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "smartphone",
+        "glass_fiber",
+        "plastic_pellet",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "epoxy_compound",
+          "glass_fiber",
+          "plastic_pellet"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 2.0,
+            "b": 9.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "glass_fiber",
+        "plastic_pellet",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "plastic_pellet",
+          "glass_fiber",
+          "epoxy_compound"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 14.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Sony Electronics",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 46.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2253871.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1818.197,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      }
+    },
+    {
+      "name": "Ross Associates",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 44.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 341663.0,
+          "b": 423858.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3967.948,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MegaSupply",
+        "Process Go.",
+        "Memory Star"
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MegaSupply",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "smartphone"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 200,
+    "replications": 1
+  }
+}

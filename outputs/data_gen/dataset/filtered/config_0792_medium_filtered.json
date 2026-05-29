@@ -1,0 +1,330 @@
+{
+  "raw_materials": [
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "copper_wire"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "carbon_fiber": 2,
+        "copper_wire": 2
+      }
+    },
+    {
+      "name": "GPU",
+      "bom": {
+        "steel_rod": 2,
+        "copper_wire": 2,
+        "carbon_fiber": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3706.66,
+          "b": 5150.96
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 37.001,
+        "review_time": 8
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1586.3,
+          "b": 4476.94
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.203,
+        "shortage_cost": 36.835,
+        "review_time": 3
+      }
+    },
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 3238391,
+      "inventory_costs": {
+        "holding_cost": 9.496,
+        "shortage_cost": 18.111,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 3275,
+      "inventory_costs": {
+        "holding_cost": 6.027,
+        "shortage_cost": 4.567,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 19.0
+        }
+      },
+      "supplier_cost": 386.232,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 20.0,
+          "b": 52.0
+        }
+      },
+      "supplier_capacity": 726576
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 307.221,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_capacity": 215408
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "supplier_cost": 245.074,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 69.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "carbon_fiber",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "carbon_fiber",
+          "copper_wire"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 13.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "copper_wire",
+        "GPU",
+        "carbon_fiber",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "steel_rod",
+          "copper_wire",
+          "carbon_fiber"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 19.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Apple Supply",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2345461.0,
+          "b": 95893.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 24.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3964.793,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 15.0
+        }
+      }
+    },
+    {
+      "name": "Infineon Technologies",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 32.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2705529.0,
+          "b": 3411631.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4452.124,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "BatteryTech",
+        "CarbonSupply Co.",
+        "Memory Star"
+      ],
+      "facility": [
+        "Fab",
+        "Advanced Fab",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "BatteryTech",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire"
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "drone"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "replications": 1
+  }
+}

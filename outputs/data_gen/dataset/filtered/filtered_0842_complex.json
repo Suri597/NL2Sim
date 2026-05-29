@@ -1,0 +1,462 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "gold_wire"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "resin": 5
+      }
+    },
+    {
+      "name": "heat_sink",
+      "bom": {
+        "gold_wire": 4,
+        "resin": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "tablet",
+      "bom": {
+        "resin": 4,
+        "cooling_unit": 3,
+        "heat_sink": 2,
+        "gold_wire": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3051.01,
+          "b": 3598.86
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.696,
+        "shortage_cost": 29.49,
+        "review_time": 7
+      }
+    },
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1878.55,
+          "b": 3931.61
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 9.575,
+        "review_time": 8
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "initial_inventory": 4645178,
+      "inventory_costs": {
+        "holding_cost": 9.768,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 3270563,
+      "inventory_costs": {
+        "holding_cost": 2.654,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 3680571,
+      "inventory_costs": {
+        "holding_cost": 4.764,
+        "shortage_cost": 8.392,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 7.0
+        }
+      },
+      "supplier_cost": 441.134,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 15.0
+        }
+      }
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 4.0
+        }
+      },
+      "supplier_cost": 78.342,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 35.0
+        }
+      },
+      "supplier_capacity": 827106
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 370.805,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_cost": 446.552,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_cost": 371.037,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "supplier_capacity": 197142
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 385.97,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 52.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "supplier_cost": 327.306,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 69.0
+        }
+      }
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 483.697,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 44.0
+        }
+      },
+      "supplier_capacity": 398035
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.697,
+          "b": 1.911
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 122.798
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 36.73
+          }
+        }
+      },
+      "operating_cost_per_time": 2.196
+    },
+    {
+      "name": "Test Equipment",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.947
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 20,
+        "max_wait_time": 19.763
+      },
+      "operating_cost_per_time": 16.272
+    }
+  ],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "gold_wire",
+        "tablet",
+        "cooling_unit",
+        "heat_sink",
+        "resin"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "resin",
+          "cooling_unit",
+          "heat_sink",
+          "gold_wire"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 1.0
+          }
+        },
+        "resource_required": "Welding Station"
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Broadcom Limited",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2122779.0,
+          "b": 398683.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1679.299,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 27.0,
+          "b": 51.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PrecisionParts",
+        "SiliconWorks",
+        "ElectroParts",
+        "GlassCore Ltd.",
+        "BatteryTech",
+        "CarbonSupply Co.",
+        "FastChip Corp.",
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Production Center",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PrecisionParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      }
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "Production Center",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "tablet"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 50
+  }
+}

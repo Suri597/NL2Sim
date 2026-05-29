@@ -1,0 +1,325 @@
+{
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "router",
+      "bom": {
+        "ceramic_substrate": 1,
+        "solder_paste": 4
+      }
+    },
+    {
+      "name": "medical_device",
+      "bom": {
+        "solder_paste": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 7.929,
+        "shortage_cost": 23.97,
+        "review_time": 13
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 9.673,
+        "review_time": 7
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 648953
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 3669561,
+      "inventory_costs": {
+        "holding_cost": 3.273,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 25.0
+        }
+      },
+      "supplier_cost": 211.455,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 22.0,
+          "b": 38.0
+        }
+      }
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 185.434,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 25.0
+        }
+      },
+      "supplier_capacity": 537325
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 19.32,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 28.0,
+          "b": 72.0
+        }
+      },
+      "supplier_capacity": 306058
+    }
+  ],
+  "resource": [
+    {
+      "name": "Laser Cutter",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 0.861,
+          "b": 9.182
+        }
+      },
+      "operating_cost_per_time": 10.851
+    }
+  ],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "router",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "ceramic_substrate",
+          "solder_paste"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 8.0
+          }
+        },
+        "resource_required": "Laser Cutter"
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "solder_paste"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 13.0,
+            "b": 19.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 32.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3029959.0,
+          "b": 300867.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 27.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1889.27,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 82.0
+        }
+      }
+    },
+    {
+      "name": "Samsung Electronics",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 44.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1058425.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3796.343,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 53.0,
+          "b": 75.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MegaSupply",
+        "MetalFab Inc.",
+        "CarbonSupply Co."
+      ],
+      "facility": [
+        "Integration Center",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MegaSupply",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      }
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "router"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "medical_device"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 10
+  }
+}

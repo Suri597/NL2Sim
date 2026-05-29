@@ -1,0 +1,292 @@
+{
+  "raw_materials": [
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "epoxy_compound"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "memory_chip": 4,
+        "epoxy_compound": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "bom": {
+        "epoxy_compound": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31532.0,
+          "b": 88094.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 25.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 30.557,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4677.82,
+          "b": 13069.8
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.413,
+        "shortage_cost": 36.993,
+        "review_time": 16
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 1016700
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 2943372,
+      "inventory_costs": {
+        "holding_cost": 9.154,
+        "shortage_cost": 0.298,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Memory Star",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 12.0
+        }
+      },
+      "supplier_cost": 52.977,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 46.0
+        }
+      },
+      "supplier_capacity": 209161
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 333.705,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 38.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "memory_chip",
+        "SoC",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "memory_chip",
+          "epoxy_compound"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 6.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "EV_battery",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "epoxy_compound"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 21.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 1162739.0,
+          "b": 15857.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 886.706,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 88.0
+        }
+      }
+    },
+    {
+      "name": "Apple Supply",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4873474.0,
+          "b": 1114491.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 18.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4398.766,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Memory Star",
+        "MegaSupply"
+      ],
+      "facility": [
+        "Main Factory",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Memory Star",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      }
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "SoC"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "replications": 10
+  }
+}

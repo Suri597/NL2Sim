@@ -1,0 +1,516 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "gold_wire"
+    },
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "display_panel",
+      "bom": {
+        "plastic_pellet": 5
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "gold_wire": 2,
+        "glass_fiber": 4,
+        "plastic_pellet": 2
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "glass_fiber": 5,
+        "gold_wire": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "tablet",
+      "bom": {
+        "motor_assembly": 2,
+        "gold_wire": 2,
+        "glass_fiber": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "bom": {
+        "display_panel": 4,
+        "lens_assembly": 3,
+        "plastic_pellet": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3771.51,
+          "b": 7414.26
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.009,
+        "shortage_cost": 0.653,
+        "review_time": 23
+      }
+    },
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 44.84,
+        "review_time": 17
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3840.97,
+          "b": 9388.38
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.757,
+        "shortage_cost": 35.779,
+        "review_time": 30
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 3373751,
+      "inventory_costs": {
+        "holding_cost": 8.423,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 1826938,
+      "inventory_costs": {
+        "holding_cost": 0.327,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 405307,
+      "inventory_costs": {
+        "holding_cost": 3.503,
+        "shortage_cost": 41.386,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 4204929,
+      "inventory_costs": {
+        "holding_cost": 5.514,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 2228968,
+      "inventory_costs": {
+        "holding_cost": 9.222,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 266.119,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 52.0,
+          "b": 63.0
+        }
+      },
+      "supplier_capacity": 877175
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "supplier_cost": 3.477,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 59.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "supplier_cost": 494.481,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 86.0
+        }
+      },
+      "supplier_capacity": 448483
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 367.227,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 69.0
+        }
+      }
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 294.844,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 38.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 406.071,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_capacity": 791912
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.306,
+          "b": 7.963
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 84,
+        "max_wait_time": 5.874
+      },
+      "operating_cost_per_time": 11.716
+    }
+  ],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "glass_fiber",
+        "motor_assembly",
+        "gold_wire",
+        "tablet"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "motor_assembly",
+          "gold_wire",
+          "glass_fiber"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 8.0,
+            "b": 17.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "plastic_pellet",
+        "EV_battery",
+        "lens_assembly",
+        "display_panel"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "display_panel",
+          "lens_assembly",
+          "plastic_pellet"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 11.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4736112.0,
+          "b": 1203359.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4479.996,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 68.0
+        }
+      }
+    },
+    {
+      "name": "ABB Industrial",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2027385.0,
+          "b": 342291.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1931.554,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 88.0
+        }
+      }
+    },
+    {
+      "name": "Sony Electronics",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 34.0,
+          "b": 35.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2166571.0,
+          "b": 3738117.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 21.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4153.443,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 54.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PrecisionParts",
+        "Memory Star",
+        "GlobalComponents",
+        "PolymerSource",
+        "NanoMaterials Inc.",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Integration Center",
+        "Assembly Hub",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PrecisionParts",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "tablet"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 1
+  }
+}

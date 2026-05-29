@@ -1,0 +1,226 @@
+{
+  "raw_materials": [
+    {
+      "name": "aluminum_sheet"
+    },
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "sensor_array",
+      "bom": {
+        "plastic_pellet": 3,
+        "aluminum_sheet": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "sensor_array": 2,
+        "aluminum_sheet": 3,
+        "plastic_pellet": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 5.178,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 121.29,
+          "b": 1049.74
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.999,
+        "review_time": 21
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "initial_inventory": 2995264,
+      "inventory_costs": {
+        "holding_cost": 5.91,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 1833397,
+      "inventory_costs": {
+        "holding_cost": 9.211,
+        "shortage_cost": 9.285,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 20.0
+        }
+      },
+      "supplier_cost": 163.735,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 85.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_cost": 378.21,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 53.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "sensor_array",
+        "plastic_pellet",
+        "camera"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "sensor_array",
+          "aluminum_sheet",
+          "plastic_pellet"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 9.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 53.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1518624.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 7.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2399.603,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MegaSupply",
+        "BatteryTech"
+      ],
+      "facility": [
+        "Advanced Fab",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MegaSupply",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Advanced Fab",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "camera"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 365,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

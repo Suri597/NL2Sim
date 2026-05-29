@@ -1,0 +1,325 @@
+{
+  "raw_materials": [
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "SoC",
+      "bom": {
+        "carbon_fiber": 4,
+        "ceramic_substrate": 2
+      }
+    },
+    {
+      "name": "FPGA",
+      "bom": {
+        "ceramic_substrate": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4658.62,
+          "b": 7195.86
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 31.275,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 0.887,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 3688714,
+      "inventory_costs": {
+        "holding_cost": 7.68,
+        "shortage_cost": 18.226,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 4503323,
+      "inventory_costs": {
+        "holding_cost": 5.031,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "supplier_cost": 406.845,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 45.0
+        }
+      },
+      "supplier_capacity": 735001
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 29.0
+        }
+      },
+      "supplier_cost": 278.602,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "supplier_capacity": 46163
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 393.469,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 24.0,
+          "b": 65.0
+        }
+      },
+      "supplier_capacity": 562853
+    }
+  ],
+  "resource": [
+    {
+      "name": "Conveyor Belt",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.727,
+          "b": 2.501
+        }
+      },
+      "operating_cost_per_time": 3.158
+    }
+  ],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "SoC",
+        "carbon_fiber",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "carbon_fiber",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 26.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "FPGA",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "ceramic_substrate"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 1.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 58.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 712187.0,
+          "b": 139095.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1392.001,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 67.0
+        }
+      }
+    },
+    {
+      "name": "Infineon Technologies",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 41.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2922087.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4112.165,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 77.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "PrecisionParts",
+        "Process Go."
+      ],
+      "facility": [
+        "Integration Center",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "SoC"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "FPGA"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 1
+  }
+}

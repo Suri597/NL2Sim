@@ -1,0 +1,288 @@
+{
+  "raw_materials": [
+    {
+      "name": "lithium_cell"
+    },
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "plastic_pellet": 2,
+        "lithium_cell": 1,
+        "ceramic_substrate": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "tablet",
+      "bom": {
+        "ceramic_substrate": 1,
+        "lithium_cell": 4,
+        "plastic_pellet": 1,
+        "motor_assembly": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 7.116,
+        "shortage_cost": 23.821,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 5.491,
+        "review_time": 18
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 3697463,
+      "inventory_costs": {
+        "holding_cost": 9.047,
+        "shortage_cost": 23.631,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 2263750
+    }
+  ],
+  "supplier": [
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "supplier_cost": 218.727,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37.0,
+          "b": 56.0
+        }
+      },
+      "supplier_capacity": 417747
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 179.435,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 56.0
+        }
+      }
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_cost": 426.602,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 38.0,
+          "b": 61.0
+        }
+      },
+      "supplier_capacity": 560550
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "ceramic_substrate",
+        "lithium_cell",
+        "motor_assembly",
+        "plastic_pellet"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "ceramic_substrate",
+          "lithium_cell",
+          "plastic_pellet",
+          "motor_assembly"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 11.0,
+            "b": 16.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 56.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 269322.0,
+          "b": 3010070.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1470.278,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 86.0
+        }
+      }
+    },
+    {
+      "name": "Apple Supply",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 45.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3486611.0,
+          "b": 1008343.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 27.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 514.464,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 51.0,
+          "b": 81.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "FastChip Corp.",
+        "ChipCo",
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Production Center",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "FastChip Corp.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Production Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "tablet"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 200,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

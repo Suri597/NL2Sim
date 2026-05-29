@@ -1,0 +1,467 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "resin"
+    },
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "sensor_array",
+      "bom": {
+        "carbon_fiber": 5,
+        "lithium_cell": 4
+      }
+    },
+    {
+      "name": "battery_pack",
+      "bom": {
+        "microprocessor": 4,
+        "resin": 1,
+        "lithium_cell": 2
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "battery_pack": 3,
+        "lithium_cell": 2,
+        "sensor_array": 2,
+        "resin": 3,
+        "microprocessor": 2
+      }
+    },
+    {
+      "name": "router",
+      "bom": {
+        "microprocessor": 1,
+        "carbon_fiber": 3,
+        "resin": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 5.5,
+        "shortage_cost": 38.354,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 37396.0,
+          "b": 3218.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 6.927,
+        "review_time": 22
+      }
+    },
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1592.19,
+          "b": 2002.38
+        }
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 56547.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 8.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.235,
+        "review_time": 29
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "initial_inventory": 1132026,
+      "inventory_costs": {
+        "holding_cost": 9.937,
+        "shortage_cost": 13.173,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "battery_pack",
+      "type": "intermediate_materials",
+      "initial_inventory": 1779603,
+      "inventory_costs": {
+        "holding_cost": 8.686,
+        "shortage_cost": 9.231,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 3657837
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 175565,
+      "inventory_costs": {
+        "shortage_cost": 10.875,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 11.0
+        }
+      },
+      "supplier_cost": 41.65,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 74.0
+        }
+      },
+      "supplier_capacity": 361713
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_cost": 72.462,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 45.0,
+          "b": 75.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "supplier_cost": 4.499,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 33.0,
+          "b": 73.0
+        }
+      },
+      "supplier_capacity": 507127
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 333.372,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 312.332,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 60.0
+        }
+      },
+      "supplier_capacity": 949465
+    }
+  ],
+  "resource": [
+    {
+      "name": "Robot Arm",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 0.708,
+          "b": 4.76
+        }
+      },
+      "operating_cost_per_time": 14.163
+    }
+  ],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "battery_pack",
+        "sensor_array",
+        "lithium_cell",
+        "resin",
+        "camera"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "battery_pack",
+          "lithium_cell",
+          "sensor_array",
+          "resin",
+          "microprocessor"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 27.0
+          }
+        },
+        "resource_required": "Robot Arm"
+      }
+    },
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "microprocessor",
+        "resin",
+        "router",
+        "carbon_fiber"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "microprocessor",
+          "carbon_fiber",
+          "resin"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 9.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Siemens Digital",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 59.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3285623.0,
+          "b": 426260.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4727.062,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      }
+    },
+    {
+      "name": "Lenovo Group",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 51.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3299420.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 27.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1718.779,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 78.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "NanoMaterials Inc.",
+        "MetalFab Inc.",
+        "BatteryTech",
+        "PrecisionParts",
+        "ChipCo"
+      ],
+      "facility": [
+        "Fab",
+        "Production Center",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      }
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "Fab",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Production Center",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "router"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

@@ -1,0 +1,270 @@
+{
+  "raw_materials": [
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "solder_paste"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "silicon_wafer": 2,
+        "microprocessor": 3,
+        "solder_paste": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 48.717,
+        "review_time": 23
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2746.65,
+          "b": 8289.56
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.804,
+        "shortage_cost": 42.946,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 3726877,
+      "inventory_costs": {
+        "holding_cost": 5.043,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 15.0
+        }
+      },
+      "supplier_cost": 151.6,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 44.0,
+          "b": 75.0
+        }
+      }
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 413.722,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 72.0
+        }
+      },
+      "supplier_capacity": 86669
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 96.81,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "laptop",
+        "microprocessor",
+        "solder_paste",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "silicon_wafer",
+          "microprocessor",
+          "solder_paste"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 5.0,
+            "b": 15.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4601081.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4839.951,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 57.0
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 54.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3739769.0,
+          "b": 345115.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 19.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 2418.023,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 83.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "MegaSupply",
+        "FastChip Corp.",
+        "Memory Star"
+      ],
+      "facility": [
+        "Integration Center",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "MegaSupply",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "laptop"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 100,
+    "replications": 1
+  }
+}

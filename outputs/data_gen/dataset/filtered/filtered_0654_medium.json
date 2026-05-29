@@ -1,0 +1,339 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "glass_fiber"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "display_panel",
+      "bom": {
+        "glass_fiber": 3,
+        "silicon_wafer": 3,
+        "resin": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "glass_fiber": 2,
+        "resin": 2,
+        "display_panel": 1,
+        "silicon_wafer": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 0.149,
+        "review_time": 27
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3806.15,
+          "b": 7781.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.867,
+        "shortage_cost": 0.005,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 7.631,
+        "shortage_cost": 32.335,
+        "review_time": 3
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 3229062,
+      "inventory_costs": {
+        "holding_cost": 4.124,
+        "shortage_cost": 4.79,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 3710026,
+      "inventory_costs": {
+        "shortage_cost": 24.916,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 24.0
+        }
+      },
+      "supplier_cost": 463.392,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 35.0
+        }
+      },
+      "supplier_capacity": 452882
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 29.0
+        }
+      },
+      "supplier_cost": 198.03,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 54.0
+        }
+      },
+      "supplier_capacity": 151277
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_cost": 388.813,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 55.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Robot Arm",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.304,
+          "b": 5.037
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 7,
+        "max_wait_time": 10.053
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 22.371
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 21.9
+          }
+        }
+      },
+      "operating_cost_per_time": 1.011
+    }
+  ],
+  "facility": [
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "display_panel",
+        "silicon_wafer",
+        "solar_panel",
+        "resin",
+        "glass_fiber"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "glass_fiber",
+          "resin",
+          "display_panel",
+          "silicon_wafer"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 24.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2186563.0,
+          "b": 3906391.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 17.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 1858.47,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      }
+    },
+    {
+      "name": "Lenovo Group",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 57.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 489764.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 15.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3131.335,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 84.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "CarbonSupply Co.",
+        "PolymerSource"
+      ],
+      "facility": [
+        "Manufacturing Site",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 11.0
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Manufacturing Site",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 10,
+    "warm_up": 30
+  }
+}

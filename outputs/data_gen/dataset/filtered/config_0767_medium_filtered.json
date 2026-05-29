@@ -1,0 +1,351 @@
+{
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "ceramic_substrate": 3,
+        "silicon_wafer": 3
+      }
+    },
+    {
+      "name": "laptop",
+      "bom": {
+        "silicon_wafer": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 831.12,
+          "b": 1152.45
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 10.104,
+        "review_time": 29
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 14844.0,
+          "b": 2556.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 767723,
+      "inventory_costs": {
+        "holding_cost": 3.557,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 50350,
+      "inventory_costs": {
+        "shortage_cost": 16.952,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "supplier_cost": 264.787,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 77.0
+        }
+      },
+      "supplier_capacity": 927954
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "supplier_cost": 396.535,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_capacity": 767938
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "supplier_cost": 207.388,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 14.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.656
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 447.543
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 3.168
+          }
+        }
+      },
+      "operating_cost_per_time": 8.984
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "industrial_sensor",
+        "ceramic_substrate",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "ceramic_substrate",
+          "silicon_wafer"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 1.0,
+            "b": 29.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "laptop",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "silicon_wafer"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 13.0,
+            "b": 24.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Bosch Automotive",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 39.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4189929.0,
+          "b": 542678.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 25.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1564.808,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 46.0
+        }
+      }
+    },
+    {
+      "name": "Samsung Electronics",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 34.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2196091.0,
+          "b": 2250558.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 21.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 1519.675,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 49.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks",
+        "CarbonSupply Co.",
+        "BatteryTech"
+      ],
+      "facility": [
+        "Main Factory",
+        "Processing Unit",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      }
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "laptop"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 5
+  }
+}

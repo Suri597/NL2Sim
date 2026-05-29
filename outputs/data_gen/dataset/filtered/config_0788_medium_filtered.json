@@ -1,0 +1,337 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "silicon_wafer"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "silicon_wafer": 2,
+        "resin": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "bom": {
+        "steel_rod": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2080.32,
+          "b": 3852.5
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 9.064,
+        "shortage_cost": 44.068,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 22.354,
+        "review_time": 24
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 24791.0,
+          "b": 50749.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 19.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 1.421,
+        "shortage_cost": 4.409,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 2303846,
+      "inventory_costs": {
+        "holding_cost": 9.407,
+        "shortage_cost": 30.036,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 3773012,
+      "inventory_costs": {
+        "holding_cost": 0.504,
+        "shortage_cost": 7.939,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 2.0
+        }
+      },
+      "supplier_cost": 406.507,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37.0,
+          "b": 65.0
+        }
+      }
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 22.0
+        }
+      },
+      "supplier_cost": 221.434,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 85.0
+        }
+      },
+      "supplier_capacity": 420589
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "supplier_cost": 421.787,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 31.0
+        }
+      },
+      "supplier_capacity": 753685
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "resin",
+        "medical_device",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "silicon_wafer",
+          "resin"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 4.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Advanced Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "EV_battery",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "steel_rod"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 13.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "ABB Industrial",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 35.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2927273.0,
+          "b": 4519302.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 692.026,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 35.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 18.0,
+          "b": 43.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 549683.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4548.789,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 45.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "ElectroParts",
+        "SiliconWorks",
+        "Process Go."
+      ],
+      "facility": [
+        "Production Center",
+        "Advanced Fab",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ElectroParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "resin",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 11.0
+        }
+      }
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "Production Center",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "medical_device"
+    },
+    {
+      "source": "Advanced Fab",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

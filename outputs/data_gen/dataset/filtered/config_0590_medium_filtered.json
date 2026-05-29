@@ -1,0 +1,298 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "epoxy_compound": 1
+      }
+    },
+    {
+      "name": "router",
+      "bom": {
+        "silicon_wafer": 2,
+        "epoxy_compound": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 57903.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2507.41,
+          "b": 4887.22
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 7.408,
+        "shortage_cost": 23.657,
+        "review_time": 5
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 1878880,
+      "inventory_costs": {
+        "holding_cost": 9.823,
+        "shortage_cost": 39.749,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 413741,
+      "inventory_costs": {
+        "holding_cost": 7.363,
+        "shortage_cost": 43.335,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_cost": 275.369,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 34.0,
+          "b": 37.0
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_cost": 468.66,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 78.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Laser Cutter",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3.038
+        }
+      },
+      "operating_cost_per_time": 15.872
+    }
+  ],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "camera",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "epoxy_compound"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 6.0,
+            "b": 6.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "router",
+        "epoxy_compound",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "silicon_wafer",
+          "epoxy_compound"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 5.0,
+            "b": 20.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4237306.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 972.828,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 50.0
+        }
+      }
+    },
+    {
+      "name": "TechCorp",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 32.0,
+          "b": 32.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 454377.0,
+          "b": 70056.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1671.234,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37.0,
+          "b": 80.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlobalComponents",
+        "Memory Star"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlobalComponents",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "router"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 500,
+    "replications": 10,
+    "warm_up": 30
+  }
+}

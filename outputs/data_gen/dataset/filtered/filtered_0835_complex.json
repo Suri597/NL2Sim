@@ -1,0 +1,612 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "epoxy_compound"
+    },
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "ceramic_substrate"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "steel_rod": 1,
+        "epoxy_compound": 5
+      }
+    },
+    {
+      "name": "display_panel",
+      "bom": {
+        "ceramic_substrate": 2
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "resin": 3,
+        "epoxy_compound": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "tablet",
+      "bom": {
+        "steel_rod": 3,
+        "resin": 4,
+        "epoxy_compound": 4,
+        "cooling_unit": 2,
+        "ceramic_substrate": 3
+      }
+    },
+    {
+      "name": "drone",
+      "bom": {
+        "ceramic_substrate": 3,
+        "cooling_unit": 3
+      }
+    },
+    {
+      "name": "solar_panel",
+      "bom": {
+        "lens_assembly": 4,
+        "display_panel": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1421.26,
+          "b": 5129.92
+        }
+      }
+    },
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 7.9,
+        "review_time": 30
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 51065.0,
+          "b": 78392.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.642,
+        "shortage_cost": 18.434,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 204.67,
+          "b": 453.82
+        }
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "initial_inventory": 3481864,
+      "inventory_costs": {
+        "holding_cost": 5.769,
+        "shortage_cost": 5.645,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 2235039
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 1941974,
+      "inventory_costs": {
+        "holding_cost": 7.557,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 3439886
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 3812777,
+      "inventory_costs": {
+        "holding_cost": 7.558,
+        "shortage_cost": 9.952,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 3005386,
+      "inventory_costs": {
+        "holding_cost": 2.774,
+        "shortage_cost": 31.114,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Memory Star",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_cost": 307.626,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0
+        }
+      },
+      "supplier_capacity": 259110
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "supplier_cost": 365.312,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 37.0
+        }
+      }
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 11.0
+        }
+      },
+      "supplier_cost": 339.374,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 87.0
+        }
+      }
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "supplier_cost": 133.371,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      }
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 21.0
+        }
+      },
+      "supplier_cost": 390.404,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 89.0
+        }
+      },
+      "supplier_capacity": 153381
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 26.0
+        }
+      },
+      "supplier_cost": 406.348,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 28.0,
+          "b": 48.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 19.0
+        }
+      },
+      "supplier_cost": 66.218,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 61.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.477,
+          "b": 5.268
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 18,
+        "max_wait_time": 10.505
+      },
+      "operating_cost_per_time": 12.874
+    }
+  ],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "epoxy_compound",
+        "tablet",
+        "cooling_unit",
+        "ceramic_substrate",
+        "steel_rod",
+        "resin"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "steel_rod",
+          "resin",
+          "epoxy_compound",
+          "cooling_unit",
+          "ceramic_substrate"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 24.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "cooling_unit",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "ceramic_substrate",
+          "cooling_unit"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 8.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solar_panel",
+        "lens_assembly",
+        "display_panel"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "lens_assembly",
+          "display_panel"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 29.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Broadcom Limited",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 36.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 449395.0,
+          "b": 73894.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 25.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4025.983,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 57.0
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 43.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 4674028.0,
+          "b": 761205.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 26.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4337.126,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 21.0,
+          "b": 44.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 273459.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3884.354,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Memory Star",
+        "PrecisionParts",
+        "PolymerSource",
+        "CarbonSupply Co.",
+        "MetalFab Inc.",
+        "ChipCo",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Fab",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Memory Star",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 11.0
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 5.0
+        }
+      }
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 6.0
+        }
+      }
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "tablet"
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "drone"
+    },
+    {
+      "source": "Fab",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 10,
+    "warm_up": 30
+  }
+}

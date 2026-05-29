@@ -1,0 +1,314 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "aluminum_sheet"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "aluminum_sheet": 4
+      }
+    },
+    {
+      "name": "SoC",
+      "bom": {
+        "plastic_pellet": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1395.86,
+          "b": 3070.75
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.072,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "aluminum_sheet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 45040.0,
+          "b": 12199.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 28.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.762,
+        "shortage_cost": 25.486,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 702725,
+      "inventory_costs": {
+        "shortage_cost": 25.966,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 869673,
+      "inventory_costs": {
+        "shortage_cost": 11.383,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 9.0
+        }
+      },
+      "supplier_cost": 378.476,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 84.0
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "aluminum_sheet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "supplier_cost": 410.54,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 32.0
+        }
+      },
+      "supplier_capacity": 162099
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 486.728,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 73.0
+        }
+      },
+      "supplier_capacity": 926462
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "aluminum_sheet",
+        "industrial_sensor"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "aluminum_sheet"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 7.0,
+            "b": 15.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "plastic_pellet",
+        "SoC"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "plastic_pellet"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 5.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Bosch Automotive",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 39.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1834806.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 2546.747,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 25.0,
+          "b": 81.0
+        }
+      }
+    },
+    {
+      "name": "Ross Associates",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 44.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2082262.0,
+          "b": 2783100.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 25.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1986.617,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "CarbonSupply Co.",
+        "Memory Star",
+        "PolymerSource"
+      ],
+      "facility": [
+        "Plant A",
+        "Manufacturing Site",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "aluminum_sheet"
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "replications": 5,
+    "warm_up": 50
+  }
+}

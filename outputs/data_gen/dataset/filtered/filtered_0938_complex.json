@@ -1,0 +1,526 @@
+{
+  "raw_materials": [
+    {
+      "name": "epoxy_compound"
+    },
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "gold_wire"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "epoxy_compound": 4,
+        "solder_paste": 1
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "gold_wire": 3,
+        "solder_paste": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "solar_panel",
+      "bom": {
+        "cooling_unit": 1,
+        "motor_assembly": 1,
+        "epoxy_compound": 3,
+        "gold_wire": 4,
+        "solder_paste": 3
+      }
+    },
+    {
+      "name": "router",
+      "bom": {
+        "solder_paste": 1,
+        "gold_wire": 3,
+        "epoxy_compound": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "epoxy_compound",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 7.435,
+        "shortage_cost": 8.773,
+        "review_time": 30
+      }
+    },
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 0.651,
+        "shortage_cost": 18.538,
+        "review_time": 2
+      }
+    },
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 47.512,
+        "review_time": 26
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 2281339,
+      "inventory_costs": {
+        "holding_cost": 2.781,
+        "shortage_cost": 29.728,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "initial_inventory": 1118993,
+      "inventory_costs": {
+        "shortage_cost": 16.681,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "solar_panel",
+      "type": "products",
+      "initial_inventory": 2451305,
+      "inventory_costs": {
+        "holding_cost": 1.604,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "router",
+      "type": "products",
+      "initial_inventory": 3452230,
+      "inventory_costs": {
+        "holding_cost": 7.254,
+        "shortage_cost": 9.953,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "supplier_cost": 276.489,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_capacity": 846949
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      },
+      "supplier_cost": 283.672,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      }
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 14.0
+        }
+      },
+      "supplier_cost": 7.019,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 39.0,
+          "b": 74.0
+        }
+      }
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "epoxy_compound",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 29.0
+        }
+      },
+      "supplier_cost": 438.97,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 68.0
+        }
+      },
+      "supplier_capacity": 97942
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "supplier_cost": 263.791,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 50.0,
+          "b": 60.0
+        }
+      }
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "supplier_cost": 273.195,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 32.0
+        }
+      }
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 15.0
+        }
+      },
+      "supplier_cost": 471.687,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 37.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Laser Cutter",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.718
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 240.489
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 6.877
+          }
+        }
+      },
+      "operating_cost_per_time": 9.127
+    }
+  ],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "gold_wire",
+        "epoxy_compound",
+        "cooling_unit",
+        "solar_panel",
+        "solder_paste",
+        "motor_assembly"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "cooling_unit",
+          "motor_assembly",
+          "epoxy_compound",
+          "gold_wire",
+          "solder_paste"
+        ],
+        "output": [
+          "solar_panel"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 15.0
+          }
+        },
+        "resource_required": "Laser Cutter"
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "gold_wire",
+        "router",
+        "epoxy_compound"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "solder_paste",
+          "gold_wire",
+          "epoxy_compound"
+        ],
+        "output": [
+          "router"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 6.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Schneider Electric",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2823561.0,
+          "b": 181180.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 15.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 4163.096,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      }
+    },
+    {
+      "name": "Apple Supply",
+      "product": "router",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 58.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3737402.0,
+          "b": 271426.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 18.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4108.757,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 31.0,
+          "b": 51.0
+        }
+      }
+    },
+    {
+      "name": "Broadcom Limited",
+      "product": "solar_panel",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2389688.0,
+          "b": 2601439.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 20.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 3100.634,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 80.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks",
+        "Memory Star",
+        "MegaSupply",
+        "NanoMaterials Inc.",
+        "CarbonSupply Co.",
+        "PrecisionParts",
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "epoxy_compound"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "solar_panel"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "router"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 365,
+    "replications": 10,
+    "warm_up": 50
+  }
+}

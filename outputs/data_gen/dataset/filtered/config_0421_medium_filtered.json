@@ -1,0 +1,384 @@
+{
+  "raw_materials": [
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "copper_wire"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "battery_pack",
+      "bom": {
+        "copper_wire": 5,
+        "carbon_fiber": 1,
+        "plastic_pellet": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "battery_pack": 4,
+        "carbon_fiber": 2,
+        "copper_wire": 2
+      }
+    },
+    {
+      "name": "GPU",
+      "bom": {
+        "plastic_pellet": 1,
+        "copper_wire": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 22132.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 7.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.231,
+        "shortage_cost": 29.705,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 3051.78,
+          "b": 3259.24
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 24.392,
+        "review_time": 4
+      }
+    },
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4121.52,
+          "b": 8617.77
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 8.806,
+        "shortage_cost": 37.931,
+        "review_time": 29
+      }
+    },
+    {
+      "name": "battery_pack",
+      "type": "intermediate_materials",
+      "initial_inventory": 2482151,
+      "inventory_costs": {
+        "holding_cost": 2.785,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 4178104,
+      "inventory_costs": {
+        "shortage_cost": 24.052,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 2132451
+    }
+  ],
+  "supplier": [
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 11.0
+        }
+      },
+      "supplier_cost": 97.636,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 80.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_cost": 183.946,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 47.0
+        }
+      },
+      "supplier_capacity": 936520
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "supplier_cost": 328.493,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 34.0
+        }
+      },
+      "supplier_capacity": 751564
+    }
+  ],
+  "resource": [
+    {
+      "name": "Welding Station",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.866,
+          "b": 5.053
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 27,
+        "max_wait_time": 4.316
+      },
+      "operating_cost_per_time": 17.365
+    }
+  ],
+  "facility": [
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "camera",
+        "carbon_fiber",
+        "battery_pack",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "battery_pack",
+          "carbon_fiber",
+          "copper_wire"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 3.0,
+            "b": 27.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Assembly Hub",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "GPU",
+        "plastic_pellet",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "plastic_pellet",
+          "copper_wire"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 6.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Infineon Technologies",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 204099.0,
+          "b": 1695018.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4867.022,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 17.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 41.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4474777.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 23.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1522.366,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 41.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "BatteryTech",
+        "ElectroParts",
+        "PolymerSource"
+      ],
+      "facility": [
+        "Assembly Hub",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "BatteryTech",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 12.0
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      }
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Assembly Hub",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Assembly Hub",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 365,
+    "replications": 10,
+    "warm_up": 30
+  }
+}

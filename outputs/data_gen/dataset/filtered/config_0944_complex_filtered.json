@@ -1,0 +1,457 @@
+{
+  "raw_materials": [
+    {
+      "name": "ceramic_substrate"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "battery_pack",
+      "bom": {
+        "ceramic_substrate": 5
+      }
+    },
+    {
+      "name": "frame_structure",
+      "bom": {
+        "steel_rod": 2,
+        "ceramic_substrate": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "ceramic_substrate": 2,
+        "battery_pack": 3
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "frame_structure": 2
+      }
+    },
+    {
+      "name": "CPU",
+      "bom": {
+        "steel_rod": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "ceramic_substrate",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 4170.75,
+          "b": 7172.95
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 19.183,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 716.64,
+          "b": 1279.26
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 6.182,
+        "shortage_cost": 7.722,
+        "review_time": 26
+      }
+    },
+    {
+      "name": "battery_pack",
+      "type": "intermediate_materials",
+      "initial_inventory": 2608516,
+      "inventory_costs": {
+        "shortage_cost": 27.327,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 3858594,
+      "inventory_costs": {
+        "holding_cost": 5.538,
+        "shortage_cost": 33.178,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 3902697
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 4683669,
+      "inventory_costs": {
+        "holding_cost": 2.907,
+        "shortage_cost": 47.792,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "initial_inventory": 3678146,
+      "inventory_costs": {
+        "holding_cost": 5.482,
+        "shortage_cost": 2.699,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_cost": 245.538,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 59.0
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_cost": 230.147,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 45.0,
+          "b": 77.0
+        }
+      },
+      "supplier_capacity": 242988
+    },
+    {
+      "name": "MetalFab Inc.",
+      "supply_material_name": "ceramic_substrate",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 20.0
+        }
+      },
+      "supplier_cost": 496.011,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 62.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Assembly Line",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.702,
+          "b": 3.581
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 38,
+        "max_wait_time": 9.86
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 84.62
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 21.507
+          }
+        }
+      },
+      "operating_cost_per_time": 12.289
+    }
+  ],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "battery_pack",
+        "ceramic_substrate"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "ceramic_substrate",
+          "battery_pack"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 21.0
+          }
+        },
+        "resource_required": "Assembly Line"
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "frame_structure",
+        "industrial_sensor"
+      ],
+      "operation": {
+        "name": "coating",
+        "input": [
+          "frame_structure"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 11.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "CPU",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "steel_rod"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 24.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "HP Enterprise",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 38.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1037221.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 10.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4006.379,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 58.0
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 154720.0,
+          "b": 18384.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 989.657,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 62.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2957590.0,
+          "b": 3071015.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 12.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3675.496,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 57.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "ChipCo",
+        "MetalFab Inc."
+      ],
+      "facility": [
+        "Production Center",
+        "Integration Center",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "MetalFab Inc.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "ceramic_substrate",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 13.0
+        }
+      }
+    },
+    {
+      "source": "Production Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "drone"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "CPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 730,
+    "replications": 10
+  }
+}

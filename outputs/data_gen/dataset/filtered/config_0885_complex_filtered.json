@@ -1,0 +1,370 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "display_panel",
+      "bom": {
+        "silicon_wafer": 1,
+        "steel_rod": 3
+      }
+    },
+    {
+      "name": "heat_sink",
+      "bom": {
+        "memory_chip": 2,
+        "steel_rod": 4
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "silicon_wafer": 1,
+        "heat_sink": 3,
+        "steel_rod": 3,
+        "memory_chip": 1,
+        "display_panel": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 42.937,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 59209.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 27.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 2.429,
+        "shortage_cost": 26.162,
+        "review_time": 11
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2837.0,
+          "b": 69683.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 27.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 49.686,
+        "review_time": 25
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 909212
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 1610699,
+      "inventory_costs": {
+        "shortage_cost": 20.844,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 322629,
+      "inventory_costs": {
+        "holding_cost": 6.466,
+        "shortage_cost": 9.948,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "supplier_cost": 122.104,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 62.0
+        }
+      },
+      "supplier_capacity": 455126
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 3.0
+        }
+      },
+      "supplier_cost": 407.309,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 36.0
+        }
+      },
+      "supplier_capacity": 374148
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 29.0
+        }
+      },
+      "supplier_cost": 199.759,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 59.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "CNC Machine",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.465,
+          "b": 3.522
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 16,
+        "max_wait_time": 17.976
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 43.007
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 38.589
+          }
+        }
+      },
+      "operating_cost_per_time": 0.177
+    }
+  ],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "display_panel",
+        "memory_chip",
+        "steel_rod",
+        "heat_sink",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "silicon_wafer",
+          "heat_sink",
+          "steel_rod",
+          "memory_chip",
+          "display_panel"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 19.0
+          }
+        },
+        "resource_required": "CNC Machine"
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Siemens Digital",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 599189.0,
+          "b": 46424.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 2.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 2516.512,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 22.0,
+          "b": 87.0
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2219642.0,
+          "b": 3962351.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 16.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1713.447,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 45.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "FastChip Corp.",
+        "PrecisionParts"
+      ],
+      "facility": [
+        "Plant A",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      }
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 10
+  }
+}

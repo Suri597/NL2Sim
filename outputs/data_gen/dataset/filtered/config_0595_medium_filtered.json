@@ -1,0 +1,378 @@
+{
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "power_module",
+      "bom": {
+        "plastic_pellet": 4,
+        "steel_rod": 1,
+        "solder_paste": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "medical_device",
+      "bom": {
+        "plastic_pellet": 3,
+        "power_module": 3,
+        "solder_paste": 1,
+        "steel_rod": 4
+      }
+    },
+    {
+      "name": "tablet",
+      "bom": {
+        "solder_paste": 4,
+        "steel_rod": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3953.0,
+          "b": 47129.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 21.0
+        }
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "initial_inventory": 4186293
+    },
+    {
+      "name": "medical_device",
+      "type": "products",
+      "initial_inventory": 4625476,
+      "inventory_costs": {
+        "shortage_cost": 0.054,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "tablet",
+      "type": "products",
+      "initial_inventory": 3066216,
+      "inventory_costs": {
+        "holding_cost": 6.378,
+        "shortage_cost": 28.653,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 59.718,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 69.0
+        }
+      },
+      "supplier_capacity": 763524
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "supplier_cost": 461.802,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 28.0,
+          "b": 44.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_cost": 160.464,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 20.0,
+          "b": 84.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Injection Molder",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 0.275,
+          "b": 9.581
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 63,
+        "max_wait_time": 6.28
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 152.986
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 35.379
+          }
+        }
+      },
+      "operating_cost_per_time": 12.211
+    }
+  ],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "steel_rod",
+        "solder_paste",
+        "power_module",
+        "plastic_pellet",
+        "medical_device"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "plastic_pellet",
+          "power_module",
+          "solder_paste",
+          "steel_rod"
+        ],
+        "output": [
+          "medical_device"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 29.0
+          }
+        },
+        "resource_required": "Injection Molder"
+      }
+    },
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "tablet",
+        "solder_paste",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "assembly",
+        "input": [
+          "solder_paste",
+          "steel_rod"
+        ],
+        "output": [
+          "tablet"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 12.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Dell Technologies",
+      "product": "medical_device",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 19.0,
+          "b": 40.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2746555.0,
+          "b": 3414578.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 705.973,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 19.0,
+          "b": 89.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "tablet",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 51.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 40488.0,
+          "b": 9965.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 16.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4303.428,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 59.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "BatteryTech",
+        "MegaSupply",
+        "GlobalComponents"
+      ],
+      "facility": [
+        "Pilot Line",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "BatteryTech",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 3.0
+        }
+      }
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "medical_device"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "tablet"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 10
+  }
+}

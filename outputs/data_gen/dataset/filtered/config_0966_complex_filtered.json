@@ -1,0 +1,594 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "glass_fiber": 5
+      }
+    },
+    {
+      "name": "display_panel",
+      "bom": {
+        "plastic_pellet": 3,
+        "glass_fiber": 1
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "CPU",
+      "bom": {
+        "plastic_pellet": 3,
+        "motor_assembly": 4,
+        "display_panel": 1,
+        "glass_fiber": 4
+      }
+    },
+    {
+      "name": "camera",
+      "bom": {
+        "glass_fiber": 4
+      }
+    },
+    {
+      "name": "GPU",
+      "bom": {
+        "display_panel": 1,
+        "motor_assembly": 2,
+        "glass_fiber": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 31134.0,
+          "b": 3912.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 1.0
+        }
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 2647297,
+      "inventory_costs": {
+        "holding_cost": 8.67,
+        "shortage_cost": 2.249,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "display_panel",
+      "type": "intermediate_materials",
+      "initial_inventory": 2701898,
+      "inventory_costs": {
+        "holding_cost": 8.096,
+        "shortage_cost": 0.939,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "initial_inventory": 2391513,
+      "inventory_costs": {
+        "holding_cost": 4.785,
+        "shortage_cost": 29.822,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 3192541,
+      "inventory_costs": {
+        "holding_cost": 3.817,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 440205,
+      "inventory_costs": {
+        "holding_cost": 9.934,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "supplier_cost": 30.804,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 80.0
+        }
+      },
+      "supplier_capacity": 772725
+    },
+    {
+      "name": "FastChip Corp.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 14.0
+        }
+      },
+      "supplier_cost": 301.229,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 38.0
+        }
+      }
+    },
+    {
+      "name": "Process Go.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 13.0
+        }
+      },
+      "supplier_cost": 163.513,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "supplier_capacity": 534482
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_cost": 477.151,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 44.0
+        }
+      },
+      "supplier_capacity": 335954
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "supplier_cost": 485.284,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 47.0
+        }
+      }
+    },
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 4.0
+        }
+      },
+      "supplier_cost": 380.43,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 83.0
+        }
+      }
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 479.727,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 65.0
+        }
+      },
+      "supplier_capacity": 308678
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "supplier_cost": 46.414,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 14.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Laser Cutter",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 8.001
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 90,
+        "max_wait_time": 2.738
+      },
+      "operating_cost_per_time": 13.076
+    },
+    {
+      "name": "Conveyor Belt",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 0.209
+        }
+      },
+      "operating_cost_per_time": 17.975
+    }
+  ],
+  "facility": [
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "display_panel",
+        "CPU",
+        "glass_fiber",
+        "motor_assembly",
+        "plastic_pellet"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "plastic_pellet",
+          "motor_assembly",
+          "display_panel",
+          "glass_fiber"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 8.0,
+            "b": 18.0
+          }
+        },
+        "resource_required": "Laser Cutter"
+      }
+    },
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "glass_fiber",
+        "camera"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "glass_fiber"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 28.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Plant A",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "motor_assembly",
+        "glass_fiber",
+        "display_panel",
+        "GPU"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "display_panel",
+          "motor_assembly",
+          "glass_fiber"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 10.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 23.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 106913.0,
+          "b": 26966.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 17.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 702.217,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 53.0
+        }
+      }
+    },
+    {
+      "name": "HP Enterprise",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 31.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2200249.0,
+          "b": 2440676.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 13.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 3818.507,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 38.0
+        }
+      }
+    },
+    {
+      "name": "Broadcom Limited",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 35.0,
+          "b": 49.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4618894.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3995.196,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 52.0,
+          "b": 58.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks",
+        "FastChip Corp.",
+        "Process Go.",
+        "PolymerSource",
+        "BatteryTech",
+        "GlobalComponents",
+        "ChipCo",
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Plant A",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "FastChip Corp.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "Process Go.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "GlobalComponents",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 11.0
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Plant A",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 5.0
+        }
+      }
+    },
+    {
+      "source": "Plant A",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "CPU"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Plant A",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 10
+  }
+}

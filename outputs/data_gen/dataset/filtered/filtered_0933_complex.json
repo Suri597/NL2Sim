@@ -1,0 +1,480 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "memory_chip"
+    },
+    {
+      "name": "carbon_fiber"
+    },
+    {
+      "name": "copper_wire"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "power_module",
+      "bom": {
+        "memory_chip": 3,
+        "copper_wire": 1
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "carbon_fiber": 5
+      }
+    },
+    {
+      "name": "frame_structure",
+      "bom": {
+        "resin": 2
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "GPU",
+      "bom": {
+        "power_module": 4,
+        "motor_assembly": 3,
+        "frame_structure": 2,
+        "resin": 1,
+        "carbon_fiber": 1,
+        "memory_chip": 3,
+        "copper_wire": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1598.61,
+          "b": 5637.02
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 5.944,
+        "shortage_cost": 43.539,
+        "review_time": 22
+      }
+    },
+    {
+      "name": "memory_chip",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 7.972,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "carbon_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 4970.0,
+          "b": 1406.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.0,
+          "b": 23.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 40.902,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 3.969,
+        "shortage_cost": 7.844,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "initial_inventory": 2871868,
+      "inventory_costs": {
+        "shortage_cost": 40.163,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 700207,
+      "inventory_costs": {
+        "holding_cost": 6.527,
+        "shortage_cost": 10.907,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "frame_structure",
+      "type": "intermediate_materials",
+      "initial_inventory": 1353953,
+      "inventory_costs": {
+        "holding_cost": 8.76,
+        "shortage_cost": 20.399,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "GPU",
+      "type": "products",
+      "initial_inventory": 1451605,
+      "inventory_costs": {
+        "shortage_cost": 26.774,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlobalComponents",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 425.678,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      }
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "memory_chip",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 14.0
+        }
+      },
+      "supplier_cost": 66.693,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 53.0,
+          "b": 59.0
+        }
+      },
+      "supplier_capacity": 889487
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "carbon_fiber",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "supplier_cost": 367.365,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 11.0
+        }
+      },
+      "supplier_capacity": 464695
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 12.527,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 52.0,
+          "b": 63.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 281.577,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 55.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Quality Scanner",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2.425,
+          "b": 9.244
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 326.418
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 43.438
+          }
+        }
+      },
+      "operating_cost_per_time": 4.596
+    }
+  ],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "GPU",
+        "frame_structure",
+        "memory_chip",
+        "resin",
+        "carbon_fiber",
+        "power_module",
+        "motor_assembly",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "power_module",
+          "motor_assembly",
+          "frame_structure",
+          "resin",
+          "carbon_fiber",
+          "memory_chip",
+          "copper_wire"
+        ],
+        "output": [
+          "GPU"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 13.0,
+            "b": 14.0
+          }
+        },
+        "resource_required": "Quality Scanner"
+      }
+    },
+    {
+      "name": "Regional Depot",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 3185043.0,
+          "b": 699858.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 28.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 3350.724,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 77.0
+        }
+      }
+    },
+    {
+      "name": "Bosch Automotive",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 56.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 910036.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 20.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 3655.731,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 70.0
+        }
+      }
+    },
+    {
+      "name": "Samsung Electronics",
+      "product": "GPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 49.0
+        }
+      },
+      "demand": {
+        "distribution": "normal",
+        "parameters": {
+          "a": 2026267.0,
+          "b": 306444.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 1886.385,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 68.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlobalComponents",
+        "MegaSupply",
+        "ChipCo",
+        "GlassCore Ltd.",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Pilot Line",
+        "Regional Depot"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlobalComponents",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "memory_chip",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 12.0
+        }
+      }
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "carbon_fiber"
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire"
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Regional Depot",
+      "material_type": "products",
+      "material_name": "GPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 100,
+    "replications": 10
+  }
+}

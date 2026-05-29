@@ -1,0 +1,384 @@
+{
+  "raw_materials": [
+    {
+      "name": "gold_wire"
+    },
+    {
+      "name": "copper_wire"
+    },
+    {
+      "name": "steel_rod"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "sensor_array",
+      "bom": {
+        "gold_wire": 1,
+        "steel_rod": 1,
+        "copper_wire": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "FPGA",
+      "bom": {
+        "steel_rod": 4,
+        "gold_wire": 1,
+        "copper_wire": 1,
+        "sensor_array": 3
+      }
+    },
+    {
+      "name": "drone",
+      "bom": {
+        "sensor_array": 1,
+        "copper_wire": 3,
+        "steel_rod": 1,
+        "gold_wire": 2
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "gold_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 66489.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 10.0
+        }
+      }
+    },
+    {
+      "name": "copper_wire",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 6.665,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15859.0,
+          "b": 66970.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 10.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 24.085,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "initial_inventory": 262678,
+      "inventory_costs": {
+        "holding_cost": 1.067,
+        "shortage_cost": 41.751,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "FPGA",
+      "type": "products",
+      "initial_inventory": 2610243,
+      "inventory_costs": {
+        "holding_cost": 8.66,
+        "shortage_cost": 43.443,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 2457614,
+      "inventory_costs": {
+        "shortage_cost": 45.145,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "gold_wire",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 24.0
+        }
+      },
+      "supplier_cost": 203.501,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 68.0
+        }
+      },
+      "supplier_capacity": 232349
+    },
+    {
+      "name": "PrecisionParts",
+      "supply_material_name": "copper_wire",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "supplier_cost": 200.728,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 85.0
+        }
+      }
+    },
+    {
+      "name": "ElectroParts",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 445.765,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 72.0
+        }
+      },
+      "supplier_capacity": 724755
+    }
+  ],
+  "resource": [
+    {
+      "name": "Assembly Line",
+      "capacity": 5,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2.061
+        }
+      },
+      "operating_cost_per_time": 0.35
+    }
+  ],
+  "facility": [
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "gold_wire",
+        "sensor_array",
+        "steel_rod",
+        "FPGA",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "fabrication",
+        "input": [
+          "steel_rod",
+          "gold_wire",
+          "copper_wire",
+          "sensor_array"
+        ],
+        "output": [
+          "FPGA"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 21.0
+          }
+        },
+        "resource_required": "Assembly Line"
+      }
+    },
+    {
+      "name": "Production Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "gold_wire",
+        "sensor_array",
+        "steel_rod",
+        "copper_wire"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "sensor_array",
+          "copper_wire",
+          "steel_rod",
+          "gold_wire"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 2.0,
+            "b": 5.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Logistics Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "FPGA",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 48.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1373536.0,
+          "b": 4103303.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 1209.229,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 22.0,
+          "b": 74.0
+        }
+      }
+    },
+    {
+      "name": "Samsung Electronics",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 18.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2319753.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 25.0
+        }
+      },
+      "shortage_policy": "backorder_partial",
+      "unit_selling_price": 471.743,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 23.0,
+          "b": 44.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "PrecisionParts",
+        "ElectroParts"
+      ],
+      "facility": [
+        "Production Center",
+        "Logistics Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "gold_wire"
+    },
+    {
+      "source": "PrecisionParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "copper_wire",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      }
+    },
+    {
+      "source": "ElectroParts",
+      "destination": "Production Center",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "Production Center",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "FPGA"
+    },
+    {
+      "source": "Production Center",
+      "destination": "Logistics Center",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 10
+  }
+}

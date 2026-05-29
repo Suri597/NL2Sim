@@ -1,0 +1,300 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "microprocessor"
+    },
+    {
+      "name": "plastic_pellet"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "sensor_array",
+      "bom": {
+        "microprocessor": 2,
+        "plastic_pellet": 5,
+        "steel_rod": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "drone",
+      "bom": {
+        "microprocessor": 1,
+        "steel_rod": 4,
+        "sensor_array": 3,
+        "plastic_pellet": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 13.429,
+        "review_time": 13
+      }
+    },
+    {
+      "name": "microprocessor",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1627.38,
+          "b": 5680.15
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.081,
+        "shortage_cost": 13.063,
+        "review_time": 20
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 2739.58,
+          "b": 3406.14
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 1.789,
+        "review_time": 12
+      }
+    },
+    {
+      "name": "sensor_array",
+      "type": "intermediate_materials",
+      "initial_inventory": 2450010
+    },
+    {
+      "name": "drone",
+      "type": "products",
+      "initial_inventory": 344614
+    }
+  ],
+  "supplier": [
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 350.483,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      }
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "microprocessor",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 9.0
+        }
+      },
+      "supplier_cost": 379.039,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_capacity": 194255
+    },
+    {
+      "name": "ChipCo",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 21.0
+        }
+      },
+      "supplier_cost": 190.316,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 79.0
+        }
+      }
+    }
+  ],
+  "resource": [],
+  "facility": [
+    {
+      "name": "Pilot Line",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "drone",
+        "microprocessor",
+        "sensor_array",
+        "steel_rod",
+        "plastic_pellet"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "microprocessor",
+          "steel_rod",
+          "sensor_array",
+          "plastic_pellet"
+        ],
+        "output": [
+          "drone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 24.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Apple Supply",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 29.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 34979.0,
+          "b": 2007106.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4965.193,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 49.0
+        }
+      }
+    },
+    {
+      "name": "TechCorp",
+      "product": "drone",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 35.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1268136.0,
+          "b": 4070407.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 17.0,
+          "b": 17.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 1502.989,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 30.0,
+          "b": 34.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "SiliconWorks",
+        "Memory Star",
+        "ChipCo"
+      ],
+      "facility": [
+        "Pilot Line",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "SiliconWorks",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "microprocessor"
+    },
+    {
+      "source": "ChipCo",
+      "destination": "Pilot Line",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 12.0
+        }
+      }
+    },
+    {
+      "source": "Pilot Line",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "drone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "hour",
+    "horizon": 730,
+    "replications": 1
+  }
+}

@@ -1,0 +1,399 @@
+{
+  "raw_materials": [
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "power_module",
+      "bom": {
+        "steel_rod": 5,
+        "silicon_wafer": 3,
+        "glass_fiber": 3
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "silicon_wafer": 1,
+        "steel_rod": 3,
+        "power_module": 3,
+        "glass_fiber": 1
+      }
+    },
+    {
+      "name": "CPU",
+      "bom": {
+        "power_module": 4,
+        "glass_fiber": 3
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 89602.0,
+          "b": 12271.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 26.0
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 33.539,
+        "review_time": 9
+      }
+    },
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 86449.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 4.157,
+        "shortage_cost": 38.873,
+        "review_time": 19
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 3.961,
+        "shortage_cost": 45.754,
+        "review_time": 10
+      }
+    },
+    {
+      "name": "power_module",
+      "type": "intermediate_materials",
+      "initial_inventory": 3744097
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 872032,
+      "inventory_costs": {
+        "holding_cost": 2.913,
+        "shortage_cost": 35.833,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "CPU",
+      "type": "products",
+      "initial_inventory": 3351253,
+      "inventory_costs": {
+        "holding_cost": 2.991,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 29.0
+        }
+      },
+      "supplier_cost": 289.367,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 24.0,
+          "b": 34.0
+        }
+      }
+    },
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 13.0
+        }
+      },
+      "supplier_cost": 10.44,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 36.0,
+          "b": 72.0
+        }
+      },
+      "supplier_capacity": 949124
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 18.0
+        }
+      },
+      "supplier_cost": 150.906,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 42.0,
+          "b": 88.0
+        }
+      },
+      "supplier_capacity": 176201
+    }
+  ],
+  "resource": [
+    {
+      "name": "Injection Molder",
+      "capacity": 1,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 4.602
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 33,
+        "max_wait_time": 15.664
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 131.787
+          }
+        },
+        "downtime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 14.895
+          }
+        }
+      },
+      "operating_cost_per_time": 1.647
+    }
+  ],
+  "facility": [
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "laptop",
+        "steel_rod",
+        "silicon_wafer",
+        "glass_fiber",
+        "power_module"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "silicon_wafer",
+          "steel_rod",
+          "power_module",
+          "glass_fiber"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 12.0,
+            "b": 12.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "power_module",
+        "CPU",
+        "glass_fiber"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "power_module",
+          "glass_fiber"
+        ],
+        "output": [
+          "CPU"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 10.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Distribution Center",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "TechCorp",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 20.0,
+          "b": 50.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 3395775.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 624.767,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 46.0,
+          "b": 77.0
+        }
+      }
+    },
+    {
+      "name": "Lenovo Group",
+      "product": "CPU",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 30.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 2217901.0,
+          "b": 4721606.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 26.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 4769.151,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 80.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "GlassCore Ltd.",
+        "PolymerSource",
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Main Factory",
+        "Integration Center",
+        "Distribution Center"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "PolymerSource",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Main Factory",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "laptop"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Distribution Center",
+      "material_type": "products",
+      "material_name": "CPU"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 200,
+    "replications": 5,
+    "warm_up": 30
+  }
+}

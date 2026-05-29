@@ -1,0 +1,542 @@
+{
+  "raw_materials": [
+    {
+      "name": "resin"
+    },
+    {
+      "name": "glass_fiber"
+    },
+    {
+      "name": "lithium_cell"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "cooling_unit",
+      "bom": {
+        "lithium_cell": 4,
+        "resin": 4,
+        "glass_fiber": 5
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "bom": {
+        "resin": 1
+      }
+    },
+    {
+      "name": "circuit_board",
+      "bom": {
+        "glass_fiber": 1,
+        "resin": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "industrial_sensor",
+      "bom": {
+        "resin": 3,
+        "circuit_board": 1,
+        "cooling_unit": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "bom": {
+        "glass_fiber": 1,
+        "lithium_cell": 1,
+        "motor_assembly": 4,
+        "resin": 2,
+        "cooling_unit": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 1.233,
+        "shortage_cost": 35.669,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "glass_fiber",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "normal",
+        "parameters": {
+          "a": 38712.0,
+          "b": 3661.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 4.0,
+          "b": 24.0
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 6.753,
+        "shortage_cost": 0.048,
+        "review_time": 5
+      }
+    },
+    {
+      "name": "lithium_cell",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "holding_cost": 6.215,
+        "shortage_cost": 8.38,
+        "review_time": 15
+      }
+    },
+    {
+      "name": "cooling_unit",
+      "type": "intermediate_materials",
+      "initial_inventory": 4253507,
+      "inventory_costs": {
+        "shortage_cost": 35.314,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "motor_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 2565627,
+      "inventory_costs": {
+        "holding_cost": 5.534,
+        "shortage_cost": 36.588,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "circuit_board",
+      "type": "intermediate_materials",
+      "initial_inventory": 2996716,
+      "inventory_costs": {
+        "shortage_cost": 4.034,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "industrial_sensor",
+      "type": "products",
+      "initial_inventory": 990683,
+      "inventory_costs": {
+        "holding_cost": 9.137,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "SoC",
+      "type": "products",
+      "initial_inventory": 659768
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 24.0
+        }
+      },
+      "supplier_cost": 453.698,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 15.0,
+          "b": 78.0
+        }
+      },
+      "supplier_capacity": 334625
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 17.0
+        }
+      },
+      "supplier_cost": 358.629,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 84.0
+        }
+      }
+    },
+    {
+      "name": "BatteryTech",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 10.0,
+          "b": 23.0
+        }
+      },
+      "supplier_cost": 430.241,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 8.0,
+          "b": 37.0
+        }
+      },
+      "supplier_capacity": 655621
+    },
+    {
+      "name": "CarbonSupply Co.",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 66.302,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 47.0,
+          "b": 81.0
+        }
+      },
+      "supplier_capacity": 251753
+    },
+    {
+      "name": "Memory Star",
+      "supply_material_name": "glass_fiber",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 25.0
+        }
+      },
+      "supplier_cost": 79.244,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 29.0,
+          "b": 78.0
+        }
+      }
+    },
+    {
+      "name": "GlassCore Ltd.",
+      "supply_material_name": "lithium_cell",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 7.0
+        }
+      },
+      "supplier_cost": 412.732,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 70.0
+        }
+      },
+      "supplier_capacity": 371248
+    }
+  ],
+  "resource": [
+    {
+      "name": "Test Equipment",
+      "capacity": 2,
+      "service_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1.508,
+          "b": 1.828
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 480.528
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 4.982
+          }
+        }
+      },
+      "operating_cost_per_time": 11.713
+    },
+    {
+      "name": "Assembly Line",
+      "capacity": 4,
+      "service_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 8.019
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 64,
+        "max_wait_time": 6.992
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 185.584
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 27.356
+          }
+        }
+      },
+      "operating_cost_per_time": 3.797
+    }
+  ],
+  "facility": [
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "industrial_sensor",
+        "resin",
+        "circuit_board",
+        "cooling_unit"
+      ],
+      "operation": {
+        "name": "bonding",
+        "input": [
+          "resin",
+          "circuit_board",
+          "cooling_unit"
+        ],
+        "output": [
+          "industrial_sensor"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 12.0,
+            "b": 12.0
+          }
+        },
+        "resource_required": "Test Equipment"
+      }
+    },
+    {
+      "name": "Integration Center",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "cooling_unit",
+        "lithium_cell",
+        "resin",
+        "glass_fiber",
+        "SoC",
+        "motor_assembly"
+      ],
+      "operation": {
+        "name": "inspection",
+        "input": [
+          "glass_fiber",
+          "lithium_cell",
+          "motor_assembly",
+          "resin",
+          "cooling_unit"
+        ],
+        "output": [
+          "SoC"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 2.0,
+            "b": 22.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Warehouse",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "industrial_sensor",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 32.0,
+          "b": 48.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 122184.0,
+          "b": 3979788.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 19.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 331.212,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 44.0
+        }
+      }
+    },
+    {
+      "name": "Apple Supply",
+      "product": "SoC",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 20.0,
+          "b": 57.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 700633.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 26.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 4538.815,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 26.0,
+          "b": 82.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "SiliconWorks",
+        "BatteryTech",
+        "CarbonSupply Co.",
+        "Memory Star",
+        "GlassCore Ltd."
+      ],
+      "facility": [
+        "Integration Center",
+        "Warehouse"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber",
+      "transfer_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4.0
+        }
+      }
+    },
+    {
+      "source": "BatteryTech",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell"
+    },
+    {
+      "source": "CarbonSupply Co.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "Memory Star",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "glass_fiber"
+    },
+    {
+      "source": "GlassCore Ltd.",
+      "destination": "Integration Center",
+      "material_type": "raw_materials",
+      "material_name": "lithium_cell",
+      "transfer_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 3.0,
+          "b": 9.0
+        }
+      }
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "industrial_sensor"
+    },
+    {
+      "source": "Integration Center",
+      "destination": "Warehouse",
+      "material_type": "products",
+      "material_name": "SoC"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 730,
+    "replications": 10,
+    "warm_up": 30
+  }
+}

@@ -1,0 +1,357 @@
+{
+  "raw_materials": [
+    {
+      "name": "solder_paste"
+    },
+    {
+      "name": "plastic_pellet"
+    },
+    {
+      "name": "resin"
+    }
+  ],
+  "intermediate_materials": [],
+  "products": [
+    {
+      "name": "camera",
+      "bom": {
+        "plastic_pellet": 2,
+        "solder_paste": 3,
+        "resin": 3
+      }
+    },
+    {
+      "name": "smartphone",
+      "bom": {
+        "resin": 2,
+        "solder_paste": 1,
+        "plastic_pellet": 4
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "solder_paste",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "demand_driven"
+      },
+      "inventory_costs": {
+        "shortage_cost": 3.099,
+        "review_time": 14
+      }
+    },
+    {
+      "name": "plastic_pellet",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1947.32,
+          "b": 3374.69
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.964,
+        "shortage_cost": 41.035,
+        "review_time": 28
+      }
+    },
+    {
+      "name": "resin",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 105.02,
+          "b": 847.79
+        }
+      },
+      "inventory_costs": {
+        "shortage_cost": 0.832,
+        "review_time": 11
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 4545479
+    },
+    {
+      "name": "smartphone",
+      "type": "products",
+      "initial_inventory": 257383,
+      "inventory_costs": {
+        "holding_cost": 8.015,
+        "shortage_cost": 6.757,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "Process Go.",
+      "supply_material_name": "solder_paste",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 11.0,
+          "b": 17.0
+        }
+      },
+      "supplier_cost": 313.078,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 42.0
+        }
+      }
+    },
+    {
+      "name": "SiliconWorks",
+      "supply_material_name": "plastic_pellet",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 6.0
+        }
+      },
+      "supplier_cost": 420.912,
+      "supplier_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 21.0
+        }
+      }
+    },
+    {
+      "name": "MegaSupply",
+      "supply_material_name": "resin",
+      "supplier_lead_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 14.0
+        }
+      },
+      "supplier_cost": 345.3,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 37.0,
+          "b": 70.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Conveyor Belt",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 9.754
+        }
+      },
+      "failure": {
+        "enabled": true,
+        "uptime": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 274.821
+          }
+        },
+        "downtime": {
+          "distribution": "exponential",
+          "parameters": {
+            "a": 19.483
+          }
+        }
+      },
+      "operating_cost_per_time": 13.18
+    }
+  ],
+  "facility": [
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "resin",
+        "plastic_pellet",
+        "camera"
+      ],
+      "operation": {
+        "name": "polishing",
+        "input": [
+          "plastic_pellet",
+          "solder_paste",
+          "resin"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 17.0,
+            "b": 19.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Processing Unit",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "solder_paste",
+        "resin",
+        "plastic_pellet",
+        "smartphone"
+      ],
+      "operation": {
+        "name": "testing",
+        "input": [
+          "resin",
+          "solder_paste",
+          "plastic_pellet"
+        ],
+        "output": [
+          "smartphone"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 10.0,
+            "b": 27.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Storage Facility",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "Lenovo Group",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 43.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 2966857.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 9.0,
+          "b": 29.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 82.24,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 43.0
+        }
+      }
+    },
+    {
+      "name": "Dell Technologies",
+      "product": "smartphone",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 19.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 510897.0,
+          "b": 3953159.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 22.0
+        }
+      },
+      "shortage_policy": "salelost",
+      "unit_selling_price": 2645.1,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 48.0,
+          "b": 72.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "Process Go.",
+        "SiliconWorks",
+        "MegaSupply"
+      ],
+      "facility": [
+        "Processing Unit",
+        "Storage Facility"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "Process Go.",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "solder_paste"
+    },
+    {
+      "source": "SiliconWorks",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "plastic_pellet"
+    },
+    {
+      "source": "MegaSupply",
+      "destination": "Processing Unit",
+      "material_type": "raw_materials",
+      "material_name": "resin"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Processing Unit",
+      "destination": "Storage Facility",
+      "material_type": "products",
+      "material_name": "smartphone"
+    }
+  ],
+  "simulation": {
+    "time_unit": "week",
+    "horizon": 500,
+    "replications": 1,
+    "warm_up": 30
+  }
+}

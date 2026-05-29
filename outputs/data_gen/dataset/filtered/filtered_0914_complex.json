@@ -1,0 +1,422 @@
+{
+  "raw_materials": [
+    {
+      "name": "steel_rod"
+    },
+    {
+      "name": "silicon_wafer"
+    }
+  ],
+  "intermediate_materials": [
+    {
+      "name": "heat_sink",
+      "bom": {
+        "steel_rod": 3,
+        "silicon_wafer": 2
+      }
+    },
+    {
+      "name": "lens_assembly",
+      "bom": {
+        "silicon_wafer": 3,
+        "steel_rod": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "laptop",
+      "bom": {
+        "heat_sink": 4,
+        "lens_assembly": 2
+      }
+    },
+    {
+      "name": "camera",
+      "bom": {
+        "silicon_wafer": 2,
+        "heat_sink": 3,
+        "steel_rod": 1
+      }
+    },
+    {
+      "name": "EV_battery",
+      "bom": {
+        "steel_rod": 2,
+        "heat_sink": 4,
+        "silicon_wafer": 1
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "name": "steel_rod",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "inventory_threshold",
+        "parameters": {
+          "a": 1970.82,
+          "b": 2746.95
+        }
+      },
+      "inventory_costs": {
+        "holding_cost": 0.895,
+        "review_time": 8
+      }
+    },
+    {
+      "name": "silicon_wafer",
+      "type": "raw_materials",
+      "procurement_scheme": {
+        "type": "periodic_supply",
+        "distribution": "constant",
+        "parameters": {
+          "a": 92758.0
+        }
+      },
+      "procurement_arrival": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 16.0,
+          "b": 26.0
+        }
+      }
+    },
+    {
+      "name": "heat_sink",
+      "type": "intermediate_materials",
+      "initial_inventory": 1136232
+    },
+    {
+      "name": "lens_assembly",
+      "type": "intermediate_materials",
+      "initial_inventory": 2255396,
+      "inventory_costs": {
+        "shortage_cost": 23.665,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "laptop",
+      "type": "products",
+      "initial_inventory": 4893107,
+      "inventory_costs": {
+        "holding_cost": 5.241,
+        "shortage_cost": 46.596,
+        "review_time": 1
+      }
+    },
+    {
+      "name": "camera",
+      "type": "products",
+      "initial_inventory": 2603320
+    },
+    {
+      "name": "EV_battery",
+      "type": "products",
+      "initial_inventory": 4873077,
+      "inventory_costs": {
+        "holding_cost": 8.526,
+        "shortage_cost": 43.735,
+        "review_time": 1
+      }
+    }
+  ],
+  "supplier": [
+    {
+      "name": "PolymerSource",
+      "supply_material_name": "steel_rod",
+      "supplier_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "supplier_cost": 290.991,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 40.0,
+          "b": 61.0
+        }
+      },
+      "supplier_capacity": 566576
+    },
+    {
+      "name": "NanoMaterials Inc.",
+      "supply_material_name": "silicon_wafer",
+      "supplier_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 6.0,
+          "b": 12.0
+        }
+      },
+      "supplier_cost": 464.806,
+      "supplier_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 28.0,
+          "b": 88.0
+        }
+      }
+    }
+  ],
+  "resource": [
+    {
+      "name": "Injection Molder",
+      "capacity": 3,
+      "service_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 0.792
+        }
+      },
+      "batching": {
+        "enabled": true,
+        "batch_size": 81,
+        "max_wait_time": 15.28
+      },
+      "operating_cost_per_time": 11.314
+    }
+  ],
+  "facility": [
+    {
+      "name": "Fab",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "laptop",
+        "lens_assembly"
+      ],
+      "operation": {
+        "name": "welding",
+        "input": [
+          "heat_sink",
+          "lens_assembly"
+        ],
+        "output": [
+          "laptop"
+        ],
+        "operation_cycle": {
+          "distribution": "uniform",
+          "parameters": {
+            "a": 4.0,
+            "b": 9.0
+          }
+        },
+        "resource_required": "Injection Molder"
+      }
+    },
+    {
+      "name": "Main Factory",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "steel_rod",
+        "camera",
+        "silicon_wafer"
+      ],
+      "operation": {
+        "name": "cutting",
+        "input": [
+          "silicon_wafer",
+          "heat_sink",
+          "steel_rod"
+        ],
+        "output": [
+          "camera"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 17.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Manufacturing Site",
+      "type": "manufacturing",
+      "inventory_managed": [
+        "heat_sink",
+        "silicon_wafer",
+        "EV_battery",
+        "steel_rod"
+      ],
+      "operation": {
+        "name": "molding",
+        "input": [
+          "steel_rod",
+          "heat_sink",
+          "silicon_wafer"
+        ],
+        "output": [
+          "EV_battery"
+        ],
+        "operation_cycle": {
+          "distribution": "constant",
+          "parameters": {
+            "a": 28.0
+          }
+        },
+        "resource_required": ""
+      }
+    },
+    {
+      "name": "Fulfillment Hub",
+      "type": "warehouse"
+    }
+  ],
+  "customer": [
+    {
+      "name": "NXP Semiconductors",
+      "product": "laptop",
+      "arrival_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 18.0,
+          "b": 24.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4958365.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 16.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4127.301,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 14.0,
+          "b": 86.0
+        }
+      }
+    },
+    {
+      "name": "Infineon Technologies",
+      "product": "camera",
+      "arrival_time": {
+        "distribution": "exponential",
+        "parameters": {
+          "a": 30.0
+        }
+      },
+      "demand": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 4321218.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 5.0,
+          "b": 24.0
+        }
+      },
+      "shortage_policy": "salelost_partial",
+      "unit_selling_price": 4473.981,
+      "customer_payment_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 7.0,
+          "b": 19.0
+        }
+      }
+    },
+    {
+      "name": "HP Enterprise",
+      "product": "EV_battery",
+      "arrival_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 27.0
+        }
+      },
+      "demand": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 1300311.0,
+          "b": 3351136.0
+        }
+      },
+      "customer_lead_time": {
+        "distribution": "uniform",
+        "parameters": {
+          "a": 12.0,
+          "b": 15.0
+        }
+      },
+      "shortage_policy": "backorder",
+      "unit_selling_price": 1764.911,
+      "customer_payment_lead_time": {
+        "distribution": "constant",
+        "parameters": {
+          "a": 48.0
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "supplier": [
+        "PolymerSource",
+        "NanoMaterials Inc."
+      ],
+      "facility": [
+        "Fab",
+        "Main Factory",
+        "Manufacturing Site",
+        "Fulfillment Hub"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "PolymerSource",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "steel_rod"
+    },
+    {
+      "source": "NanoMaterials Inc.",
+      "destination": "Fab",
+      "material_type": "raw_materials",
+      "material_name": "silicon_wafer"
+    },
+    {
+      "source": "Fab",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "laptop"
+    },
+    {
+      "source": "Main Factory",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "camera"
+    },
+    {
+      "source": "Manufacturing Site",
+      "destination": "Fulfillment Hub",
+      "material_type": "products",
+      "material_name": "EV_battery"
+    }
+  ],
+  "simulation": {
+    "time_unit": "day",
+    "horizon": 100,
+    "replications": 5,
+    "warm_up": 30
+  }
+}
