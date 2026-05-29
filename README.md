@@ -352,38 +352,6 @@ The 8-character ID at the end matches train and val as a pair.
 
 ### Step 2 — Upload to OpenAI for fine-tuning
 
-```python
-from openai import OpenAI
-client = OpenAI()
-
-# upload train file
-train_file = client.files.create(
-    file=open("train_640samples_a3f2c1b4.jsonl", "rb"),
-    purpose="fine-tune"
-)
-
-# upload val file
-val_file = client.files.create(
-    file=open("val_160samples_a3f2c1b4.jsonl", "rb"),
-    purpose="fine-tune"
-)
-
-# start fine-tuning job
-job = client.fine_tuning.jobs.create(
-    training_file   = train_file.id,
-    validation_file = val_file.id,
-    model           = "gpt-4.1-2025-04-14",
-    hyperparameters = {
-        "n_epochs":        3,
-        "batch_size":      1,
-        "learning_rate_multiplier": 2,
-    },
-    seed = 1,
-)
-
-print(f"Fine-tuning job started: {job.id}")
-```
-
 ### Step 3 — Update model in pipeline
 
 Once fine-tuning completes update the model in `scripts/nl_to_json.py`:
