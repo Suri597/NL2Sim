@@ -407,8 +407,6 @@ Make sure you are running from inside the `scripts/` directory and your virtual 
 **Validation errors after generation**
 The interactive repair runner will guide you through fixing them. Press `2` to skip any issue that is not relevant to your scenario.
 
-**Simulation results seem wrong**
-Check that procurement types are correct (`periodic_supply` vs `demand_driven`) and that supplier capacity is `0` for unlimited.
 
 ---
 
