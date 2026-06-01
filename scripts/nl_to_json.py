@@ -30,7 +30,7 @@ load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 
 # ── Model config ───────────────────────────────────────────
-MODEL       = "ft:gpt-4.1-2025-04-14:personal:filterfinetune80:DZeuAI1R"
+MODEL       = "ft:gpt-4.1-2025-04-14:personal:nl2sim-ft:Dkz8vnRw"
 # MODEL       = "gpt-5.4"
 TEMPERATURE = 0.3
 
