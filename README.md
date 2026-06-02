@@ -9,7 +9,9 @@ NL2Sim is an end-to-end pipeline that converts a plain English description of a 
 ```
 Natural language description
         ↓
-LLM generates structured JSON config
+LLM generates structured JSON config  (OpenAI or Azure fine-tuned model)
+        ↓
+Pre-validation: resolve "missing" placeholders interactively
         ↓
 Multi-layer validation + interactive repair
         ↓
@@ -24,12 +26,14 @@ KPI results + what-if analysis
 
 ## Key features
 
-- **NL → JSON** — GPT-powered translation from plain English to a fully structured supply chain config
+- **NL → JSON** — fine-tuned GPT model translates plain English to a fully structured supply chain config
+- **OpenAI + Azure support** — choose between OpenAI fine-tuned model or Azure OpenAI fine-tuned model at runtime
+- **Pre-validation resolver** — interactively fills in any required fields the LLM left as `"missing"` before validation
 - **3-layer validation** — structural, semantic, and simulation-readiness checks with interactive repair
 - **Reliability scoring** — quantifies how well the generated JSON matches the original description
 - **DES simulation** — SimPy-based engine supporting periodic supply, inventory threshold, demand-driven procurement, backorder and lost sales policies, resource failures, batching
 - **What-if analysis** — modify any parameter in plain English and re-simulate
-- **Resume-safe pipeline** — interrupted runs resume from where they left off
+- **Resume-safe pipeline** — `--from-config` flag lets you skip the LLM step and resume from a saved config
 
 ---
 
@@ -37,22 +41,22 @@ KPI results + what-if analysis
 
 ```
 NL2Sim_v1/
-├── scripts/                   ← all runnable scripts
-│   ├── run_pipeline.py        ← main CLI entry point
-│   ├── nl_to_json.py          ← NL → JSON generation
-│   ├── validate.py            ← run all validation layers
-│   ├── iterative_repair.py    ← interactive repair runner
-│   ├── score_reliability.py   ← BLEU + Numeric F1 scoring
-│   ├── simulate.py            ← SimPy simulation engine
-│   ├── nl_to_whatif.py        ← what-if instruction parser
-│   ├── what_if_engine.py      ← applies what-if changes
-│   ├── prompts.py             ← LLM system instructions
-│   ├── schema.py              ← JSON schema example
-│   ├── resolvers.py           ← interactive repair resolvers
-│   ├── validation_layer_a.py  ← structural validation
-│   ├── validation_layer_b.py  ← supply chain semantic validation
-│   ├── validation_layer_c.py  ← simulation readiness checks
-│   └── data_gen/              ← synthetic dataset generation
+├── scripts/                        ← all runnable scripts
+│   ├── run_pipeline.py             ← main CLI entry point
+│   ├── nl_to_json.py               ← NL → JSON generation (OpenAI + Azure)
+│   ├── iterative_repair.py         ← interactive repair runner + pre-validation pass
+│   ├── score_reliability.py        ← BLEU + Numeric F1 scoring (OpenAI + Azure)
+│   ├── simulate.py                 ← SimPy simulation engine
+│   ├── nl_to_whatif.py             ← what-if instruction parser
+│   ├── what_if_engine.py           ← applies what-if changes
+│   ├── prompts.py                  ← LLM system instructions
+│   ├── schema.py                   ← JSON schema example
+│   ├── resolvers.py                ← interactive repair resolvers
+│   ├── validation_layer_a.py       ← Layer A: structural validation
+│   ├── validation_layer_b.py       ← Layer B: supply chain semantic validation
+│   ├── validation_layer_c.py       ← Layer C: simulation readiness checks
+│   ├── test_azure.py               ← Azure connection test script
+│   └── data_gen/                   ← synthetic dataset generation
 │       ├── json_generator.py
 │       ├── filter_config.py
 │       ├── nl_generator.py
@@ -60,11 +64,14 @@ NL2Sim_v1/
 │       ├── process_configs.py
 │       ├── dataset_builder.py
 │       └── format_dataset.py
-├── nl2sim/                    ← importable library
-│   ├── pipeline.py            ← Pipeline class
+├── finetune/                       ← Azure fine-tuning scripts
+│   ├── upload_file.py              ← upload JSONL training data to Azure OpenAI
+│   └── finetune_job.py             ← create and monitor Azure fine-tuning job
+├── nl2sim/                         ← importable library
+│   ├── pipeline.py                 ← Pipeline class
 │   └── __init__.py
-├── outputs/                   ← generated outputs (git-ignored)
-├── .env.example               ← API key template
+├── outputs/                        ← generated outputs (git-ignored)
+├── .env.example                    ← API key template
 ├── requirements.txt
 └── README.md
 ```
@@ -74,10 +81,9 @@ NL2Sim_v1/
 ## Prerequisites
 
 - Python 3.9+
-- An OpenAI API key
-- Azure OpenAI API key
-- Azure OpenAI Project Endpoint
-- Azure OpenAI Fine-tuned Model
+- One of the following:
+  - **OpenAI API key** (for OpenAI fine-tuned model)
+  - **Azure OpenAI API key + endpoint** (for Azure fine-tuned model)
 
 ---
 
@@ -104,16 +110,24 @@ source .venv/bin/activate        # macOS / Linux
 pip install -r requirements.txt
 ```
 
-**4. Set up your API key**
+**4. Set up environment variables**
 
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and add your OpenAI API key:
+Open `.env` and fill in your credentials. You only need to fill in the section for the model you intend to use:
 
-```
+```env
+# ── OpenAI (option 1) ──────────────────────────────────────
 OPENAI_API_KEY=sk-...your-key-here...
+
+# ── Azure OpenAI (option 2) ────────────────────────────────
+AZURE_OPENAI_API_KEY=your-azure-key
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2024-10-21
+AZURE_BASE_MODEL=gpt-4.1
+AZURE_FINETUNED_MODEL=your-finetuned-deployment-name
 ```
 
 ---
@@ -128,11 +142,31 @@ python run_pipeline.py
 ```
 
 You will be prompted to:
-1. Enter a supply chain description (from a file or directly in the terminal)
-2. Choose whether to include system instructions
-3. Review the reliability score and decide whether to proceed
-4. View simulation results
-5. Optionally run what-if analyses
+1. Choose which model to use (OpenAI or Azure)
+2. Enter a supply chain description (from a file or directly in the terminal)
+3. Choose whether to include system instructions
+4. Fill in any required fields the LLM left as `"missing"`
+5. Review the reliability score and decide whether to proceed
+6. View simulation results
+7. Optionally run what-if analyses
+
+---
+
+## Pipeline flags
+
+```bash
+# Skip simulation step
+python run_pipeline.py --no-simulate
+
+# Resume from an existing config (skip LLM step entirely)
+python run_pipeline.py --from-config ../outputs/run_xyz/config_raw.json
+
+# Resume and skip simulation
+python run_pipeline.py --from-config ../outputs/run_xyz/config_raw.json --no-simulate
+
+# Save outputs to a custom folder
+python run_pipeline.py --output-dir ../outputs/my_run
+```
 
 ---
 
@@ -167,7 +201,8 @@ The simulation runs for 365 days with 10 replications.
 
 ```bash
 cd scripts
-python nl_to_json.py description.txt output.json
+python nl_to_json.py description.txt output.json           # OpenAI
+python nl_to_json.py description.txt output.json --azure   # Azure
 ```
 
 **Validate and repair a JSON config**
@@ -179,19 +214,21 @@ python iterative_repair.py config.json
 **Score a config against its description**
 
 ```bash
-python score_reliability.py description.txt config.json
+python score_reliability.py description.txt config.json           # OpenAI
+python score_reliability.py description.txt config.json --azure   # Azure
 ```
 
 **Run simulation directly**
 
 ```bash
 python simulate.py config.json
+python simulate.py config.json --output ../outputs/results.json
 ```
 
-**Run what-if analysis**
+**Test Azure connection**
 
 ```bash
-python nl_to_whatif.py "increase supplier capacity of Process Go. to 500000" config.json
+python test_azure.py
 ```
 
 ---
@@ -210,6 +247,7 @@ The simulation engine (`simulate.py`) supports:
 | Financial KPIs | revenue, procurement cost, holding cost, shortage cost, profit, cash balance |
 | Service KPIs | fill rate, units delivered, units lost, backorder |
 | Inventory KPIs | average and ending inventory per material |
+| Missing fields | `"missing"` placeholders and absent fields handled automatically via `normalize_config()` |
 
 ---
 
@@ -218,18 +256,18 @@ The simulation engine (`simulate.py`) supports:
 The full schema supports the following sections:
 
 ```
-config_info       → scenario name and version
-raw_materials     → input materials (names)
+config_info            → scenario name and version
+raw_materials          → input materials (names)
 intermediate_materials → semi-finished goods with BOM
-products          → finished products with BOM
-inventory         → procurement scheme, costs, initial stock
-supplier          → lead time, cost, capacity, payment terms
-resource          → machines with service time, batching, failure
-facility          → manufacturing or warehouse, operations
-customer          → demand, arrival time, shortage policy, pricing
-nodes             → supply chain graph nodes
-edges             → material flows with transfer times
-simulation        → horizon, replications, warm-up, time unit
+products               → finished products with BOM
+inventory              → procurement scheme, costs, initial stock
+supplier               → lead time, cost, capacity, payment terms
+resource               → machines with service time, batching, failure
+facility               → manufacturing or warehouse, operations
+customer               → demand, arrival time, shortage policy, pricing
+nodes                  → supply chain graph nodes
+edges                  → material flows with transfer times
+simulation             → horizon, replications, warm-up, time unit
 ```
 
 Full schema example is in `scripts/schema.py`.
@@ -240,26 +278,31 @@ Full schema example is in `scripts/schema.py`.
 
 | Value | Meaning |
 |---|---|
-| `supplier_capacity = 0` | Unlimited capacity |
+| `supplier_capacity` absent/`"missing"` | Unlimited capacity (`inf`) |
 | `batch_size = 0` | Batching disabled |
-| `review_time = 0` | Defaults to 1 time unit |
-| `transfer_time.a = 0` | Immediate transfer |
-| `"missing"` | Field not provided — validation will prompt user |
+| `review_time` absent/`"missing"` | Defaults to 1 time unit |
+| `transfer_time` absent/`"missing"` | Immediate transfer (0 delay) |
+| `warm_up` absent/`"missing"` | Defaults to 0 |
+| `random_seed` absent/`"missing"` | Defaults to 12345 |
+| `"missing"` | Field not provided by user — pre-validation will prompt |
 
 ---
 
 ## Validation layers
 
+**Pre-validation pass**
+Scans the filtered config for required fields still set to `"missing"` and interactively prompts the user to fill them in before any validation layer runs.
+
 **Layer A — Structural**
-Checks types, required fields, allowed values, distribution parameters.
+Checks types, allowed values, and distribution parameters.
 
 **Layer B — Supply chain semantics**
 Checks BOMs reference known materials, every raw material has a supplier, facility operations are consistent, edges are valid.
 
 **Layer C — Simulation readiness**
-Checks producibility, inventory alignment, operation consistency.
+Checks producibility, inventory alignment, operation consistency, and distribution parameter constraints (e.g. uniform b > a).
 
-If any layer finds errors the interactive repair runner prompts you to fix them one by one using guided menus.
+If any layer finds errors, the interactive repair runner prompts you to fix them one by one using guided menus.
 
 ---
 
@@ -280,7 +323,45 @@ pipeline_summary.json     ← full run summary
 
 ---
 
-## Synthetic data generation (Optional, dataset already included. See instruction below for more information)
+## Fine-tuning on Azure OpenAI
+
+Scripts in `finetune/` handle uploading training data and launching fine-tuning jobs on Azure OpenAI / Microsoft Foundry.
+
+**Upload training data**
+
+```bash
+cd finetune
+# Fill in credentials and TRAINING_FILE_NAME in upload_file.py, then:
+python upload_file.py
+```
+
+**Start a fine-tuning job**
+
+```bash
+# Using an already-uploaded file ID
+python finetune_job.py --training-file file-abc123
+
+# Upload and fine-tune in one step
+python finetune_job.py --upload ../outputs/data_gen/dataset/train.jsonl
+
+# With validation file and custom hyperparameters
+python finetune_job.py \
+    --training-file file-abc123 \
+    --validation-file file-xyz789 \
+    --epochs 3 \
+    --batch-size 4 \
+    --lr-multiplier 0.2
+```
+
+Once fine-tuning completes, add the deployment name to `.env`:
+
+```env
+AZURE_FINETUNED_MODEL=your-finetuned-deployment-name
+```
+
+---
+
+## Synthetic data generation
 
 NL2Sim includes a pipeline for generating synthetic (NL, JSON) training pairs for fine-tuning:
 
@@ -307,80 +388,19 @@ python data_gen/format_dataset.py \
     --input ../outputs/data_gen/dataset/dataset.jsonl \
     --split 0.8 --validate
 ```
----
 
-## Using the dataset for fine-tuning
-
-The dataset is provided as a single JSONL file at `outputs/data_gen/dataset/dataset.jsonl`.
-Each line is one training instance in OpenAI fine-tuning format:
-
-```json
-{
-  "messages": [
-    {"role": "user",      "content": "instruction prefix + NL description + schema"},
-    {"role": "assistant", "content": "{...full JSON config with missing placeholders...}"}
-  ]
-}
-```
-
-### Step 1 — Sample and split
-
-Use `format_dataset.py` to randomly sample a subset and split into train/validation sets:
-
-```bash
-cd scripts
-
-# sample 800 from 1000, split 80/20 train/val, validate format
-python data_gen/format_dataset.py \
-    --input ../outputs/data_gen/dataset/dataset.jsonl \
-    --sample 800 \
-    --split 0.8 \
-    --validate
-
-# use all 1000, split 80/20
-python data_gen/format_dataset.py \
-    --input ../outputs/data_gen/dataset/dataset.jsonl \
-    --split 0.8 \
-    --validate
-
-# no split — single formatted file
-python data_gen/format_dataset.py \
-    --input ../outputs/data_gen/dataset/dataset.jsonl \
-    --no-split
-```
-
-Output files are saved next to the input with descriptive names:
-
-The 8-character ID at the start matches train and val as a pair.
-
-### Step 2 — Upload to OpenAI for fine-tuning
-
-### Step 3 — Update model in pipeline
-
-Once fine-tuning completes update the model in `scripts/nl_to_json.py`:
-
-```python
-MODEL = "ft:gpt-4.1-2025-04-14:personal:nl2sim:XXXXXXXX"
-```
-
-### format_dataset.py options
-
-| Flag | Default | Description |
-|---|---|---|
-| `--input` | required | Path to dataset.jsonl |
-| `--sample` | all | Randomly sample N records before splitting |
-| `--split` | 0.8 | Train/validation ratio |
-| `--no-split` | off | Save single file without splitting |
-| `--validate` | off | Validate OpenAI format before saving |
-| `--seed` | 42 | Random seed for sampling and splitting |
-| `--output-dir` | same as input | Directory to save output files |
 ---
 
 ## Environment variables
 
-| Variable | Required | Description |
+| Variable | Required for | Description |
 |---|---|---|
-| `OPENAI_API_KEY` | Yes | OpenAI API key for LLM calls |
+| `OPENAI_API_KEY` | OpenAI model | OpenAI API key |
+| `AZURE_OPENAI_API_KEY` | Azure model | Azure OpenAI API key |
+| `AZURE_OPENAI_ENDPOINT` | Azure model | Azure resource endpoint URL |
+| `AZURE_OPENAI_API_VERSION` | Azure model | API version (default: `2024-10-21`) |
+| `AZURE_BASE_MODEL` | Azure model | Base model deployment name |
+| `AZURE_FINETUNED_MODEL` | Azure model | Fine-tuned model deployment name |
 
 ---
 
@@ -390,11 +410,11 @@ Key packages (see `requirements.txt` for full list):
 
 ```
 simpy           ← discrete-event simulation
-openai          ← LLM API calls
+openai          ← LLM API calls (OpenAI + Azure)
 python-dotenv   ← .env file loading
-scipy           ← statistical distributions
+scipy           ← statistical distributions and confidence intervals
 nltk            ← BLEU score computation
-numpy           ← numerical operations
+word2number     ← numeric F1 scoring
 ```
 
 ---
@@ -402,16 +422,19 @@ numpy           ← numerical operations
 ## Troubleshooting
 
 **`OPENAI_API_KEY is not set`**
-Make sure you have a `.env` file in the root directory with your API key.
+Make sure your `.env` file exists in the root directory and contains your API key.
+
+**`AZURE_OPENAI_API_KEY is not set`**
+Make sure `AZURE_OPENAI_API_KEY` and `AZURE_OPENAI_ENDPOINT` are set in your `.env` file.
+
+**`DeploymentNotFound` on Azure**
+The model name in `AZURE_BASE_MODEL` or `AZURE_FINETUNED_MODEL` must match the exact deployment name in your Azure resource, not the model name. Check **Models + endpoints** in Microsoft Foundry.
 
 **`ModuleNotFoundError`**
 Make sure you are running from inside the `scripts/` directory and your virtual environment is activated.
 
+**Reliability score fails with quota error**
+The pipeline will ask if you want to skip the score and continue to simulation. Press `1` to skip.
+
 **Validation errors after generation**
-The interactive repair runner will guide you through fixing them. Press `2` to skip any issue that is not relevant to your scenario.
-
-
----
-
-
-
+The interactive repair runner will guide you through fixing them. Press `2` to skip any issue not relevant to your scenario.
