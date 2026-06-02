@@ -7,10 +7,13 @@ Usage:
     python run_pipeline.py
     python run_pipeline.py --output-dir ../outputs/my_run
     python run_pipeline.py --no-simulate
+    python run_pipeline.py --from-config ../outputs/run_xyz/config_raw.json
+    python run_pipeline.py --from-config ../outputs/run_xyz/config_raw.json --no-simulate
 
 """
 
 import sys
+import json
 import argparse
 from pathlib import Path
 
@@ -19,6 +22,36 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from nl2sim.pipeline import Pipeline
+
+
+def ask_model_choice() -> bool:
+    """
+    Interactively ask the user which model backend to use.
+    Returns True if Azure, False if OpenAI.
+    """
+    import os
+    from dotenv import load_dotenv
+    load_dotenv(ROOT / ".env")
+
+    openai_model = os.environ.get("OPENAI_MODEL", "ft:gpt-4.1-2025-04-14:personal:nl2sim-ft:Dkz8vnRw")
+    azure_model  = os.environ.get("AZURE_FINETUNED_MODEL") or os.environ.get("AZURE_BASE_MODEL", "Azure fine-tuned model")
+
+    print("\n" + "─" * 60)
+    print("Which model would you like to use?")
+    print(f"  1) OpenAI  — {openai_model}")
+    print(f"  2) Azure   — {azure_model} (Microsoft Foundry)")
+    print("─" * 60)
+
+    while True:
+        choice = input("Select option (1 or 2): ").strip()
+        if choice == "1":
+            print("  ✓ Using OpenAI fine-tuned model.")
+            return False
+        elif choice == "2":
+            print("  ✓ Using Azure fine-tuned model.")
+            return True
+        else:
+            print("  Invalid selection. Please enter 1 or 2.")
 
 
 if __name__ == "__main__":
@@ -35,13 +68,49 @@ if __name__ == "__main__":
         action="store_true",
         help="Skip simulation step",
     )
-    
+    parser.add_argument(
+        "--from-config",
+        default=None,
+        help="Skip LLM step and start from an existing raw config JSON file",
+    )
     args = parser.parse_args()
 
-    # ── Interactive input choice ───────────────────────────
+    output_dir = Path(args.output_dir) if args.output_dir else None
+
+    # ── Short-circuit: skip LLM, jump straight to validation ──
+    if args.from_config:
+        config_path = Path(args.from_config)
+        if not config_path.exists():
+            print(f"[ERROR] Config file not found: {config_path}")
+            sys.exit(1)
+
+        with open(config_path, encoding="utf-8") as f:
+            cfg = json.load(f)
+
+        print(f"\n  ✓ Loaded config from {config_path} — skipping LLM step")
+
+       
+
+        pipeline = Pipeline(
+            description="",
+            output_dir=output_dir,
+            use_context=False,
+            simulate=not args.no_simulate,
+            use_azure=False,
+        )
+
+        pipeline.validate_and_simulate(cfg)
+        sys.exit(0)
+
+    # ── Normal flow: LLM → validate → simulate ────────────
     print("\n" + "=" * 60)
     print("NL2Sim Pipeline")
     print("=" * 60)
+
+    # ── Ask model choice first ─────────────────────────────
+    use_azure = ask_model_choice()
+
+    # ── Ask for description ────────────────────────────────
     print("\nHow would you like to provide the supply chain description?")
     print("  1) Load from a .txt file")
     print("  2) Type directly in the terminal")
@@ -91,13 +160,12 @@ if __name__ == "__main__":
     print(f"  System instructions: {'included' if use_context else 'excluded'}")
 
     # ── Run pipeline ───────────────────────────────────────
-    output_dir = Path(args.output_dir) if args.output_dir else None
-
     pipeline = Pipeline(
-        description = description,
-        output_dir  = output_dir,
-        use_context = use_context,
-        simulate    = not args.no_simulate,
+        description=description,
+        output_dir=output_dir,
+        use_context=use_context,
+        simulate=not args.no_simulate,
+        use_azure=use_azure,
     )
 
     pipeline.run()

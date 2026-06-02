@@ -61,14 +61,11 @@ def filter_distribution(block: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def is_zero_constant(block: Dict[str, Any]) -> bool:
-    """
-    Returns True if block is constant distribution with a=0.
-    Used to decide whether transfer_time is relevant.
-    """
-    if not isinstance(block, dict):
-        return True
     dist = block.get("distribution", "constant")
     a    = block.get("parameters", {}).get("a", 0)
+    # if distribution is "missing", treat transfer_time as absent
+    if dist == "missing" or not isinstance(a, (int, float)):
+        return True
     return dist == "constant" and a == 0
 
 
@@ -116,11 +113,14 @@ def filter_inventory(inventory: List[Dict]) -> List[Dict]:
         inv_type  = item.get("type", "")
         is_raw    = inv_type == "raw_materials"
         costs     = item.get("inventory_costs", {})
-        holding   = costs.get("holding_cost", 0)
-        shortage  = costs.get("shortage_cost", 0)
-        review    = costs.get("review_time", 0)
-        init_inv  = item.get("initial_inventory", 0)
 
+        def _num(val):
+            return val if isinstance(val, (int, float)) else None
+
+        holding   = _num(costs.get("holding_cost"))
+        shortage  = _num(costs.get("shortage_cost"))
+        review    = _num(costs.get("review_time"))
+        init_inv  = _num(item.get("initial_inventory"))
         filtered: Dict[str, Any] = {"name": item["name"], "type": inv_type}
 
         # ── procurement scheme ─────────────────────────────
@@ -160,16 +160,15 @@ def filter_inventory(inventory: List[Dict]) -> List[Dict]:
                 filtered["procurement_arrival"] = filter_distribution(pa)
 
         # ── initial inventory ──────────────────────────────
-        if init_inv > 0:
+        if init_inv is not None and init_inv > 0:
             filtered["initial_inventory"] = init_inv
 
-        # ── inventory costs ────────────────────────────────
         inv_costs: Dict[str, Any] = {}
-        if holding > 0:
+        if holding is not None and holding > 0:
             inv_costs["holding_cost"] = holding
-        if shortage > 0:
+        if shortage is not None and shortage > 0:
             inv_costs["shortage_cost"] = shortage
-        if (holding > 0 or shortage > 0) and review > 0:
+        if (inv_costs.get("holding_cost") or inv_costs.get("shortage_cost")) and review is not None and review > 0:
             inv_costs["review_time"] = review
 
         if inv_costs:
@@ -189,6 +188,8 @@ def filter_suppliers(suppliers: List[Dict]) -> List[Dict]:
     result = []
     for s in suppliers:
         cap = s.get("supplier_capacity", 0)
+        cap = cap if isinstance(cap, (int, float)) else None
+
 
         filtered: Dict[str, Any] = {
             "name":                 s["name"],
@@ -200,7 +201,7 @@ def filter_suppliers(suppliers: List[Dict]) -> List[Dict]:
                 s.get("supplier_payment_lead_time", {})),
         }
 
-        if cap > 0:
+        if cap is not None and cap > 0:
             filtered["supplier_capacity"] = cap
 
         result.append(filtered)
@@ -355,8 +356,9 @@ def filter_simulation(sim: Dict) -> Dict:
         "replications": sim.get("replications", 10),
     }
 
+    # AFTER
     warm_up = sim.get("warm_up", 0)
-    if warm_up > 0:
+    if isinstance(warm_up, (int, float)) and warm_up > 0:
         filtered["warm_up"] = warm_up
 
     return filtered

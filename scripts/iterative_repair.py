@@ -35,7 +35,7 @@ from validation_layer_c import LayerCValidator
 # ------------------------------------------------------------
 # Resolvers
 # ------------------------------------------------------------
-from resolvers import REGISTRY
+from resolvers import REGISTRY, set_at_path
 
 
 # ============================================================
@@ -267,17 +267,41 @@ def sort_section(section_name: str, items: list) -> list:
         )
 
     return items
-
-def find_required_missing(cfg: dict) -> list:
+def _resolve_missing_generic(cfg: dict, path: str) -> None:
     """
-    Find all fields that are both:
-    1. Present in the filtered config (i.e. relevant/required)
-    2. Still have "missing" as their value
-
-    These are the fields the user must provide.
-    Returns a list of (path, value) tuples.
+    Generic fallback for missing required fields.
+    Tries int → float → string in that order.
     """
-    import sys
+    print(f"\n--- Required field missing ---")
+    print(f"  Field : {path}")
+
+    while True:
+        raw = input(f"  Enter value: ").strip()
+        if not raw:
+            print("  Value is required — cannot skip.")
+            continue
+
+        # Try int first, then float, then string
+        try:
+            val: Any = int(raw)
+        except ValueError:
+            try:
+                val = float(raw)
+            except ValueError:
+                val = raw
+
+        set_at_path(cfg, path, val)
+        print(f"  ✓ Set {path} → {val}")
+        break
+
+def resolve_missing_placeholders(cfg: dict) -> None:
+    """
+    Pre-validation pass:
+    1. Filter the full config to find only required fields
+    2. Scan filtered config for "missing" placeholders
+    3. For each one, trigger a resolver against the FULL config
+    4. Full config is patched in-place — no "missing" left for validators
+    """
     from pathlib import Path
     SCRIPTS_DIR = Path(__file__).resolve().parent
     if str(SCRIPTS_DIR) not in sys.path:
@@ -287,11 +311,12 @@ def find_required_missing(cfg: dict) -> list:
 
     filtered = filter_config(cfg)
 
-    missing_fields = []
+    # Collect all "missing" paths from filtered config
+    missing_paths = []
 
     def _scan(obj: Any, path: str = "") -> None:
         if isinstance(obj, str) and obj.strip().lower() == "missing":
-            missing_fields.append(path)
+            missing_paths.append(path)
             return
         if isinstance(obj, dict):
             for k, v in obj.items():
@@ -301,7 +326,30 @@ def find_required_missing(cfg: dict) -> list:
                 _scan(v, f"{path}[{i}]")
 
     _scan(filtered)
-    return missing_fields
+
+    if not missing_paths:
+        print("  ✓ No required fields missing.")
+        return
+
+    print(f"\n  ⚠️  {len(missing_paths)} required field(s) need input:\n")
+
+    for path in missing_paths:
+        # Build a synthetic finding so resolvers can match on it
+        finding = Finding(
+            layer="Layer0",
+            severity="missing_required",
+            path=path,
+            message="Found placeholder 'missing' in required field",
+        )
+
+        print(f"  → {path}")
+
+        # Try specific resolver first
+        applied = REGISTRY.resolve(cfg, finding)
+
+        if not applied:
+            # Generic numeric / string fallback
+            _resolve_missing_generic(cfg, path)
 
 def clean_missing_placeholders(cfg: dict, required_paths: set = None) -> dict:
     """

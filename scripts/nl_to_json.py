@@ -6,11 +6,12 @@ description into a structured JSON configuration.
 
 Usage (standalone):
     python nl_to_json.py description.txt output.json
-    python nl_to_json.py description.txt output.json --no-schema
+    python nl_to_json.py description.txt output.json --no-context
+    python nl_to_json.py description.txt output.json --azure
 
 Usage (imported):
     from nl_to_json import generate_json
-    result = generate_json(description, use_schema=True)
+    result = generate_json(description, use_context=True, use_azure=False)
 """
 
 import os
@@ -18,43 +19,83 @@ import re
 import json
 import sys
 from pathlib import Path
-from openai import OpenAI
 from dotenv import load_dotenv
 
 from prompts import SYSTEM_INSTRUCTIONS
 from schema  import SCHEMA_EXAMPLE
 
-
-
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 
-# ── Model config ───────────────────────────────────────────
-MODEL       = "ft:gpt-4.1-2025-04-14:personal:nl2sim-ft:Dkz8vnRw"
-# MODEL       = "gpt-5.4"
+# ============================================================
+# Model config
+# ============================================================
+
+# ── OpenAI fine-tuned model ────────────────────────────────
+OPENAI_MODEL = "ft:gpt-4.1-2025-04-14:personal:nl2sim-ft:Dkz8vnRw"
+
+# ── Azure OpenAI ───────────────────────────────────────────
+# Set these in your .env file:
+#   AZURE_OPENAI_API_KEY=...
+#   AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+#   AZURE_OPENAI_API_VERSION=2024-10-21
+#   AZURE_BASE_MODEL=gpt-4.1          ← base model deployment name
+#   AZURE_FINETUNED_MODEL=...         ← fine-tuned deployment name (once ready)
+AZURE_FINETUNED_MODEL = os.environ.get("AZURE_FINETUNED_MODEL", "")
+AZURE_BASE_MODEL      = os.environ.get("AZURE_BASE_MODEL", "gpt-4.1")
+
 TEMPERATURE = 0.3
 
-# ── Lazy client — only initialised when generate_json() is called ──
-_client = None
 
-def _get_client() -> OpenAI:
-    global _client
-    if _client is None:
+# ============================================================
+# Lazy clients
+# ============================================================
+
+_openai_client = None
+_azure_client  = None
+
+
+def _get_openai_client():
+    global _openai_client
+    if _openai_client is None:
+        from openai import OpenAI
         api_key = os.environ.get("OPENAI_API_KEY", "")
         if not api_key:
             raise EnvironmentError(
                 "OPENAI_API_KEY is not set. "
                 "Add it to your .env file or export it in your terminal."
             )
-        _client = OpenAI(api_key=api_key)
-    return _client
+        _openai_client = OpenAI(api_key=api_key)
+    return _openai_client
 
 
-# ── Prompt builder ─────────────────────────────────────────
+def _get_azure_client():
+    global _azure_client
+    if _azure_client is None:
+        from openai import AzureOpenAI
+        api_key  = os.environ.get("AZURE_OPENAI_API_KEY", "")
+        endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
+        version  = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-10-21")
+        if not api_key or not endpoint:
+            raise EnvironmentError(
+                "AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT must be "
+                "set in your .env file."
+            )
+        _azure_client = AzureOpenAI(
+            api_key=api_key,
+            azure_endpoint=endpoint,
+            api_version=version,
+        )
+    return _azure_client
+
+
+# ============================================================
+# Prompt builder
+# ============================================================
 
 def build_prompt(description: str) -> str:
     return f"""
-Convert the following supply chain description into JSON.
+Convert the following supply chain description into JSON structured representation following adhere to provided schema:
 
 {SCHEMA_EXAMPLE}
 
@@ -65,16 +106,28 @@ Supply chain description:
 """
 
 
-# ── Core function (importable by pipeline) ─────────────────
+# ============================================================
+# Core function (importable by pipeline)
+# ============================================================
 
-def generate_json(description: str, use_context: bool = True) -> dict:
+def generate_json(
+    description: str,
+    use_context: bool = True,
+    use_azure:   bool = False,
+) -> dict:
     """
+    Convert a natural language supply chain description to JSON.
+
     Parameters
     ----------
+    description : str
+        Natural language supply chain description.
     use_context : bool
-        If True (default), include SYSTEM_INSTRUCTIONS with full schema rules.
-        If False, send no system message — rely on the schema example only.
-        SCHEMA_EXAMPLE is always included in the user prompt regardless.
+        If True, include SYSTEM_INSTRUCTIONS with full schema rules.
+        If False, send no system message (fewer tokens).
+    use_azure : bool
+        If True, use Azure OpenAI fine-tuned model.
+        If False (default), use OpenAI fine-tuned model.
     """
     system_message = SYSTEM_INSTRUCTIONS if use_context else ""
 
@@ -83,14 +136,32 @@ def generate_json(description: str, use_context: bool = True) -> dict:
         {"role": "user",   "content": build_prompt(description)},
     ]
 
-    response = _get_client().responses.create(
-        model=MODEL,
-        temperature=TEMPERATURE,
-        input=messages,
-    )
+    if use_azure:
+        # ── Azure OpenAI ───────────────────────────────────
+        client = _get_azure_client()
 
-    raw = response.output_text.strip()
+        # Use fine-tuned model if set, otherwise fall back to base model
+        model = AZURE_FINETUNED_MODEL if AZURE_FINETUNED_MODEL else AZURE_BASE_MODEL
+        if not AZURE_FINETUNED_MODEL:
+            print(f"  [INFO] AZURE_FINETUNED_MODEL not set — using base model: {model}")
 
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=TEMPERATURE,
+        )
+        raw = response.choices[0].message.content.strip()
+
+    else:
+        # ── OpenAI ─────────────────────────────────────────
+        response = _get_openai_client().responses.create(
+            model=OPENAI_MODEL,
+            temperature=TEMPERATURE,
+            input=messages,
+        )
+        raw = response.output_text.strip()
+
+    # ── Parse JSON ─────────────────────────────────────────
     if raw.startswith("```"):
         raw = re.sub(r"```(?:json)?", "", raw).replace("```", "").strip()
 
@@ -102,7 +173,9 @@ def generate_json(description: str, use_context: bool = True) -> dict:
         )
 
 
-# ── Helpers ────────────────────────────────────────────────
+# ============================================================
+# Helpers
+# ============================================================
 
 def read_description(filepath: str) -> str:
     return Path(filepath).read_text(encoding="utf-8")
@@ -114,7 +187,9 @@ def save_json(data: dict, filepath: str) -> None:
     print(f"Saved → {filepath}")
 
 
-# ── CLI entry point ────────────────────────────────────────
+# ============================================================
+# CLI entry point
+# ============================================================
 
 if __name__ == "__main__":
     import argparse
@@ -123,7 +198,6 @@ if __name__ == "__main__":
         description="Convert a supply chain description to JSON."
     )
 
-    # Input — either a file OR a direct string
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "description_file",
@@ -139,23 +213,29 @@ if __name__ == "__main__":
     parser.add_argument(
         "--no-context",
         action="store_true",
-        help="Exclude system instructions — rely on schema example only (fewer tokens)",
+        help="Exclude system instructions (fewer tokens)",
+    )
+    parser.add_argument(
+        "--azure",
+        action="store_true",
+        help="Use Azure OpenAI fine-tuned model instead of OpenAI",
     )
 
     args = parser.parse_args()
 
-    # Load description from file or direct string
-    if args.text:
-        description = args.text
-    else:
-        description = read_description(args.description_file)
-
+    description = args.text if args.text else read_description(args.description_file)
     use_context = not args.no_context
+    use_azure   = args.azure
 
-    print(f"Model       : {MODEL}")
+    model_label = (
+        f"Azure — {AZURE_FINETUNED_MODEL or AZURE_BASE_MODEL}"
+        if use_azure else OPENAI_MODEL
+    )
+
+    print(f"Model       : {model_label}")
     print(f"Temperature : {TEMPERATURE}")
     print(f"Context     : {'yes' if use_context else 'no'}")
     print("Generating...\n")
 
-    result = generate_json(description, use_context=use_context)
+    result = generate_json(description, use_context=use_context, use_azure=use_azure)
     save_json(result, args.output_file)

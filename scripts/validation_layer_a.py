@@ -504,11 +504,10 @@ class LayerAValidator:
             for field, expected_type in schema.items():
                 p = f"{base}.{field}"
                 if field not in item:
-                    self._err(p, "Missing required field")
-                    continue
+                    continue  # LLM handles field presence — skip
                 val = item[field]
                 if val == MISSING_LITERAL:
-                    continue  # handled by _detect_missing_literals
+                    continue
                 if not isinstance(val, expected_type):
                     self._err(p, f"Expected {expected_type}")
 

@@ -1187,6 +1187,90 @@ def resolve_layerc_unknown_resource_required(
                 print("Invalid selection. Try again.")
         except ValueError:
             print("Invalid selection. Try again.")
+
+@REGISTRY.register(
+    layer="LayerC",
+    severity="error",
+    path_regex=r"\.procurement_scheme$|\.procurement_arrival$|\.supplier_lead_time$|\.supplier_payment_lead_time$|\.arrival_time$|\.demand$|\.customer_lead_time$|\.customer_payment_lead_time$|\.service_time$|\.operation_cycle$",
+    message_regex=r"distribution requires",
+)
+def resolve_layerc_invalid_distribution_parameters(
+    cfg: Dict[str, Any], finding: FindingLike
+) -> bool:
+    import re
+
+    print(f"\n--- Invalid distribution parameters ---")
+    print(f"  Path  : {finding.path}")
+    print(f"  Issue : {finding.message}")
+
+    # ── Resolve the block from path ────────────────────────
+    # Path format: inventory[name=microprocessor].procurement_scheme
+    # or: supplier[name=X].supplier_lead_time etc.
+    block = None
+
+    m = re.match(r"^(\w+)\[name=(.+?)\]\.(.+)$", finding.path)
+    if m:
+        section   = m.group(1)   # e.g. inventory
+        name      = m.group(2)   # e.g. microprocessor
+        field     = m.group(3)   # e.g. procurement_scheme
+
+        entries = cfg.get(section, [])
+        for entry in entries:
+            if isinstance(entry, dict) and entry.get("name") == name:
+                block = entry.get(field)
+                break
+
+    if not isinstance(block, dict):
+        print("  Could not locate distribution block.")
+        return False
+
+    dist = block.get("distribution")
+    if not dist or dist == "missing":
+        print("  Distribution type not set.")
+        return False
+
+    print(f"\n  Distribution : {dist}")
+
+    # ── keep prompting until valid ─────────────────────────
+    while True:
+        print(f"  Current params: {block.get('parameters', {})}")
+        print(f"  Issue         : {finding.message}")
+        print(f"\n  Please re-enter parameters for '{dist}' distribution:")
+
+        new_params = _prompt_distribution_parameters(dist)
+
+        a = new_params.get("a")
+        b = new_params.get("b")
+        c = new_params.get("c")
+        valid = True
+
+        if dist == "uniform" and isinstance(a, (int, float)) and isinstance(b, (int, float)):
+            if b <= a:
+                print(f"\n  ✗ Invalid: b ({b}) must be greater than a ({a}). Try again.")
+                valid = False
+
+        elif dist == "normal" and isinstance(b, (int, float)):
+            if b <= 0:
+                print(f"\n  ✗ Invalid: std (b) must be > 0, got {b}. Try again.")
+                valid = False
+
+        elif dist == "triangular" and all(isinstance(x, (int, float)) for x in [a, b, c]):
+            if not (a <= b <= c):
+                print(f"\n  ✗ Invalid: must satisfy a <= b <= c, got a={a}, b={b}, c={c}. Try again.")
+                valid = False
+
+        elif dist in ("weibull", "beta"):
+            if isinstance(a, (int, float)) and a <= 0:
+                print(f"\n  ✗ Invalid: a must be > 0, got {a}. Try again.")
+                valid = False
+            elif isinstance(b, (int, float)) and b <= 0:
+                print(f"\n  ✗ Invalid: b must be > 0, got {b}. Try again.")
+                valid = False
+
+        if valid:
+            block["parameters"] = new_params
+            print(f"\n  ✓ Updated parameters → {new_params}")
+            return True
 # @REGISTRY.register(
 #     layer="Layer0",
 #     severity="error",

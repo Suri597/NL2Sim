@@ -143,6 +143,7 @@ class LayerCValidator:
         self._index_operations()
         self._check_operation_consistency()
         self._check_inventory_alignment()
+        self._check_all_distributions()
         self._check_producibility_for_customers()
         self._check_edges_vs_facility_inventory_managed()
 
@@ -286,7 +287,72 @@ class LayerCValidator:
     # -------------------------
     # Operations checks
     # -------------------------
+    def _check_all_distributions(self) -> None:
+        """Validate distribution parameter constraints across all sections."""
 
+        # ── inventory procurement scheme + arrival ─────────
+        for inv in self.config.get("inventory", []):
+            if not isinstance(inv, dict):
+                continue
+            name = inv.get("name", "?")
+
+            ps = inv.get("procurement_scheme")
+            if isinstance(ps, dict):
+                self._validate_distribution_block(
+                    ps, f"inventory[name={name}].procurement_scheme")
+
+            pa = inv.get("procurement_arrival")
+            if isinstance(pa, dict):
+                self._validate_distribution_block(
+                    pa, f"inventory[name={name}].procurement_arrival")
+
+        # ── supplier lead time + payment lead time ─────────
+        for s in self.config.get("supplier", []):
+            if not isinstance(s, dict):
+                continue
+            name = s.get("name", "?")
+
+            self._validate_distribution_block(
+                s.get("supplier_lead_time", {}),
+                f"supplier[name={name}].supplier_lead_time")
+
+            self._validate_distribution_block(
+                s.get("supplier_payment_lead_time", {}),
+                f"supplier[name={name}].supplier_payment_lead_time")
+
+        # ── customer distributions ─────────────────────────
+        for c in self.config.get("customer", []):
+            if not isinstance(c, dict):
+                continue
+            name = c.get("name", "?")
+
+            for field in ["arrival_time", "demand", "customer_lead_time",
+                        "customer_payment_lead_time"]:
+                self._validate_distribution_block(
+                    c.get(field, {}),
+                    f"customer[name={name}].{field}")
+
+        # ── resource service time ──────────────────────────
+        for r in self.config.get("resource", []):
+            if not isinstance(r, dict):
+                continue
+            name = r.get("name", "?")
+
+            self._validate_distribution_block(
+                r.get("service_time", {}),
+                f"resource[name={name}].service_time")
+
+        # ── facility operation cycle ───────────────────────
+        for fac in self.config.get("facility", []):
+            if not isinstance(fac, dict):
+                continue
+            fname = fac.get("name", "?")
+            op = fac.get("operation", {})
+            if isinstance(op, dict):
+                self._validate_distribution_block(
+                    op.get("operation_cycle", {}),
+                    f"facility[name={fname}].operation.operation_cycle")
+                
     def _index_operations(self) -> None:
         self.ops_by_output.clear()
         for i, fac in enumerate(self.facilities):
@@ -478,7 +544,55 @@ class LayerCValidator:
                 if sp_norm not in allowed_norm:
                     self._warn(f"customer[{i}].shortage_policy",
                                f"Unknown shortage_policy '{sp}' (engine may not support it)")
+    def _validate_distribution_block(self, block: dict, path: str) -> None:
+        """
+        Validates distribution parameter constraints.
+        Called for any distribution block in the config.
+        """
+        if not isinstance(block, dict):
+            return
 
+        dist   = block.get("distribution")
+        params = block.get("parameters", {})
+
+        if not isinstance(dist, str) or not isinstance(params, dict):
+            return
+
+        a = params.get("a")
+        b = params.get("b")
+        c = params.get("c")
+
+        if dist == "uniform":
+            if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                if b <= a:
+                    self._err(path, f"uniform distribution requires b > a, got a={a}, b={b}")
+
+        elif dist == "normal":
+            if isinstance(b, (int, float)):
+                if b <= 0:
+                    self._err(path, f"normal distribution requires std (b) > 0, got b={b}")
+
+        elif dist == "triangular":
+            if isinstance(a, (int, float)) and isinstance(b, (int, float)) and isinstance(c, (int, float)):
+                if not (a <= b <= c):
+                    self._err(path, f"triangular distribution requires a <= b <= c, got a={a}, b={b}, c={c}")
+
+        elif dist == "weibull":
+            if isinstance(a, (int, float)) and a <= 0:
+                self._err(path, f"weibull scale (a) must be > 0, got a={a}")
+            if isinstance(b, (int, float)) and b <= 0:
+                self._err(path, f"weibull shape (b) must be > 0, got b={b}")
+
+        elif dist == "beta":
+            if isinstance(a, (int, float)) and a <= 0:
+                self._err(path, f"beta alpha (a) must be > 0, got a={a}")
+            if isinstance(b, (int, float)) and b <= 0:
+                self._err(path, f"beta beta (b) must be > 0, got b={b}")
+
+        elif dist in ("exponential", "poisson", "constant"):
+            if isinstance(a, (int, float)) and a < 0:
+                self._err(path, f"{dist} parameter (a) must be >= 0, got a={a}")
+                
     def _is_producible(self, item: str, supplier_materials: Set[str]) -> bool:
         """
         Conservative feasibility:

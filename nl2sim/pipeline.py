@@ -22,13 +22,13 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from nl_to_json       import generate_json
-from iterative_repair import InteractiveRepairRunner, canonicalize_config, deep_sort
+from nl_to_json        import generate_json
+from iterative_repair  import InteractiveRepairRunner, canonicalize_config, deep_sort, resolve_missing_placeholders
 from score_reliability import compute_reliability_score, print_score_report
-from simulate         import run_simulation
-from nl_to_whatif     import generate_whatif
-from what_if_engine   import apply_what_if_config, WhatIfError
-from iterative_repair import find_required_missing
+from simulate          import run_simulation
+from nl_to_whatif      import generate_whatif
+from what_if_engine    import apply_what_if_config, WhatIfError
+
 
 # ============================================================
 # Pipeline
@@ -48,12 +48,14 @@ class Pipeline:
         self,
         description:  str,
         output_dir:   Optional[Path] = None,
-        use_context:   bool = True,
+        use_context:  bool = True,
         simulate:     bool = True,
+        use_azure:    bool = False,
     ):
         self.description = description
-        self.use_context  = use_context
+        self.use_context = use_context
         self.simulate    = simulate
+        self.use_azure   = use_azure
 
         # ── output directory ───────────────────────────────
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -74,7 +76,11 @@ class Pipeline:
 
     def generate(self) -> Dict[str, Any]:
         print("\nStep 1/4 — Generating JSON from description...")
-        cfg = generate_json(self.description, use_context=self.use_context)
+        cfg = generate_json(
+            self.description,
+            use_context=self.use_context,
+            use_azure=self.use_azure,
+        )
         self._save("config_raw.json", cfg)
         print(f"  ✓ JSON generated → {self.output_dir / 'config_raw.json'}")
         return cfg
@@ -84,19 +90,12 @@ class Pipeline:
     def validate(self, cfg: Dict[str, Any]) -> Dict[str, Any]:
         print("\nStep 2/4 — Validating and repairing JSON...")
 
-        # ── pre-check: find required missing fields ────────
-        # filter_config is the oracle — same conditions as training
-        # only fields present in filtered are required
-        
-        required_missing = find_required_missing(cfg)
+        # ── Pre-pass: resolve all "missing" placeholders ───────
+        # Uses filter_config as oracle — only required fields are scanned
+        # Full config is patched in-place before validators run
+        resolve_missing_placeholders(cfg)
 
-        if required_missing:
-            print(f"\n  ⚠️  {len(required_missing)} required fields not provided:")
-            for path in required_missing:
-                print(f"    - {path}")
-            print()
-
-        # ── full JSON proceeds unchanged to validation ─────
+        # ── Full patched JSON → validation layers ──────────────
         runner = InteractiveRepairRunner(
             cfg,
             strict_layer0=True,
@@ -112,16 +111,37 @@ class Pipeline:
 
     def score(self, cfg: Dict[str, Any]) -> Dict[str, Any]:
         print("\nStep 3/4 — Computing reliability score...")
-        result = compute_reliability_score(self.description, cfg)
-        print_score_report(result)
-        self._save("reliability_score.json", result)
-        return result
+        try:
+            result = compute_reliability_score(
+                self.description,
+                cfg,
+                use_azure=self.use_azure,
+            )
+            print_score_report(result)
+            self._save("reliability_score.json", result)
+            return result
+        except Exception as e:
+            print(f"\n  ✗ Reliability score failed: {e}")
+            print("\n  How would you like to proceed?")
+            print("  1) Skip score and continue")
+            print("  2) Abort")
+            while True:
+                choice = input("  Select option #: ").strip()
+                if choice == "1":
+                    print("  Skipping reliability score.")
+                    return {}
+                elif choice == "2":
+                    raise SystemExit("Aborted by user.")
+                else:
+                    print("  Invalid selection. Please enter 1 or 2.")
 
     # ── Step 4 — Simulate ──────────────────────────────────
 
-    def simulate_run(self, cfg: Dict[str, Any],
-                     output_name: str = "simulation_results.json"
-                     ) -> Dict[str, Any]:
+    def simulate_run(
+        self,
+        cfg: Dict[str, Any],
+        output_name: str = "simulation_results.json",
+    ) -> Dict[str, Any]:
         print(f"\nStep 4/4 — Running simulation...")
         out_path = str(self.output_dir / output_name)
         result   = run_simulation(cfg, output_path=out_path)
@@ -132,8 +152,8 @@ class Pipeline:
 
     def run_whatif(
         self,
-        cfg:         Dict[str, Any],
-        instruction: str,
+        cfg:          Dict[str, Any],
+        instruction:  str,
         use_examples: bool = True,
     ) -> Dict[str, Any]:
         self.whatif_count += 1
@@ -220,11 +240,57 @@ class Pipeline:
 
             elif choice == "3":
                 print("Exiting pipeline.")
-                import sys
                 sys.exit(0)
 
             else:
                 print("Invalid selection. Please enter 1, 2 or 3.")
+
+        # Step 4 — Simulate
+        if self.simulate:
+            self.simulation_result = self.simulate_run(cfg)
+
+        # Step 5 — What-if loop
+        self._whatif_loop(cfg)
+
+        # Save summary
+        summary = self._build_summary()
+        self._save("pipeline_summary.json", summary)
+
+        self._print_footer()
+        return summary
+
+    # ── Validate + Simulate (skip LLM step) ───────────────
+
+    def validate_and_simulate(self, cfg: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Entry point when skipping LLM step (--from-config flag).
+        Starts from an existing raw config JSON.
+        """
+        self._print_header()
+
+        # Step 2 — Validate
+        cfg = self.validate(cfg)
+        self.config = cfg
+
+        # Step 3 — Score
+        self.reliability_result = self.score(cfg)
+
+        # ── Ask user to proceed ────────────────────────────
+        while True:
+            print("\n" + "─" * 60)
+            print("How would you like to proceed?")
+            print("  1) Proceed to simulation")
+            print("  2) Exit")
+            print("─" * 60)
+            choice = input("Select option: ").strip()
+
+            if choice == "1":
+                break
+            elif choice == "2":
+                print("Exiting pipeline.")
+                sys.exit(0)
+            else:
+                print("Invalid selection. Please enter 1 or 2.")
 
         # Step 4 — Simulate
         if self.simulate:

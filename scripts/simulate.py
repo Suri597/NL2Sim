@@ -24,6 +24,7 @@ import random
 import warnings
 import bisect
 from collections import defaultdict, deque
+from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -71,6 +72,12 @@ NL2Sim Simulation Engine — Assumptions
      treated as instantaneous (no delay, no failure modelled).
  13. Warehouse facilities are treated as pure storage nodes.
      No operations are executed at warehouse facilities.
+ 14. If supplier_capacity is absent or 'missing', it is treated
+     as unlimited (inf). Only explicit numeric values cap supply.
+ 15. If transfer_time is absent or distribution is 'missing',
+     transfer is instantaneous (delay = 0).
+ 16. If warm_up or random_seed is 'missing', defaults of 0
+     and 12345 are used respectively.
 ============================================================
 """
 
@@ -84,7 +91,13 @@ def _lower(x: Any) -> Any:
 
 
 def _param_values(params: Dict[str, Any]) -> List[float]:
-    return [float(v) for v in (params or {}).values()]
+    out = []
+    for v in (params or {}).values():
+        try:
+            out.append(float(v))
+        except (TypeError, ValueError):
+            out.append(0.0)
+    return out
 
 
 def sample_distribution(spec: Optional[Dict[str, Any]],
@@ -114,7 +127,6 @@ def sample_distribution(spec: Optional[Dict[str, Any]],
         if sps is not None:
             return float(sps.poisson.rvs(
                 mu=lam, random_state=rng.randint(1, 2**31 - 1)))
-        # Knuth fallback
         L, k, p = math.exp(-lam), 0, 1.0
         while p > L:
             k += 1
@@ -173,7 +185,6 @@ def interarrival_time(spec: Optional[Dict[str, Any]],
         return 1.0
     d    = _lower(spec.get("distribution", "exponential"))
     vals = _param_values(spec.get("parameters", {}))
-    # poisson arrivals → exponential inter-arrival with rate = a
     if d == "poisson":
         rate = float(vals[0]) if vals else 0.0
         return rng.expovariate(rate) if rate > 0 else 1.0
@@ -186,6 +197,190 @@ def _is_zero_constant(spec: Optional[Dict[str, Any]]) -> bool:
     d    = _lower(spec.get("distribution", "constant"))
     vals = _param_values(spec.get("parameters", {}))
     return d in ("constant", "deterministic") and (not vals or float(vals[0]) <= 0)
+
+
+# ============================================================
+# Config normalizer — strips "missing" and applies defaults
+# ============================================================
+
+MISSING_STR = "missing"
+
+
+def _is_missing(val: Any) -> bool:
+    """Returns True if value is None, absent, or the 'missing' placeholder."""
+    return val is None or (
+        isinstance(val, str) and val.strip().lower() == MISSING_STR)
+
+
+def _clean_params(params: Dict[str, Any]) -> Dict[str, Any]:
+    """Replace 'missing' parameter values with 0.0."""
+    return {
+        k: (0.0 if _is_missing(v) else float(v))
+        for k, v in (params or {}).items()
+    }
+
+
+def _clean_dist_block(block: Any) -> Dict[str, Any]:
+    """
+    Normalize a distribution block.
+    If distribution is missing or absent → constant(0) = instantaneous.
+    """
+    if not isinstance(block, dict):
+        return {"distribution": "constant", "parameters": {"a": 0.0}}
+
+    dist = block.get("distribution")
+    if _is_missing(dist):
+        return {"distribution": "constant", "parameters": {"a": 0.0}}
+
+    return {
+        "distribution": str(dist).strip().lower(),
+        "parameters":   _clean_params(block.get("parameters", {})),
+    }
+
+
+def normalize_config(cfg: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Normalize a config dict before passing to the simulation engine.
+
+    Decisions:
+    - 'missing' placeholder   → sensible default for each field
+    - absent optional field   → sensible default
+    - transfer_time missing   → instantaneous (constant 0)
+    - supplier_capacity miss  → float('inf') = unlimited
+    - warm_up missing         → 0
+    - random_seed missing     → 12345
+    - holding/shortage cost   → 0
+    - review_time missing     → 1
+    - operation_cycle missing → constant(1)
+    - resource_required miss  → "" (no resource)
+    - warehouse operation     → cleared entirely
+    """
+    cfg = deepcopy(cfg)
+
+    # ── simulation ─────────────────────────────────────────
+    sim = cfg.get("simulation", {}) or {}
+    if _is_missing(sim.get("warm_up")):
+        sim["warm_up"] = 0
+    if _is_missing(sim.get("random_seed")):
+        sim["random_seed"] = 12345
+    sim["horizon"]      = float(sim.get("horizon", 365))
+    sim["replications"] = int(sim.get("replications", 1))
+    cfg["simulation"]   = sim
+
+    # ── inventory ──────────────────────────────────────────
+    for item in cfg.get("inventory", []) or []:
+        # initial inventory
+        if _is_missing(item.get("initial_inventory")):
+            item["initial_inventory"] = 0
+
+        # inventory costs
+        costs = item.get("inventory_costs", {}) or {}
+        for f in ("holding_cost", "shortage_cost"):
+            if _is_missing(costs.get(f)):
+                costs[f] = 0.0
+        if _is_missing(costs.get("review_time")):
+            costs["review_time"] = 1.0
+        item["inventory_costs"] = costs
+
+        inv_type = item.get("type", "")
+        ps       = item.get("procurement_scheme", {}) or {}
+        ps_type  = ps.get("type", "")
+
+        if inv_type == "raw_materials" and not _is_missing(ps_type):
+            if ps_type == "periodic_supply":
+                if _is_missing(ps.get("distribution")):
+                    ps["distribution"] = "constant"
+                ps["parameters"] = _clean_params(ps.get("parameters", {}))
+            elif ps_type == "inventory_threshold":
+                ps["parameters"] = _clean_params(ps.get("parameters", {}))
+            elif ps_type == "demand_driven":
+                pass  # no distribution needed
+            item["procurement_scheme"] = ps
+
+            # procurement arrival
+            pa = item.get("procurement_arrival", {})
+            item["procurement_arrival"] = _clean_dist_block(pa)
+
+        else:
+            # product / intermediate / missing type → no procurement
+            item["procurement_scheme"]  = {"type": "none"}
+            item["procurement_arrival"] = {
+                "distribution": "constant", "parameters": {"a": 0.0}}
+
+    # ── supplier ───────────────────────────────────────────
+    for s in cfg.get("supplier", []) or []:
+        # unlimited capacity if missing
+        cap = s.get("supplier_capacity")
+        if _is_missing(cap):
+            s["supplier_capacity"] = float("inf")
+        else:
+            try:
+                s["supplier_capacity"] = float(cap)
+            except (TypeError, ValueError):
+                s["supplier_capacity"] = float("inf")
+
+        s["supplier_lead_time"] = _clean_dist_block(
+            s.get("supplier_lead_time"))
+        s["supplier_payment_lead_time"] = _clean_dist_block(
+            s.get("supplier_payment_lead_time"))
+
+        if _is_missing(s.get("supplier_cost")):
+            s["supplier_cost"] = 0.0
+
+    # ── facility ───────────────────────────────────────────
+    for fac in cfg.get("facility", []) or []:
+        ftype = _lower(fac.get("type", ""))
+
+        # clean inventory_managed — remove "missing" entries
+        fac["inventory_managed"] = [
+            m for m in (fac.get("inventory_managed") or [])
+            if not _is_missing(m)
+        ]
+
+        if ftype == "warehouse":
+            # warehouses are pure storage — clear operation entirely
+            fac["operation"] = {
+                "name": "storage", "input": [], "output": [],
+                "resource_required": "",
+                "operation_cycle": {
+                    "distribution": "constant", "parameters": {"a": 0.0}},
+            }
+            continue
+
+        # manufacturing facility
+        op = fac.get("operation", {}) or {}
+
+        # resource_required
+        rr = op.get("resource_required")
+        if _is_missing(rr):
+            op["resource_required"] = ""
+
+        # operation_cycle — default to constant(1) if missing
+        cycle = _clean_dist_block(op.get("operation_cycle"))
+        if _is_zero_constant(cycle):
+            cycle = {"distribution": "constant", "parameters": {"a": 1.0}}
+        op["operation_cycle"] = cycle
+
+        fac["operation"] = op
+
+    # ── customer ───────────────────────────────────────────
+    for c in cfg.get("customer", []) or []:
+        for f in ("arrival_time", "demand", "customer_lead_time",
+                  "customer_payment_lead_time"):
+            c[f] = _clean_dist_block(c.get(f))
+
+        if _is_missing(c.get("unit_selling_price")):
+            c["unit_selling_price"] = 0.0
+
+        sp = c.get("shortage_policy", "")
+        if _is_missing(sp):
+            c["shortage_policy"] = "backorder"
+
+    # ── edges ──────────────────────────────────────────────
+    for e in cfg.get("edges", []) or []:
+        e["transfer_time"] = _clean_dist_block(e.get("transfer_time"))
+
+    return cfg
 
 
 # ============================================================
@@ -253,7 +448,6 @@ class Logger:
         self.env      = env
         self.warm_up  = float(warm_up)
 
-        # financials
         self.revenue           = 0.0
         self.procurement_cost  = 0.0
         self.operating_cost    = 0.0
@@ -261,29 +455,24 @@ class Logger:
         self.shortage_cost     = 0.0
         self.cash_balance      = 0.0
 
-        # service
         self.orders              = 0
         self.units_demanded      = 0
         self.units_delivered     = 0
         self.units_lost          = 0
         self.backorder_units_end = 0
 
-        # order wait times
         self.order_wait_times   = []
         self.partial_wait_times = []
 
-        # time-weighted inventory
         self._inv_last_t:     Dict[str, float] = {}
         self._inv_last_level: Dict[str, float] = {}
         self._inv_area:       Dict[str, float] = defaultdict(float)
 
-        # time-weighted resource busy
         self._res_last_t:    Dict[str, float] = defaultdict(float)
         self._res_last_busy: Dict[str, float] = defaultdict(float)
         self._res_busy_area: Dict[str, float] = defaultdict(float)
         self.res_queue_waits: Dict[str, List[float]] = defaultdict(list)
 
-        # cash time-weighted
         self._cash_last_t:     float = 0.0
         self._cash_last_level: float = 0.0
         self._cash_area:       float = 0.0
@@ -295,7 +484,6 @@ class Logger:
             self.holding_cost    + self.shortage_cost
         )
 
-    # ── financials ────────────────────────────────────────
     def add_revenue(self, x: float):
         self.revenue += float(x)
 
@@ -311,7 +499,6 @@ class Logger:
     def add_shortage_cost(self, x: float):
         self.shortage_cost += float(x)
 
-    # ── service ───────────────────────────────────────────
     def record_order(self, units: int):
         self.orders         += 1
         self.units_demanded += int(units)
@@ -322,7 +509,6 @@ class Logger:
     def record_lost(self, units: int):
         self.units_lost += int(units)
 
-    # ── inventory time-weighted ───────────────────────────
     def inv_register(self, inv: Inventory):
         self._inv_last_t[inv.name]     = self.env.now
         self._inv_last_level[inv.name] = inv.level
@@ -354,7 +540,6 @@ class Logger:
         denom = max(1e-9, horizon - self.warm_up)
         return {k: v / denom for k, v in self._inv_area.items()}
 
-    # ── resource time-weighted ────────────────────────────
     def res_register(self, name: str):
         self._res_last_t[name]    = self.env.now
         self._res_last_busy[name] = 0.0
@@ -389,7 +574,6 @@ class Logger:
             for r, area in self._res_busy_area.items()
         }
 
-    # ── cash time-weighted ────────────────────────────────
     def cash_update(self, new_balance: float):
         t      = self.env.now
         last_t = self._cash_last_t
@@ -428,17 +612,17 @@ class FailableResource:
                  downtime_spec: Optional[Dict[str, Any]],
                  rng: random.Random,
                  logger: Logger):
-        self.env          = env
-        self.name         = name
-        self.capacity     = int(capacity)
-        self.resource     = simpy.Resource(env, capacity=self.capacity)
-        self.uptime_spec  = uptime_spec
+        self.env           = env
+        self.name          = name
+        self.capacity      = int(capacity)
+        self.resource      = simpy.Resource(env, capacity=self.capacity)
+        self.uptime_spec   = uptime_spec
         self.downtime_spec = downtime_spec
-        self.rng          = rng
-        self.logger       = logger
-        self.is_up        = True
-        self._state_ev    = simpy.Event(env)
-        self._busy        = 0
+        self.rng           = rng
+        self.logger        = logger
+        self.is_up         = True
+        self._state_ev     = simpy.Event(env)
+        self._busy         = 0
         logger.res_register(name)
 
         if uptime_spec and downtime_spec:
@@ -490,12 +674,14 @@ class FailableResource:
 class SupplyChainEngine:
     """
     JSON-driven discrete-event simulation engine for supply chain.
-    Only valid JSON configs should be passed — no validation is done here.
+    Accepts both raw configs (with 'missing' placeholders) and
+    filtered configs (with absent optional fields).
+    normalize_config() is called automatically on init.
     """
 
     def __init__(self, config: Dict[str, Any]):
-        self.cfg  = config
-        sim       = config.get("simulation", {}) or {}
+        self.cfg  = normalize_config(config)
+        sim       = self.cfg.get("simulation", {}) or {}
         self.horizon      = float(sim.get("horizon",      365))
         self.warm_up      = float(sim.get("warm_up",        0))
         self.replications = int(sim.get("replications",     1))
@@ -510,8 +696,8 @@ class SupplyChainEngine:
                     e.get("destination")   == dst and
                     e.get("material_name") == mat):
                 tt = e.get("transfer_time")
-                return tt if tt else {"distribution": "constant",
-                                      "parameters": {"a": 0}}
+                return tt if tt else {
+                    "distribution": "constant", "parameters": {"a": 0}}
         return {"distribution": "constant", "parameters": {"a": 0}}
 
     def _best_supplier(self, material: str) -> Dict[str, Any]:
@@ -539,30 +725,22 @@ class SupplyChainEngine:
         logger = Logger(env, warm_up=self.warm_up)
 
         # ── classify materials ─────────────────────────────
-        raw_names  = {m["name"] for m in
-                      (self.cfg.get("raw_materials", []) or [])}
+        raw_names   = {m["name"] for m in
+                       (self.cfg.get("raw_materials", []) or [])}
         inter_names = {m["name"] for m in
                        (self.cfg.get("intermediate_materials", []) or [])}
         prod_names  = {p["name"] for p in
                        (self.cfg.get("products", []) or [])}
 
         # ── identify facilities ────────────────────────────
-        fac_cfg = self.cfg.get("facility", []) or []
-        mfg_facilities  = [f for f in fac_cfg
-                           if _lower(f.get("type", "")) == "manufacturing"]
-        wh_facilities   = [f for f in fac_cfg
-                           if _lower(f.get("type", "")) == "warehouse"]
+        fac_cfg        = self.cfg.get("facility", []) or []
+        mfg_facilities = [f for f in fac_cfg
+                          if _lower(f.get("type", "")) == "manufacturing"]
+        wh_facilities  = [f for f in fac_cfg
+                          if _lower(f.get("type", "")) == "warehouse"]
 
-        # print(f"  All facilities: {[(f['name'], f.get('type')) for f in fac_cfg]}")
-        # print(f"  mfg_facilities: {[f['name'] for f in mfg_facilities]}")
-        # print(f"  wh_facilities:  {[f['name'] for f in wh_facilities]}")
-
-        # primary manufacturing facility name (first one)
         mfg_name = mfg_facilities[0]["name"] if mfg_facilities else "Manufacturing"
         wh_name  = wh_facilities[0]["name"]  if wh_facilities  else "Warehouse"
-
-        # print(f"mfg_facilities: {[f['name'] for f in mfg_facilities]}")
-        # print(f"wh_facilities: {[f['name'] for f in wh_facilities]}")
 
         # ── BOMs ───────────────────────────────────────────
         bom_inter = {
@@ -593,12 +771,12 @@ class SupplyChainEngine:
             logger.inv_register(obj)
 
         # ── resources ──────────────────────────────────────
-        res_cfg  = self.cfg.get("resource", []) or []
-        resources: Dict[str, FailableResource] = {}
-        res_caps: Dict[str, int]               = {}
-        res_svc:  Dict[str, Dict]              = {}
-        res_batch:Dict[str, Dict]              = {}
-        res_opcost: Dict[str, float]           = {}
+        res_cfg    = self.cfg.get("resource", []) or []
+        resources:  Dict[str, FailableResource] = {}
+        res_caps:   Dict[str, int]              = {}
+        res_svc:    Dict[str, Dict]             = {}
+        res_batch:  Dict[str, Dict]             = {}
+        res_opcost: Dict[str, float]            = {}
 
         for r in res_cfg:
             svc     = r.get("service_time") or \
@@ -632,7 +810,7 @@ class SupplyChainEngine:
         # ── on-order tracking ──────────────────────────────
         on_order: Dict[str, float] = defaultdict(float)
 
-        # ── pending deliveries ─────────────────────────────
+        # ── pending deliveries / shipments ─────────────────
         pending_deliveries: List[Tuple[float, str, float]] = []
         pending_shipments:  List[Tuple[float, str, float]] = []
 
@@ -653,15 +831,11 @@ class SupplyChainEngine:
         # Helper functions
         # ==========================================================
 
-        
-
         def schedule_delivery(t: float, mat: str, qty: float):
-            entry = (t, mat, qty)
-            bisect.insort(pending_deliveries, entry)
+            bisect.insort(pending_deliveries, (t, mat, qty))
 
         def schedule_shipment(t: float, prod: str, qty: float):
-            entry = (t, prod, qty)
-            bisect.insort(pending_shipments, entry)
+            bisect.insort(pending_shipments, (t, prod, qty))
 
         def request_production(item: str, units: float):
             if units > 0:
@@ -687,17 +861,22 @@ class SupplyChainEngine:
             new_lvl = inv[item].level + qty
             logger.inv_update(inv[item], new_lvl)
             inv[item].level = new_lvl
-            # print(f"  t={env.now:.1f} add_to_inventory {item} +{qty:.0f} → {new_lvl:.0f}")
 
         def place_supplier_order(raw_mat: str, qty: float):
             if qty <= 0:
                 return
             supplier  = self._best_supplier(raw_mat)
             unit_cost = float(supplier.get("supplier_cost", 0.0))
-            raw_cap   = float(supplier.get("supplier_capacity", 0))
-            # treat 0 or 99999 as unlimited
-            cap       = qty if (raw_cap <= 0 or raw_cap == 99999) else raw_cap
-            qty       = min(qty, cap)
+
+            # ── capacity check — inf means unlimited ───────
+            raw_cap = supplier.get("supplier_capacity", float("inf"))
+            try:
+                raw_cap = float(raw_cap)
+            except (TypeError, ValueError):
+                raw_cap = float("inf")
+
+            if raw_cap > 0 and not math.isinf(raw_cap):
+                qty = min(qty, raw_cap)
 
             lead_spec = supplier.get("supplier_lead_time") or \
                         {"distribution": "constant", "parameters": {"a": 0}}
@@ -713,9 +892,8 @@ class SupplyChainEngine:
                 on_order[raw_mat] += qty
 
             pay_spec = supplier.get("supplier_payment_lead_time")
-            pay_t    = env.now + lead + (sample_distribution(pay_spec, rng)
-                                  if pay_spec else 0.0)
-
+            pay_t    = env.now + lead + (
+                sample_distribution(pay_spec, rng) if pay_spec else 0.0)
             bisect.insort(pending_payables, (pay_t, unit_cost * qty))
 
         def fulfill_backorders(product: str):
@@ -730,10 +908,9 @@ class SupplyChainEngine:
                 inv[product].level = new_lvl
                 logger.record_delivery(take)
 
-                pay_spec = None
-                recv_t   = env.now
-
-                bisect.insort(pending_receivables, (recv_t, bo.unit_price * take))
+                recv_t = env.now
+                bisect.insort(pending_receivables,
+                              (recv_t, bo.unit_price * take))
 
                 bo.remaining -= take
                 if env.now >= self.warm_up:
@@ -767,7 +944,7 @@ class SupplyChainEngine:
 
         env.process(payment_loop())
 
-        # ── delivery processor ────────────────────────────
+        # ── delivery processor ─────────────────────────────
         def delivery_loop():
             while True:
                 t = env.now
@@ -779,7 +956,7 @@ class SupplyChainEngine:
 
         env.process(delivery_loop())
 
-        # ── shipment processor ────────────────────────────
+        # ── shipment processor ─────────────────────────────
         def shipment_loop():
             while True:
                 t = env.now
@@ -791,12 +968,11 @@ class SupplyChainEngine:
 
         env.process(shipment_loop())
 
-        # ── inventory costing loop ────────────────────────
+        # ── inventory costing loop ─────────────────────────
         def costing_loop():
             tick = min(
                 (max(1.0, inv[i].review_time)
-                 for i in inv
-                 if inv[i].review_time > 0),
+                 for i in inv if inv[i].review_time > 0),
                 default=1.0
             )
             while True:
@@ -812,42 +988,37 @@ class SupplyChainEngine:
 
         env.process(costing_loop())
 
-         # ── daily inventory sampler (matches benchmark) ───
+        # ── daily inventory sampler ────────────────────────
         inv_daily_samples: Dict[str, List[float]] = defaultdict(list)
 
         def daily_sampler():
             while True:
                 yield env.timeout(1.0)
-                yield env.timeout(1e-6)   # sample slightly after tick
+                yield env.timeout(1e-6)
                 if env.now >= self.warm_up:
                     for name, item in inv.items():
                         inv_daily_samples[name].append(item.level)
 
         env.process(daily_sampler())
 
-        # ── raw material procurement ──────────────────────
+        # ── raw material procurement ───────────────────────
         def raw_procurement_loop(raw_mat: str):
             scheme      = raw_schemes.get(raw_mat, {})
             scheme_type = _lower(scheme.get("type", "inventory_threshold"))
-            # use procurement_arrival as review interval if present
             arrival_spec = next(
                 (it.get("procurement_arrival") for it in inv_cfg
-                if it["name"] == raw_mat), None)
-
-            # print(f"  raw_procurement_loop {raw_mat}: arrival_spec={arrival_spec}")
+                 if it["name"] == raw_mat), None)
 
             if arrival_spec and not _is_zero_constant(arrival_spec):
                 review = max(1.0, sample_distribution(arrival_spec, rng))
             else:
                 review = max(1.0, inv[raw_mat].review_time
-                            if raw_mat in inv else 1.0)
+                             if raw_mat in inv else 1.0)
 
-            # print(f"  raw_procurement_loop {raw_mat}: review={review}")
-            
             next_periodic = env.now
 
             while True:
-                if scheme_type in ("inventory_threshold",):
+                if scheme_type == "inventory_threshold":
                     s, S = self._sS_params(scheme)
                     pos  = inv[raw_mat].level + on_order[raw_mat] \
                            if raw_mat in inv else 0.0
@@ -856,12 +1027,13 @@ class SupplyChainEngine:
                         if qty > 0:
                             place_supplier_order(raw_mat, qty)
 
-                elif scheme_type in ("periodic_supply",):
+                elif scheme_type == "periodic_supply":
                     if env.now >= next_periodic:
                         dist_spec = {
                             "distribution": scheme.get("distribution",
                                                         "constant"),
-                            "parameters":   scheme.get("parameters", {"a": 0})
+                            "parameters":   scheme.get("parameters",
+                                                        {"a": 0})
                         }
                         qty = int(max(0, math.floor(
                             sample_distribution(dist_spec, rng))))
@@ -869,19 +1041,17 @@ class SupplyChainEngine:
                             place_supplier_order(raw_mat, qty)
                         next_periodic = env.now + review
 
-                # demand_driven handled in production / customer shortage
-
                 yield env.timeout(review)
 
         for rm in raw_names:
             if rm in inv:
                 env.process(raw_procurement_loop(rm))
 
-        # ── threshold controllers for inter + products ────
+        # ── threshold controllers for inter + products ─────
         def threshold_controller(item: str):
             scheme      = all_schemes.get(item, {})
             scheme_type = _lower(scheme.get("type", ""))
-            if scheme_type not in ("inventory_threshold",):
+            if scheme_type != "inventory_threshold":
                 return
             s, S   = self._sS_params(scheme)
             review = max(1e-6, inv[item].review_time
@@ -899,31 +1069,25 @@ class SupplyChainEngine:
             if name in inv:
                 env.process(threshold_controller(name))
 
-        # ── facility operations ───────────────────────────
+        # ── facility operations ────────────────────────────
         def operation_process(fac: Dict[str, Any]):
-            # skip warehouse facilities entirely
-
-            
             if _lower(fac.get("type", "")) == "warehouse":
                 return
+
             op       = fac.get("operation", {}) or {}
             outputs  = op.get("output", []) or []
             if len(outputs) != 1:
-                # print(f"  SKIP operation in {fac.get('name')} — outputs={outputs}")
                 return
             out_item = outputs[0]
-            res_name = op.get("resource_required")
+            res_name = op.get("resource_required", "")
 
-            # detect no-resource operations
             no_resource = (
                 not res_name or
                 res_name.strip() == "" or
-                res_name.strip().lower() == "none" or
+                _lower(res_name) == "none" or
                 res_name not in resources
             )
 
-            # print(f"  OPERATION {fac.get('name')}: out={out_item} res='{res_name}' no_resource={no_resource}")
-            # operation_cycle spec
             cycle_spec = op.get("operation_cycle")
             if not cycle_spec or _is_zero_constant(cycle_spec):
                 cycle_spec = res_svc.get(res_name,
@@ -946,7 +1110,6 @@ class SupplyChainEngine:
 
             # ── flush mode: no resource OR batch_size = -1 ─
             if no_resource or (batching_on and batch_size == -1):
-                # print(f"  FLUSH MODE entered for {out_item}")
                 while True:
                     cycle = max(1e-6, sample_distribution(cycle_spec, rng))
                     yield env.timeout(cycle)
@@ -967,7 +1130,6 @@ class SupplyChainEngine:
 
                     consume_inputs(bom, make)
 
-                    # drain work_q by however much we made
                     if out_item in work_q:
                         work_q[out_item] = max(
                             0.0, work_q[out_item] - make)
@@ -985,17 +1147,14 @@ class SupplyChainEngine:
 
                     elif out_item in prod_names:
                         transfer = sample_distribution(
-                            self._edge_transfer(mfg_name, wh_name, out_item), rng)
+                            self._edge_transfer(
+                                mfg_name, wh_name, out_item), rng)
                         if transfer <= 0:
-                            # immediate — add directly, no shipment queue delay
                             add_to_inventory(out_item, make)
                             fulfill_backorders(out_item)
-                            # print(f"  t={env.now:.1f} flush produced {make} {out_item} → inv={inv[out_item].level:.0f}")
-
                         else:
                             schedule_shipment(
                                 env.now + transfer, out_item, make)
-                            # print(f"  t={env.now:.1f} flush scheduled {make} {out_item} transfer={transfer}")
                 return
 
             # ── per-unit mode (resource present) ──────────
@@ -1077,26 +1236,21 @@ class SupplyChainEngine:
                     if transfer <= 0:
                         add_to_inventory(out_item, make)
                     else:
-                        if transfer > 0:
-                            yield env.timeout(transfer)
+                        yield env.timeout(transfer)
                         add_to_inventory(out_item, make)
 
                 elif out_item in prod_names:
                     transfer = sample_distribution(
-                        self._edge_transfer(
-                            mfg_name, wh_name, out_item), rng)
+                        self._edge_transfer(mfg_name, wh_name, out_item), rng)
                     schedule_shipment(
                         env.now + max(0.0, transfer), out_item, make)
                 else:
                     add_to_inventory(out_item, make)
-        # ── THIS LOOP IS OUTSIDE THE FUNCTION ─────────────
-        # print(f"  Starting {len(mfg_facilities)} manufacturing operations...")
-        for fac in mfg_facilities:
-            # print(f"  Registering operation for {fac.get('name')}")
-            env.process(operation_process(fac))
-            # print(f"  Registered operation for {fac.get('name')}")
 
-        # ── customer processes ────────────────────────────
+        for fac in mfg_facilities:
+            env.process(operation_process(fac))
+
+        # ── customer processes ─────────────────────────────
         def customer_process(c: Dict[str, Any]):
             cname      = c.get("name", "Customer")
             product    = c.get("product")
@@ -1120,13 +1274,13 @@ class SupplyChainEngine:
                     logger.inv_register(inv[product])
 
                 available = int(max(0, inv[product].level))
-                # print(f"  t={env.now:.1f} customer '{cname}' sees {product} inventory = {available}")
 
                 def recv_payment(units: int):
                     recv_t = env.now + (
                         sample_distribution(pay_spec, rng)
                         if pay_spec else 0.0)
-                    bisect.insort(pending_receivables, (recv_t, unit_price * units))
+                    bisect.insort(pending_receivables,
+                                  (recv_t, unit_price * units))
 
                 # ── full demand satisfied ──────────────────
                 if available >= dem:
@@ -1139,13 +1293,14 @@ class SupplyChainEngine:
                     continue
 
                 # ── shortage policies ──────────────────────
-                if policy == "sale_lost":
+                if policy in ("sale_lost", "salelost"):
                     if env.now >= self.warm_up:
                         logger.record_lost(dem)
-                    # request_production(product, dem)
                     continue
 
                 if policy in ("sale_lost_partial",
+                               "salelostpartial",
+                               "sale_lost_partial_fulfillment",
                                "Sale_lost_partial_fulfillment"):
                     if available > 0:
                         new_lvl = inv[product].level - available
@@ -1157,10 +1312,10 @@ class SupplyChainEngine:
                     lost = dem - available
                     if lost > 0 and env.now >= self.warm_up:
                         logger.record_lost(lost)
-                    # request_production(product, dem)
                     continue
 
                 if policy in ("backorder_partial",
+                               "backorderpartial",
                                "backorder_partial_fulfillment"):
                     if available > 0:
                         new_lvl = inv[product].level - available
@@ -1213,37 +1368,37 @@ class SupplyChainEngine:
             name: (sum(samples) / len(samples) if samples else 0.0)
             for name, samples in inv_daily_samples.items()
         }
-        util     = logger.res_utilization(self.horizon, res_caps)
-        q_waits  = {r: (sum(ws) / len(ws) if ws else 0.0)
-                    for r, ws in logger.res_queue_waits.items()}
-        ow       = logger.order_wait_times
-        pw       = logger.partial_wait_times
+        util    = logger.res_utilization(self.horizon, res_caps)
+        q_waits = {r: (sum(ws) / len(ws) if ws else 0.0)
+                   for r, ws in logger.res_queue_waits.items()}
+        ow      = logger.order_wait_times
+        pw      = logger.partial_wait_times
 
         units_dem = max(logger.units_demanded, 1)
         fill_rate = logger.units_delivered / units_dem
 
         return {
             "kpis": {
-                "revenue":            logger.revenue,
-                "procurement_cost":   logger.procurement_cost,
-                "operating_cost":     logger.operating_cost,
-                "holding_cost":       logger.holding_cost,
-                "shortage_cost":      logger.shortage_cost,
-                "profit":             logger.profit,
-                "ending_cash":        logger.cash_balance,
-                "avg_cash_balance":   logger.cash_time_avg(self.horizon),
-                "orders":             logger.orders,
-                "units_demanded":     logger.units_demanded,
-                "units_delivered":    logger.units_delivered,
-                "units_lost":         logger.units_lost,
-                "backorder_units_end":logger.backorder_units_end,
-                "fill_rate":          fill_rate,
+                "revenue":             logger.revenue,
+                "procurement_cost":    logger.procurement_cost,
+                "operating_cost":      logger.operating_cost,
+                "holding_cost":        logger.holding_cost,
+                "shortage_cost":       logger.shortage_cost,
+                "profit":              logger.profit,
+                "ending_cash":         logger.cash_balance,
+                "avg_cash_balance":    logger.cash_time_avg(self.horizon),
+                "orders":              logger.orders,
+                "units_demanded":      logger.units_demanded,
+                "units_delivered":     logger.units_delivered,
+                "units_lost":          logger.units_lost,
+                "backorder_units_end": logger.backorder_units_end,
+                "fill_rate":           fill_rate,
             },
             "ending_inventory":  {n: inv[n].level for n in inv},
             "avg_inventory":     inv_avg,
             "resource_stats": {
-                "utilization":      util,
-                "avg_queue_wait":   q_waits,
+                "utilization":    util,
+                "avg_queue_wait": q_waits,
             },
             "order_wait": {
                 "avg_full_order_wait":
@@ -1335,8 +1490,10 @@ def print_summary(results: Dict[str, Any]) -> None:
     agg = results["aggregated"]
 
     def fmt(stat: Dict) -> str:
-        m = stat["mean"]
-        c90, c95, c99 = stat["ci90"], stat["ci95"], stat["ci99"]
+        m   = stat["mean"]
+        c90 = stat["ci90"]
+        c95 = stat["ci95"]
+        c99 = stat["ci99"]
         return (f"{m:>14.2f}   "
                 f"CI90[{c90[0]:.2f}, {c90[1]:.2f}]   "
                 f"CI95[{c95[0]:.2f}, {c95[1]:.2f}]   "
@@ -1381,9 +1538,19 @@ def print_summary(results: Dict[str, Any]) -> None:
     print("=" * 80)
 
 
+def _json_default(obj: Any) -> Any:
+    """JSON serializer that handles float('inf') and float('nan')."""
+    if isinstance(obj, float):
+        if math.isinf(obj):
+            return None   # inf → null in JSON
+        if math.isnan(obj):
+            return None
+    return str(obj)
+
+
 def save_results(results: Dict[str, Any], path: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, default=str)
+        json.dump(results, f, indent=2, default=_json_default)
     print(f"\nFull results saved → {path}")
 
 
@@ -1398,7 +1565,8 @@ def run_simulation(config: Dict[str, Any],
 
     Parameters
     ----------
-    config      : dict  — validated supply chain JSON config
+    config      : dict  — supply chain JSON config (raw or filtered)
+                          'missing' placeholders are handled automatically
     output_path : str   — optional path to save results JSON
 
     Returns
@@ -1440,7 +1608,6 @@ if __name__ == "__main__":
     with open(args.config_file, encoding="utf-8") as f:
         config = json.load(f)
 
-    # auto-generate output path if not provided
     if args.output:
         out_path = args.output
     else:

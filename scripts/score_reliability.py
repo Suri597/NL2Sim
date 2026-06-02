@@ -13,10 +13,12 @@ Combined reliability score = 0.4 * BLEU-4 + 0.6 * Numeric F1
 
 Usage (standalone):
     python score_reliability.py description.txt output.json
+    python score_reliability.py description.txt output.json --azure
 
 Usage (imported):
     from score_reliability import compute_reliability_score
     result = compute_reliability_score(original_nl, generated_json)
+    result = compute_reliability_score(original_nl, generated_json, use_azure=True)
 """
 
 import os
@@ -40,25 +42,59 @@ for pkg in ["punkt", "punkt_tab", "averaged_perceptron_tagger",
             "averaged_perceptron_tagger_eng"]:
     nltk.download(pkg, quiet=True)
 
-# ── API client ─────────────────────────────────────────────
-_client = None
+
+# ============================================================
+# API clients
+# ============================================================
+
+_openai_client = None
+_azure_client  = None
+
 
 def _get_client() -> OpenAI:
-    global _client
-    if _client is None:
+    global _openai_client
+    if _openai_client is None:
         api_key = os.environ.get("OPENAI_API_KEY", "")
         if not api_key:
             raise EnvironmentError(
                 "OPENAI_API_KEY is not set. "
                 "Add it to your .env file or export it in your terminal."
             )
-        _client = OpenAI(api_key=api_key)
-    return _client
+        _openai_client = OpenAI(api_key=api_key)
+    return _openai_client
 
-# ── Reconstruction model ───────────────────────────────────
-RECONSTRUCTION_MODEL = "gpt-5.4"
 
-# ── System prompt for reconstruction ──────────────────────
+def _get_azure_client():
+    global _azure_client
+    if _azure_client is None:
+        from openai import AzureOpenAI
+        api_key  = os.environ.get("AZURE_OPENAI_API_KEY", "")
+        endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
+        version  = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-10-21")
+        if not api_key or not endpoint:
+            raise EnvironmentError(
+                "AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT must be set in your .env file."
+            )
+        _azure_client = AzureOpenAI(
+            api_key=api_key,
+            azure_endpoint=endpoint,
+            api_version=version,
+        )
+    return _azure_client
+
+
+# ============================================================
+# Reconstruction model config
+# ============================================================
+
+OPENAI_RECONSTRUCTION_MODEL = "gpt-4o"
+AZURE_RECONSTRUCTION_MODEL  = os.environ.get("AZURE_BASE_MODEL", "gpt-4.1-2025-04-14")
+
+
+# ============================================================
+# System prompt for reconstruction
+# ============================================================
+
 RECONSTRUCTION_SYSTEM_INSTRUCTIONS = """
 You are a supply chain description writer. Take some liberty in describing
 the supply chain in human style but make sure all the information is covered.
@@ -134,7 +170,10 @@ General rules:
 5. If a field contains MISSING state that information was not provided.
 """
 
-# ── Tier 3 field stripping ─────────────────────────────────
+
+# ============================================================
+# Tier 3 field stripping
+# ============================================================
 
 def _is_zero_constant(block: dict) -> bool:
     return (
@@ -226,12 +265,21 @@ def strip_tier3_fields(json_data: dict) -> dict:
     return data
 
 
-# ── NL reconstruction ──────────────────────────────────────
+# ============================================================
+# NL reconstruction
+# ============================================================
 
-def reconstruct_nl(json_data: dict) -> str:
+def reconstruct_nl(json_data: dict, use_azure: bool = False) -> str:
     """
     Reconstruct natural language from a generated JSON config.
-    Uses gpt-4o with Tier 3 fields stripped first.
+    Strips Tier 3 fields first, then calls the appropriate LLM.
+
+    Parameters
+    ----------
+    json_data : dict
+        Generated JSON config.
+    use_azure : bool
+        If True, use Azure OpenAI. If False (default), use OpenAI.
     """
     cleaned = strip_tier3_fields(json_data)
 
@@ -243,15 +291,26 @@ def reconstruct_nl(json_data: dict) -> str:
         )},
     ]
 
-    response = _get_client().chat.completions.create(
-        model=RECONSTRUCTION_MODEL,
+    if use_azure:
+        client = _get_azure_client()
+        model  = AZURE_RECONSTRUCTION_MODEL
+        print(f"  [Azure] Reconstruction model: {model}")
+    else:
+        client = _get_client()
+        model  = OPENAI_RECONSTRUCTION_MODEL
+        print(f"  [OpenAI] Reconstruction model: {model}")
+
+    response = client.chat.completions.create(
+        model=model,
         temperature=0.3,
         messages=messages,
     )
     return response.choices[0].message.content
 
 
-# ── Number normalization ───────────────────────────────────
+# ============================================================
+# Number normalization
+# ============================================================
 
 def _normalize_number_formats(text: str) -> str:
     magnitude_map = {
@@ -338,7 +397,9 @@ def preprocess(text: str) -> str:
     return text
 
 
-# ── Scoring ────────────────────────────────────────────────
+# ============================================================
+# Scoring
+# ============================================================
 
 def _extract_numbers(text: str) -> list:
     return [float(n) for n in re.findall(r"\b\d+(?:\.\d+)?\b", text)]
@@ -404,11 +465,14 @@ def _diagnose(bleu_4: float, numeric_f1: float) -> str:
         return "Partial — mixed signals, review individual scores."
 
 
-# ── Public API ─────────────────────────────────────────────
+# ============================================================
+# Public API
+# ============================================================
 
 def compute_reliability_score(
     original_nl: str,
     generated_json: dict,
+    use_azure: bool = False,
 ) -> dict:
     """
     Compute reliability score for a generated JSON config.
@@ -419,6 +483,8 @@ def compute_reliability_score(
         The original natural language description provided by the user.
     generated_json : dict
         The JSON config generated by the LLM.
+    use_azure : bool
+        If True, use Azure OpenAI for reconstruction. Default: False.
 
     Returns
     -------
@@ -433,7 +499,7 @@ def compute_reliability_score(
     """
     # Step 1 — reconstruct NL from generated JSON
     print("  Reconstructing NL from JSON...")
-    reconstructed_nl = reconstruct_nl(generated_json)
+    reconstructed_nl = reconstruct_nl(generated_json, use_azure=use_azure)
 
     # Step 2 — preprocess both texts
     ref = preprocess(original_nl)
@@ -444,7 +510,6 @@ def compute_reliability_score(
     numeric = _compute_numeric_f1(ref, hyp)
 
     # Step 4 — combined reliability score
-    # Weighted: Numeric F1 carries more weight (supply chain is number-heavy)
     reliability = round(
         0.4 * bleu["bleu_4"] + 0.6 * numeric["numeric_f1"], 4
     )
@@ -476,7 +541,9 @@ def print_score_report(result: dict) -> None:
     print("=" * 55)
 
 
-# ── CLI entry point ────────────────────────────────────────
+# ============================================================
+# CLI entry point
+# ============================================================
 
 if __name__ == "__main__":
     import sys
@@ -487,13 +554,19 @@ if __name__ == "__main__":
     )
     parser.add_argument("description_file", help="Path to original NL description .txt")
     parser.add_argument("json_file",        help="Path to generated JSON config")
+    parser.add_argument(
+        "--azure",
+        action="store_true",
+        help="Use Azure OpenAI for NL reconstruction instead of OpenAI",
+    )
     args = parser.parse_args()
 
     original_nl    = Path(args.description_file).read_text(encoding="utf-8").strip()
     generated_json = json.loads(Path(args.json_file).read_text(encoding="utf-8"))
 
-    print("Computing reliability score...")
-    result = compute_reliability_score(original_nl, generated_json)
+    print(f"Computing reliability score ({'Azure' if args.azure else 'OpenAI'})...")
+    result = compute_reliability_score(
+        original_nl, generated_json, use_azure=args.azure)
 
     print_score_report(result)
 
