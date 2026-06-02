@@ -75,6 +75,9 @@ NL2Sim_v1/
 
 - Python 3.9+
 - An OpenAI API key
+- Azure OpenAI API key
+- Azure OpenAI Project Endpoint
+- Azure OpenAI Fine-tuned Model
 
 ---
 
