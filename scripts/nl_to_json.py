@@ -30,19 +30,9 @@ load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 # ============================================================
 # Model config
 # ============================================================
-
-# ── OpenAI fine-tuned model ────────────────────────────────
-OPENAI_MODEL = "ft:gpt-4.1-2025-04-14:personal:nl2sim-ft:Dkz8vnRw"
-
-# ── Azure OpenAI ───────────────────────────────────────────
-# Set these in your .env file:
-#   AZURE_OPENAI_API_KEY=...
-#   AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-#   AZURE_OPENAI_API_VERSION=2024-10-21
-#   AZURE_BASE_MODEL=gpt-4.1          ← base model deployment name
-#   AZURE_FINETUNED_MODEL=...         ← fine-tuned deployment name (once ready)
+OPENAI_MODEL = os.environ["OPENAI_MODEL"]
 AZURE_FINETUNED_MODEL = os.environ.get("AZURE_FINETUNED_MODEL", "")
-AZURE_BASE_MODEL      = os.environ.get("AZURE_BASE_MODEL", "gpt-4.1")
+AZURE_BASE_MODEL      = os.environ.get("AZURE_BASE_MODEL", "")
 
 TEMPERATURE = 0.3
 

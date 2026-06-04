@@ -1111,50 +1111,50 @@ class SupplyChainEngine:
             # ── flush mode: no resource OR batch_size = -1 ─
             if no_resource or (batching_on and batch_size == -1):
                 while True:
+                    # flush FIRST, then wait
+                    bom = bom_for(out_item)
+                    if bom:
+                        max_units = float("inf")
+                        for mat, q in bom.items():
+                            if q > 0 and mat in inv:
+                                max_units = min(max_units, inv[mat].level / q)
+
+                        make = int(max(0, math.floor(
+                            max_units if max_units != float("inf") else 0)))
+                        if make > 0:
+                            consume_inputs(bom, make)
+
+                            if out_item in work_q:
+                                work_q[out_item] = max(
+                                    0.0, work_q[out_item] - make)
+
+                            cycle = max(1e-6, sample_distribution(cycle_spec, rng))
+
+                            if env.now >= self.warm_up:
+                                logger.add_operating_cost(op_cost * cycle)
+
+                            if out_item in inter_names:
+                                transfer = sample_distribution(
+                                    self._edge_transfer(
+                                        mfg_name, mfg_name, out_item), rng)
+                                if transfer > 0:
+                                    yield env.timeout(transfer)
+                                add_to_inventory(out_item, make)
+
+                            elif out_item in prod_names:
+                                transfer = sample_distribution(
+                                    self._edge_transfer(
+                                        mfg_name, wh_name, out_item), rng)
+                                if transfer <= 0:
+                                    add_to_inventory(out_item, make)
+                                    fulfill_backorders(out_item)
+                                else:
+                                    schedule_shipment(
+                                        env.now + transfer, out_item, make)
+
+                    # always wait the cycle before next flush
                     cycle = max(1e-6, sample_distribution(cycle_spec, rng))
                     yield env.timeout(cycle)
-
-                    bom = bom_for(out_item)
-                    if not bom:
-                        continue
-
-                    max_units = float("inf")
-                    for mat, q in bom.items():
-                        if q > 0 and mat in inv:
-                            max_units = min(max_units, inv[mat].level / q)
-
-                    make = int(max(0, math.floor(
-                        max_units if max_units != float("inf") else 0)))
-                    if make <= 0:
-                        continue
-
-                    consume_inputs(bom, make)
-
-                    if out_item in work_q:
-                        work_q[out_item] = max(
-                            0.0, work_q[out_item] - make)
-
-                    if env.now >= self.warm_up:
-                        logger.add_operating_cost(op_cost * cycle)
-
-                    if out_item in inter_names:
-                        transfer = sample_distribution(
-                            self._edge_transfer(
-                                mfg_name, mfg_name, out_item), rng)
-                        if transfer > 0:
-                            yield env.timeout(transfer)
-                        add_to_inventory(out_item, make)
-
-                    elif out_item in prod_names:
-                        transfer = sample_distribution(
-                            self._edge_transfer(
-                                mfg_name, wh_name, out_item), rng)
-                        if transfer <= 0:
-                            add_to_inventory(out_item, make)
-                            fulfill_backorders(out_item)
-                        else:
-                            schedule_shipment(
-                                env.now + transfer, out_item, make)
                 return
 
             # ── per-unit mode (resource present) ──────────
@@ -1260,11 +1260,12 @@ class SupplyChainEngine:
             dem_spec   = c.get("demand")
             pay_spec   = c.get("customer_payment_lead_time")
 
+            first = True
             while True:
-                yield env.timeout(interarrival_time(arr_spec, rng))
-
-                dem = int(max(1, math.floor(
-                    sample_distribution(dem_spec, rng))))
+                if not first:
+                    yield env.timeout(interarrival_time(arr_spec, rng))
+                first = False
+                dem = int(max(1, math.floor(sample_distribution(dem_spec, rng))))
 
                 if env.now >= self.warm_up:
                     logger.record_order(dem)
