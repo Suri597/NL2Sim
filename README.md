@@ -121,6 +121,7 @@ Open `.env` and fill in your credentials. You only need to fill in the section f
 ```env
 # ── OpenAI (option 1) ──────────────────────────────────────
 OPENAI_API_KEY=sk-...your-key-here...
+OPENAI_MODEL=sk-...your-model-here...
 
 # ── Azure OpenAI (option 2) ────────────────────────────────
 AZURE_OPENAI_API_KEY=your-azure-key
