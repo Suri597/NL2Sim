@@ -448,6 +448,7 @@ class Logger:
         self.env      = env
         self.warm_up  = float(warm_up)
 
+        # ── scalar accumulators (unchanged) ────────────────
         self.revenue           = 0.0
         self.procurement_cost  = 0.0
         self.operating_cost    = 0.0
@@ -464,18 +465,46 @@ class Logger:
         self.order_wait_times   = []
         self.partial_wait_times = []
 
+        # ── inventory area tracking (unchanged) ────────────
         self._inv_last_t:     Dict[str, float] = {}
         self._inv_last_level: Dict[str, float] = {}
         self._inv_area:       Dict[str, float] = defaultdict(float)
 
+        # ── resource tracking (unchanged) ──────────────────
         self._res_last_t:    Dict[str, float] = defaultdict(float)
         self._res_last_busy: Dict[str, float] = defaultdict(float)
         self._res_busy_area: Dict[str, float] = defaultdict(float)
         self.res_queue_waits: Dict[str, List[float]] = defaultdict(list)
 
+        # ── cash area tracking (unchanged) ─────────────────
         self._cash_last_t:     float = 0.0
         self._cash_last_level: float = 0.0
         self._cash_area:       float = 0.0
+
+        # ── time-series: cumulative financials ─────────────
+        # Each entry is {"t": sim_time, "value": cumulative_value}
+        # Only recorded after warm-up to match KPI scope.
+        self.ts_revenue:          List[Dict[str, float]] = []
+        self.ts_procurement_cost: List[Dict[str, float]] = []
+        self.ts_operating_cost:   List[Dict[str, float]] = []
+        self.ts_holding_cost:     List[Dict[str, float]] = []
+        self.ts_shortage_cost:    List[Dict[str, float]] = []
+        self.ts_cash_balance:     List[Dict[str, float]] = []
+
+        # ── time-series: cumulative service counts ──────────
+        self.ts_units_delivered:  List[Dict[str, float]] = []
+        self.ts_units_lost:       List[Dict[str, float]] = []
+        self.ts_orders:           List[Dict[str, float]] = []
+        self.ts_units_demanded:   List[Dict[str, float]] = []
+
+    # ── helper: append a time-series point ────────────────
+    def _ts_append(self, series: List, value: float) -> None:
+        """Only record after warm-up so series matches KPI scope."""
+        if self.env.now >= self.warm_up:
+            series.append({"t": round(self.env.now, 6),
+                           "value": round(value, 6)})
+
+    # ── financial mutators ─────────────────────────────────
 
     @property
     def profit(self) -> float:
@@ -486,28 +515,41 @@ class Logger:
 
     def add_revenue(self, x: float):
         self.revenue += float(x)
+        self._ts_append(self.ts_revenue, self.revenue)
 
     def add_procurement_cost(self, x: float):
         self.procurement_cost += float(x)
+        self._ts_append(self.ts_procurement_cost, self.procurement_cost)
 
     def add_operating_cost(self, x: float):
         self.operating_cost += float(x)
+        self._ts_append(self.ts_operating_cost, self.operating_cost)
 
     def add_holding_cost(self, x: float):
         self.holding_cost += float(x)
+        self._ts_append(self.ts_holding_cost, self.holding_cost)
 
     def add_shortage_cost(self, x: float):
         self.shortage_cost += float(x)
+        self._ts_append(self.ts_shortage_cost, self.shortage_cost)
+
+    # ── service count mutators ─────────────────────────────
 
     def record_order(self, units: int):
         self.orders         += 1
         self.units_demanded += int(units)
+        self._ts_append(self.ts_orders,         self.orders)
+        self._ts_append(self.ts_units_demanded, self.units_demanded)
 
     def record_delivery(self, units: int):
         self.units_delivered += int(units)
+        self._ts_append(self.ts_units_delivered, self.units_delivered)
 
     def record_lost(self, units: int):
         self.units_lost += int(units)
+        self._ts_append(self.ts_units_lost, self.units_lost)
+
+    # ── inventory area tracking (unchanged) ────────────────
 
     def inv_register(self, inv: Inventory):
         self._inv_last_t[inv.name]     = self.env.now
@@ -539,6 +581,8 @@ class Logger:
     def inv_time_avg(self, horizon: float) -> Dict[str, float]:
         denom = max(1e-9, horizon - self.warm_up)
         return {k: v / denom for k, v in self._inv_area.items()}
+
+    # ── resource tracking (unchanged) ──────────────────────
 
     def res_register(self, name: str):
         self._res_last_t[name]    = self.env.now
@@ -574,6 +618,8 @@ class Logger:
             for r, area in self._res_busy_area.items()
         }
 
+    # ── cash tracking ──────────────────────────────────────
+
     def cash_update(self, new_balance: float):
         t      = self.env.now
         last_t = self._cash_last_t
@@ -585,6 +631,7 @@ class Logger:
         self._cash_last_t     = t
         self._cash_last_level = float(new_balance)
         self.cash_balance     = float(new_balance)
+        self._ts_append(self.ts_cash_balance, self.cash_balance)
 
     def cash_finalize(self):
         t      = self.env.now
@@ -989,6 +1036,8 @@ class SupplyChainEngine:
         env.process(costing_loop())
 
         # ── daily inventory sampler ────────────────────────
+        # Samples every sim-day after warm-up; used for both
+        # avg_inventory KPI and the inventory_daily time series.
         inv_daily_samples: Dict[str, List[float]] = defaultdict(list)
 
         def daily_sampler():
@@ -1378,6 +1427,16 @@ class SupplyChainEngine:
         units_dem = max(logger.units_demanded, 1)
         fill_rate = logger.units_delivered / units_dem
 
+        # ── build inventory daily time series ──────────────
+        # inv_daily_samples is {name: [level_per_day]} — attach sim-day
+        # index as "t" so the format matches the financial series.
+        inv_daily_ts: Dict[str, List[Dict[str, float]]] = {}
+        for mat_name, levels in inv_daily_samples.items():
+            inv_daily_ts[mat_name] = [
+                {"t": float(day + 1), "value": round(lvl, 6)}
+                for day, lvl in enumerate(levels)
+            ]
+
         return {
             "kpis": {
                 "revenue":             logger.revenue,
@@ -1408,6 +1467,27 @@ class SupplyChainEngine:
                     sum(pw) / len(pw) if pw else 0.0,
                 "n_full_wait_samples":    len(ow),
                 "n_partial_wait_samples": len(pw),
+            },
+            # ── time series ────────────────────────────────
+            # Financial / service series: list of {"t": sim_time, "value": cumulative}
+            # Inventory series:           list of {"t": day_number, "value": level}
+            # All series only contain post-warm-up observations.
+            "time_series": {
+                "financial": {
+                    "revenue":          logger.ts_revenue,
+                    "procurement_cost": logger.ts_procurement_cost,
+                    "operating_cost":   logger.ts_operating_cost,
+                    "holding_cost":     logger.ts_holding_cost,
+                    "shortage_cost":    logger.ts_shortage_cost,
+                    "cash_balance":     logger.ts_cash_balance,
+                },
+                "service": {
+                    "units_delivered": logger.ts_units_delivered,
+                    "units_lost":      logger.ts_units_lost,
+                    "orders":          logger.ts_orders,
+                    "units_demanded":  logger.ts_units_demanded,
+                },
+                "inventory_daily": inv_daily_ts,
             },
         }
 
@@ -1555,12 +1635,100 @@ def save_results(results: Dict[str, Any], path: str) -> None:
     print(f"\nFull results saved → {path}")
 
 
+def save_raw_data(results: Dict[str, Any], raw_dir: str) -> None:
+    """
+    Write per-replication raw data into a structured directory.
+
+    Layout per replication:
+        replication_NNN/
+            kpis.json                   — scalar KPIs + ending/avg inventory
+            time_series/
+                financial/
+                    revenue.json        — [{"t": sim_time, "value": cumulative}, ...]
+                    procurement_cost.json
+                    operating_cost.json
+                    holding_cost.json
+                    shortage_cost.json
+                    cash_balance.json
+                service/
+                    units_delivered.json
+                    units_lost.json
+                    orders.json
+                    units_demanded.json
+                inventory_daily/
+                    <material_name>.json — [{"t": day, "value": level}, ...]
+
+    Plus a combined all_replications.json at the top level.
+    """
+    raw_path = Path(raw_dir)
+    raw_path.mkdir(parents=True, exist_ok=True)
+
+    reps = results.get("replication_results", [])
+
+    for i, rep in enumerate(reps, start=1):
+        rep_dir = raw_path / f"replication_{i:03d}"
+        rep_dir.mkdir(exist_ok=True)
+
+        # ── scalar KPIs + inventory summaries ─────────────
+        kpi_data = {
+            k: v for k, v in rep.items() if k != "time_series"
+        }
+        with open(rep_dir / "kpis.json", "w", encoding="utf-8") as f:
+            json.dump(kpi_data, f, indent=2, default=_json_default)
+
+        # ── time series ────────────────────────────────────
+        ts      = rep.get("time_series", {})
+        ts_dir  = rep_dir / "time_series"
+
+        # financial series
+        fin_dir = ts_dir / "financial"
+        fin_dir.mkdir(parents=True, exist_ok=True)
+        for series_name, data in ts.get("financial", {}).items():
+            with open(fin_dir / f"{series_name}.json",
+                      "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, default=_json_default)
+
+        # service series
+        svc_dir = ts_dir / "service"
+        svc_dir.mkdir(parents=True, exist_ok=True)
+        for series_name, data in ts.get("service", {}).items():
+            with open(svc_dir / f"{series_name}.json",
+                      "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, default=_json_default)
+
+        # inventory daily series — one file per material
+        inv_dir = ts_dir / "inventory_daily"
+        inv_dir.mkdir(parents=True, exist_ok=True)
+        for mat_name, data in ts.get("inventory_daily", {}).items():
+            # sanitise material name for use as filename
+            safe_name = "".join(
+                c if c.isalnum() or c in "-_" else "_"
+                for c in mat_name
+            )
+            with open(inv_dir / f"{safe_name}.json",
+                      "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, default=_json_default)
+
+    # ── combined dump ──────────────────────────────────────
+    combined = {
+        "simulation_params":   results.get("simulation_params", {}),
+        "replication_results": reps,
+    }
+    with open(raw_path / "all_replications.json",
+              "w", encoding="utf-8") as f:
+        json.dump(combined, f, indent=2, default=_json_default)
+
+    print(f"Raw per-replication data saved → {raw_path}/ "
+          f"({len(reps)} replication(s))")
+
+
 # ============================================================
 # Public API (importable)
 # ============================================================
 
 def run_simulation(config: Dict[str, Any],
-                   output_path: Optional[str] = None) -> Dict[str, Any]:
+                   output_path: Optional[str] = None,
+                   raw_dir: Optional[str] = None) -> Dict[str, Any]:
     """
     Run the full simulation pipeline.
 
@@ -1568,7 +1736,8 @@ def run_simulation(config: Dict[str, Any],
     ----------
     config      : dict  — supply chain JSON config (raw or filtered)
                           'missing' placeholders are handled automatically
-    output_path : str   — optional path to save results JSON
+    output_path : str   — optional path to save summary results JSON
+    raw_dir     : str   — optional path to save per-replication raw data
 
     Returns
     -------
@@ -1578,6 +1747,8 @@ def run_simulation(config: Dict[str, Any],
     engine  = SupplyChainEngine(config)
     results = engine.run()
     print_summary(results)
+    if raw_dir:
+        save_raw_data(results, raw_dir)
     if output_path:
         save_results(results, output_path)
     return results
@@ -1602,20 +1773,22 @@ if __name__ == "__main__":
     parser.add_argument("config_file",
                         help="Path to validated JSON config file")
     parser.add_argument("--output", "-o", default=None,
-                        help="Path to save full results JSON "
-                             "(default: auto-generated in outputs/)")
+                        help="Path to save summary results JSON "
+                             "(default: auto-generated next to config)")
     args = parser.parse_args()
 
     with open(args.config_file, encoding="utf-8") as f:
         config = json.load(f)
 
+    stem = Path(args.config_file).stem
+
     if args.output:
         out_path = args.output
     else:
-        stem     = Path(args.config_file).stem
         out_path = str(
-            Path(args.config_file).parent.parent /
-            "outputs" / f"{stem}_results.json"
+            Path(args.config_file).parent / f"{stem}_results.json"
         )
 
-    run_simulation(config, output_path=out_path)
+    raw_dir = str(Path(out_path).parent / "results")
+
+    run_simulation(config, output_path=out_path, raw_dir=raw_dir)

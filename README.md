@@ -41,39 +41,53 @@ KPI results + what-if analysis
 
 ```
 NL2Sim_v1/
+├── main.py                         ← top-level entry point
+├── README.md
+├── requirements.txt
+├── .env.example                    ← API key template
+├── .gitignore
+├── todo.txt
+│
 ├── scripts/                        ← all runnable scripts
 │   ├── run_pipeline.py             ← main CLI entry point
 │   ├── nl_to_json.py               ← NL → JSON generation (OpenAI + Azure)
 │   ├── iterative_repair.py         ← interactive repair runner + pre-validation pass
-│   ├── score_reliability.py        ← BLEU + Numeric F1 scoring (OpenAI + Azure)
-│   ├── simulate.py                 ← SimPy simulation engine
-│   ├── nl_to_whatif.py             ← what-if instruction parser
-│   ├── what_if_engine.py           ← applies what-if changes
-│   ├── prompts.py                  ← LLM system instructions
-│   ├── schema.py                   ← JSON schema example
 │   ├── resolvers.py                ← interactive repair resolvers
 │   ├── validation_layer_a.py       ← Layer A: structural validation
 │   ├── validation_layer_b.py       ← Layer B: supply chain semantic validation
 │   ├── validation_layer_c.py       ← Layer C: simulation readiness checks
+│   ├── score_reliability.py        ← BLEU + Numeric F1 scoring (OpenAI + Azure)
+│   ├── simulate.py                 ← SimPy simulation engine
+│   ├── nl_to_whatif.py             ← what-if instruction parser
+│   ├── what_if_engine.py           ← applies what-if changes
+│   ├── what_if_perform.py          ← runs what-if simulations
+│   ├── what_if_schema.py           ← what-if JSON schema
+│   ├── what_if_examples.py         ← what-if usage examples
+│   ├── prompts.py                  ← LLM system instructions
+│   ├── schema.py                   ← JSON schema example
 │   ├── test_azure.py               ← Azure connection test script
+│   ├── test_description.txt        ← sample supply chain description
+│   ├── requirements.txt            ← scripts-level dependencies
 │   └── data_gen/                   ← synthetic dataset generation
-│       ├── json_generator.py
-│       ├── filter_config.py
-│       ├── nl_generator.py
-│       ├── config_populate.py
-│       ├── process_configs.py
-│       ├── dataset_builder.py
-│       └── format_dataset.py
+│       ├── config_populate.py      ← generate full JSON configs
+│       ├── filter_config.py        ← filter configs to relevant fields
+│       ├── json_generator.py       ← JSON config generator utilities
+│       ├── nl_generator.py         ← generate NL descriptions from configs
+│       ├── context_prompt.py       ← context prompts for NL generation
+│       ├── process_configs.py      ← apply missing placeholders
+│       ├── dataset_builder.py      ← assemble fine-tuning JSONL
+│       └── format_dataset.py       ← format and split train/val
+│
 ├── finetune/                       ← Azure fine-tuning scripts
+│   ├── data_upload.py              ← prepare and upload training data
 │   ├── upload_file.py              ← upload JSONL training data to Azure OpenAI
 │   └── finetune_job.py             ← create and monitor Azure fine-tuning job
+│
 ├── nl2sim/                         ← importable library
 │   ├── pipeline.py                 ← Pipeline class
 │   └── __init__.py
-├── outputs/                        ← generated outputs (git-ignored)
-├── .env.example                    ← API key template
-├── requirements.txt
-└── README.md
+│
+└── outputs/                        ← generated outputs (git-ignored)
 ```
 
 ---
@@ -248,6 +262,7 @@ The simulation engine (`simulate.py`) supports:
 | Financial KPIs | revenue, procurement cost, holding cost, shortage cost, profit, cash balance |
 | Service KPIs | fill rate, units delivered, units lost, backorder |
 | Inventory KPIs | average and ending inventory per material |
+| Time-series data | per-replication financial, service, and daily inventory series saved to `results/` |
 | Missing fields | `"missing"` placeholders and absent fields handled automatically via `normalize_config()` |
 
 ---
@@ -303,7 +318,7 @@ Checks BOMs reference known materials, every raw material has a supplier, facili
 **Layer C — Simulation readiness**
 Checks producibility, inventory alignment, operation consistency, and distribution parameter constraints (e.g. uniform b > a).
 
-If any layer finds errors, the interactive repair runner prompts you to fix them one by one using guided menus.
+If any layer finds errors, the interactive repair runner prompts you to fix them one by one using guided menus. All error messages show the full field path in plain English (e.g. `Inventory → 'phosphorus' → Procurement scheme → Distribution`) rather than raw JSON paths.
 
 ---
 
@@ -315,7 +330,15 @@ Each pipeline run saves to `outputs/run_{timestamp}/`:
 config_raw.json           ← raw LLM output
 config.json               ← validated and repaired config
 reliability_score.json    ← BLEU + Numeric F1 scores
-simulation_results.json   ← full simulation KPIs
+config_results.json       ← aggregated simulation KPIs and CI intervals
+results/                  ← per-replication raw data
+    replication_001/
+        kpis.json
+        time_series/
+            financial/    ← revenue, costs, cash balance over time
+            service/      ← units delivered, lost, orders over time
+            inventory_daily/ ← daily inventory levels per material
+    all_replications.json
 whatif_1_changes.json     ← what-if modification spec
 whatif_1_config.json      ← modified config
 whatif_1_results.json     ← what-if simulation results
@@ -397,11 +420,12 @@ python data_gen/format_dataset.py \
 | Variable | Required for | Description |
 |---|---|---|
 | `OPENAI_API_KEY` | OpenAI model | OpenAI API key |
+| `OPENAI_MODEL` | OpenAI model | Fine-tuned model string (e.g. `ft:gpt-4.1-...`) |
 | `AZURE_OPENAI_API_KEY` | Azure model | Azure OpenAI API key |
 | `AZURE_OPENAI_ENDPOINT` | Azure model | Azure resource endpoint URL |
 | `AZURE_OPENAI_API_VERSION` | Azure model | API version (default: `2024-10-21`) |
 | `AZURE_BASE_MODEL` | Azure model | Base model deployment name |
-| `AZURE_FINETUNED_MODEL` | Azure model | Fine-tuned model deployment name |
+| `AZURE_FINETUNED_MODEL` | Azure model | Fine-tuned model deployment name (blank = use base model) |
 
 ---
 
@@ -425,6 +449,9 @@ word2number     ← numeric F1 scoring
 **`OPENAI_API_KEY is not set`**
 Make sure your `.env` file exists in the root directory and contains your API key.
 
+**`OPENAI_MODEL is not set`**
+Set `OPENAI_MODEL` in your `.env` file to your fine-tuned model string (e.g. `ft:gpt-4.1-2025-04-14:personal:nl2sim-ft:Dkz8vnRw`).
+
 **`AZURE_OPENAI_API_KEY is not set`**
 Make sure `AZURE_OPENAI_API_KEY` and `AZURE_OPENAI_ENDPOINT` are set in your `.env` file.
 
@@ -438,4 +465,4 @@ Make sure you are running from inside the `scripts/` directory and your virtual 
 The pipeline will ask if you want to skip the score and continue to simulation. Press `1` to skip.
 
 **Validation errors after generation**
-The interactive repair runner will guide you through fixing them. Press `2` to skip any issue not relevant to your scenario.
+The interactive repair runner will guide you through fixing them one by one. All prompts show the full human-readable field path so you always know exactly which part of the config needs attention. Press `2` to skip any issue not relevant to your scenario.

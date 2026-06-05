@@ -1,13 +1,4 @@
 # interactive_repair.py
-# ============================================================
-# Orchestrates:
-#   LLM-generated config
-#     → Layer0 validation + repair
-#     → LayerB validation + repair
-#     → LayerC validation + repair
-#
-# Repair logic lives in resolvers.py (REGISTRY)
-# ============================================================
 
 from __future__ import annotations
 
@@ -18,6 +9,7 @@ from typing import Any, Dict, List
 from pprint import pformat
 from datetime import datetime
 import json
+
 # ------------------------------------------------------------
 # Make sure local imports work when run as a script
 # ------------------------------------------------------------
@@ -35,7 +27,7 @@ from validation_layer_c import LayerCValidator
 # ------------------------------------------------------------
 # Resolvers
 # ------------------------------------------------------------
-from resolvers import REGISTRY, set_at_path
+from resolvers import REGISTRY, set_at_path, describe_finding
 
 
 # ============================================================
@@ -125,18 +117,17 @@ class InteractiveRepairRunner:
         print(f"REPAIRING {layer_name}")
         print("==============================")
 
-        skipped_issues = set()  # ← track skipped findings
+        skipped_issues = set()
 
         for pass_i in range(1, self.max_passes_per_layer + 1):
 
             findings = validate_fn()
-
             layer_findings = [f for f in findings if f.layer == layer_name]
 
             errors = [
                 f for f in layer_findings
                 if f.severity in {"error", "missing_required"}
-                and (f.path, f.message) not in skipped_issues  # ← skip known issues
+                and (f.path, f.message) not in skipped_issues
             ]
             warnings = [
                 f for f in layer_findings
@@ -152,19 +143,20 @@ class InteractiveRepairRunner:
                     print(f"\n{layer_name} passed clean.")
                 return
 
+            f0 = errors[0]
+
             print(f"\n--- {layer_name} pass {pass_i} ---")
             print("Current issue:")
-            print(" ", errors[0])
+            print(f"  {describe_finding(self.config, f0.path)}")
+            print(f"  (detail: {f0.message})")
 
-            finding = errors[0]
-
-            applied = REGISTRY.resolve(self.config, finding)
+            applied = REGISTRY.resolve(self.config, f0)
 
             if applied:
                 continue
 
-            print("\nNo resolver applied for:")
-            print(" ", finding)
+            print("\nNo resolver found for this issue.")
+            print(f"  {describe_finding(self.config, f0.path)}")
 
             choice = self._fallback_decision()
 
@@ -172,9 +164,8 @@ class InteractiveRepairRunner:
                 raise SystemExit("Aborted by user.")
 
             if choice == "skip_issue":
-                # ── skip only this specific finding ────────
-                skipped_issues.add((finding.path, finding.message))
-                print(f"  Skipping: {finding.path}")
+                skipped_issues.add((f0.path, f0.message))
+                print(f"  Skipping: {describe_finding(self.config, f0.path)}")
                 continue
 
             # else: retry
@@ -182,7 +173,6 @@ class InteractiveRepairRunner:
         raise RuntimeError(
             f"Exceeded max passes ({self.max_passes_per_layer}) for {layer_name}"
         )
-
 
     # -------------------------
     # Fallback prompt
@@ -220,6 +210,7 @@ def backup_and_write_config(config: Dict[str, Any], filepath: str) -> None:
 
     print(f"Saved updated config to: {filepath}")
 
+
 CANONICAL_TOP_LEVEL_ORDER = [
     "config_info",
     "raw_materials",
@@ -233,6 +224,7 @@ CANONICAL_TOP_LEVEL_ORDER = [
     "nodes",
     "edges",
 ]
+
 
 def sort_section(section_name: str, items: list) -> list:
     if not isinstance(items, list):
@@ -250,7 +242,6 @@ def sort_section(section_name: str, items: list) -> list:
         return sorted(items, key=lambda x: x.get("name", ""))
 
     if section_name == "facility":
-        # group same facility together, then operation
         return sorted(
             items,
             key=lambda x: (x.get("name", ""), x.get("operation", {}).get("name", ""))
@@ -267,21 +258,23 @@ def sort_section(section_name: str, items: list) -> list:
         )
 
     return items
+
+
 def _resolve_missing_generic(cfg: dict, path: str) -> None:
     """
     Generic fallback for missing required fields.
     Tries int → float → string in that order.
     """
     print(f"\n--- Required field missing ---")
-    print(f"  Field : {path}")
+    print(f"  {describe_finding(cfg, path)}")
+    print(f"  (path: {path})")
 
     while True:
-        raw = input(f"  Enter value: ").strip()
+        raw = input("  Enter value: ").strip()
         if not raw:
             print("  Value is required — cannot skip.")
             continue
 
-        # Try int first, then float, then string
         try:
             val: Any = int(raw)
         except ValueError:
@@ -291,8 +284,9 @@ def _resolve_missing_generic(cfg: dict, path: str) -> None:
                 val = raw
 
         set_at_path(cfg, path, val)
-        print(f"  ✓ Set {path} → {val}")
+        print(f"  ✓ Set → {val}")
         break
+
 
 def resolve_missing_placeholders(cfg: dict) -> None:
     """
@@ -311,7 +305,6 @@ def resolve_missing_placeholders(cfg: dict) -> None:
 
     filtered = filter_config(cfg)
 
-    # Collect all "missing" paths from filtered config
     missing_paths = []
 
     def _scan(obj: Any, path: str = "") -> None:
@@ -334,7 +327,6 @@ def resolve_missing_placeholders(cfg: dict) -> None:
     print(f"\n  ⚠️  {len(missing_paths)} required field(s) need input:\n")
 
     for path in missing_paths:
-        # Build a synthetic finding so resolvers can match on it
         finding = Finding(
             layer="Layer0",
             severity="missing_required",
@@ -342,28 +334,19 @@ def resolve_missing_placeholders(cfg: dict) -> None:
             message="Found placeholder 'missing' in required field",
         )
 
-        print(f"  → {path}")
+        # Show human-readable breadcrumb instead of raw path
+        print(f"  → {describe_finding(cfg, path)}")
 
-        # Try specific resolver first
         applied = REGISTRY.resolve(cfg, finding)
 
         if not applied:
-            # Generic numeric / string fallback
             _resolve_missing_generic(cfg, path)
+
 
 def clean_missing_placeholders(cfg: dict, required_paths: set = None) -> dict:
     """
     Replace 'missing' placeholder strings with empty string ""
     for all fields except those in required_paths.
-    
-    Parameters
-    ----------
-    cfg : dict
-        The JSON config to clean.
-    required_paths : set
-        Set of dot-notation paths that should NOT be replaced.
-        e.g. {"raw_materials.name", "supplier.name"}
-        If None uses the default REQUIRED set from validation_layer_a.
     """
     import copy
     from validation_layer_a import MISSING_POLICY_REQUIRED
@@ -386,8 +369,8 @@ def clean_missing_placeholders(cfg: dict, required_paths: set = None) -> dict:
             if obj.strip().lower() == "missing":
                 canon = _canonical(path)
                 if canon in required_paths:
-                    return obj  # keep — required field
-                return ""      # replace with empty string
+                    return obj
+                return ""
             return obj
 
         if isinstance(obj, dict):
@@ -425,12 +408,12 @@ def canonicalize_config(config: dict) -> dict:
         else:
             new_cfg[key] = val
 
-    # Preserve any unknown top-level keys at the end
     for key, val in config.items():
         if key not in new_cfg:
             new_cfg[key] = val
 
     return new_cfg
+
 
 def deep_sort(obj, *, _is_root=True):
     """
@@ -443,7 +426,6 @@ def deep_sort(obj, *, _is_root=True):
     if isinstance(obj, dict):
         items = obj.items()
 
-        # ONLY sort dict keys if not root
         if not _is_root:
             items = sorted(items, key=lambda kv: kv[0])
 
@@ -453,14 +435,12 @@ def deep_sort(obj, *, _is_root=True):
         }
 
     if isinstance(obj, list):
-        # list of dicts with 'name'
         if all(isinstance(x, dict) and "name" in x for x in obj):
             return [
                 deep_sort(x, _is_root=False)
                 for x in sorted(obj, key=lambda d: d.get("name", ""))
             ]
 
-        # list of strings
         if all(isinstance(x, str) for x in obj):
             return sorted(obj)
 
@@ -472,6 +452,7 @@ def deep_sort(obj, *, _is_root=True):
 # ============================================================
 # Entry point
 # ============================================================
+
 def interactive_repair(config: dict) -> dict:
     runner = InteractiveRepairRunner(
         config,
@@ -479,6 +460,7 @@ def interactive_repair(config: dict) -> dict:
         max_passes_per_layer=20,
     )
     return runner.run()
+
 
 if __name__ == "__main__":
     import sys
@@ -513,8 +495,7 @@ if __name__ == "__main__":
     print("  2) No")
     choice = input("Select option #: ").strip().lower()
 
-    if choice in {"1", "yes", "y", ""} :
-        # Use second argument if provided, otherwise default
+    if choice in {"1", "yes", "y", ""}:
         if len(sys.argv) > 2:
             output_path = sys.argv[2]
         else:

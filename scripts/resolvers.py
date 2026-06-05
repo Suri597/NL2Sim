@@ -1,4 +1,4 @@
-# simulationv2/config/resolvers.py
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -46,6 +46,108 @@ def set_at_path(cfg: Dict[str, Any], path: str, value: Any) -> None:
         cur[last_key][last_idx] = value
 
 
+# ============================================================
+# Human-readable context helpers
+# ============================================================
+
+def _name_for_entry(entry):
+    if isinstance(entry, dict):
+        n = entry.get("name")
+        if n and str(n).strip().lower() != "missing":
+            return str(n)
+    return None
+
+
+def _resolve_segment(segment, seq):
+    mi = re.match(r"^\[(\d+)\]$", segment)
+    mn = re.match(r"^\[name=(.+?)\]$", segment)
+
+    if mi:
+        idx   = int(mi.group(1))
+        entry = seq[idx] if isinstance(seq, list) and idx < len(seq) else None
+        name  = _name_for_entry(entry)
+        return entry, (f"'{name}'" if name else f"[{idx}]")
+
+    if mn:
+        name  = mn.group(1)
+        entry = next(
+            (e for e in (seq or [])
+             if isinstance(e, dict) and e.get("name") == name),
+            None,
+        )
+        return entry, f"'{name}'"
+
+    return None, segment
+
+
+def describe_finding(cfg, path):
+    """
+    Convert a raw validator path into a full human-readable breadcrumb.
+
+    Every level is shown. Array indices are replaced with the entry's
+    name where one exists. Dots and brackets become ' → '.
+
+    Examples
+    --------
+    inventory[2].procurement_scheme.parameters.a
+        → Inventory → 'phosphorus' → Procurement scheme → Parameters → a
+
+    supplier[1].supplier_lead_time.parameters.b
+        → Supplier → 'AcmeChem' → Supplier lead time → Parameters → b
+
+    products[0].bom.steel_sheet
+        → Products → 'cpu_chip' → Bom → steel_sheet
+
+    customer[0].shortage_policy
+        → Customer → 'RetailCo' → Shortage policy
+
+    edges[3].transfer_time.parameters.b
+        → Edges → 'AcmeChem → Fab (steel_sheet)' → Transfer time → Parameters → b
+    """
+    try:
+        parts = []
+        node  = cfg
+        tokens = re.findall(r"[a-zA-Z_]\w*(?:\[\d+\]|\[name=[^\]]+\])?", path)
+
+        for token in tokens:
+            km = re.match(r"^([a-zA-Z_]\w*)(\[.+\])?$", token)
+            if not km:
+                parts.append(token.replace("_", " ").capitalize())
+                continue
+
+            key     = km.group(1)
+            bracket = km.group(2)
+
+            child = node.get(key) if isinstance(node, dict) else (node if isinstance(node, list) else None)
+            parts.append(key.replace("_", " ").capitalize())
+            node = child
+
+            if bracket:
+                entry, entry_label = _resolve_segment(bracket, node)
+
+                if key == "edges" and isinstance(entry, dict):
+                    src = entry.get("source") or "?"
+                    dst = entry.get("destination") or "?"
+                    mat = entry.get("material_name")
+                    edge_label = f"{src} → {dst}"
+                    if mat and mat != "missing":
+                        edge_label += f" ({mat})"
+                    parts.append(f"'{edge_label}'")
+                else:
+                    parts.append(entry_label)
+
+                node = entry
+
+        return " → ".join(parts)
+
+    except Exception:
+        return path
+
+
+# ============================================================
+# Input helpers
+# ============================================================
+
 def _input_choice(prompt: str, choices: List[str], default: str) -> str:
     print(prompt)
     for i, c in enumerate(choices, 1):
@@ -61,6 +163,7 @@ def _input_choice(prompt: str, choices: List[str], default: str) -> str:
     except Exception:
         pass
     return default
+
 
 def _select_from_list(
     title: str,
@@ -88,6 +191,7 @@ def _select_from_list(
         print("Invalid selection.")
         return []
 
+
 def _input_int(prompt: str) -> int:
     while True:
         raw = input(prompt).strip()
@@ -104,6 +208,7 @@ def _input_float(prompt: str) -> float:
             return float(raw)
         except Exception:
             print("Please enter a number.")
+
 
 # ============================================================
 # Distribution parameter definitions
@@ -176,6 +281,8 @@ def _prompt_distribution_and_parameters() -> tuple:
 
     params = _prompt_distribution_parameters(dist)
     return dist, params
+
+
 # ============================================================
 # Finding interface
 # ============================================================
@@ -242,6 +349,7 @@ REGISTRY = ResolverRegistry()
 # ============================================================
 # Layer A resolvers
 # ============================================================
+
 @REGISTRY.register(
     layer="Layer0",
     severity="error",
@@ -283,10 +391,8 @@ def resolve_layer0_incomplete_procurement_scheme(
         return True
 
     print("\n--- Missing procurement scheme ---")
-    print(f"Inventory item : {item.get('name')}")
-    print(f"Type           : {inv_type}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
-    # ── Step 1: Select procurement type ───────────────────
     PROCUREMENT_TYPES = [
         (
             "periodic_supply",
@@ -318,7 +424,6 @@ def resolve_layer0_incomplete_procurement_scheme(
         except ValueError:
             print("Invalid selection. Try again.")
 
-    # ── Step 2: Get parameters based on type ──────────────
     ps = {"type": proc_type}
 
     if proc_type == "inventory_threshold":
@@ -343,7 +448,6 @@ def resolve_layer0_incomplete_procurement_scheme(
         ps["distribution"] = dist
         ps["parameters"]   = params
 
-    # ── Step 3: Procurement arrival (periodic_supply only) ─
     if proc_type == "periodic_supply":
         print("\nProcurement arrival distribution (how often orders arrive):")
         arrival_dist, arrival_params = _prompt_distribution_and_parameters()
@@ -358,6 +462,7 @@ def resolve_layer0_incomplete_procurement_scheme(
     print(json.dumps(ps, indent=2))
     return True
 
+
 @REGISTRY.register(
     layer="Layer0",
     severity="error",
@@ -367,10 +472,6 @@ def resolve_layer0_incomplete_procurement_scheme(
 def resolve_layer0_invalid_shortage_policy(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolver for invalid or missing shortage_policy.
-    Shows all four supported policies with descriptions.
-    """
     import re
 
     m = re.match(r"customer\[(\d+)\]", finding.path)
@@ -386,8 +487,8 @@ def resolve_layer0_invalid_shortage_policy(
     customer = customers[idx]
 
     print("\n--- Invalid shortage policy ---")
-    print(f"Customer       : {customer.get('name')}")
-    print(f"Current value  : {customer.get('shortage_policy')}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Current value : {customer.get('shortage_policy')}")
 
     SHORTAGE_POLICIES = [
         (
@@ -440,6 +541,7 @@ def resolve_layer0_invalid_shortage_policy(
     print(f"\nUpdated shortage_policy → '{chosen}'")
     return True
 
+
 @REGISTRY.register(
     layer="Layer0",
     severity="error",
@@ -464,8 +566,8 @@ def resolve_layer0_invalid_facility_type(
     fac = facilities[idx]
 
     print("\n--- Invalid facility type ---")
-    print(f"Facility       : {fac.get('name')}")
-    print(f"Current type   : {fac.get('type')}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Current type : {fac.get('type')}")
 
     print("\nSelect facility type:")
     print("  1) manufacturing")
@@ -487,32 +589,10 @@ def resolve_layer0_invalid_facility_type(
     print(f"Updated facility type → '{fac['type']}'")
     return True
 
-@REGISTRY.register(layer="Layer0", severity="missing_required")
-def resolve_layer0_missing_required(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    print("\n--- Missing required field ---")
-    print(f"[{finding.layer}] {finding.path}: {finding.message}")
-
-    raw = input(f"Enter value for {finding.path}: ").strip()
-
-    if raw.lower() in {"true", "false"}:
-        val: Any = raw.lower() == "true"
-    else:
-        try:
-            val = int(raw)
-        except Exception:
-            try:
-                val = float(raw)
-            except Exception:
-                val = raw
-
-    set_at_path(cfg, finding.path, val)
-    return True
-
 
 # ============================================================
 # Layer A / Layer 0 resolvers (ORDER MATTERS)
 # ============================================================
-
 
 # ------------------------------------------------------------
 # 1️⃣ SPECIFIC: customer_lead_time.distribution (dropdown)
@@ -543,7 +623,7 @@ def resolve_layer0_customer_lead_time_distribution(
     customer = customers[idx]
 
     print("\n--- Missing customer lead time distribution ---")
-    print(f"Customer: {customer.get('name')}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
     ALLOWED_DISTS = [
         "poisson",
@@ -586,6 +666,7 @@ def resolve_layer0_customer_lead_time_distribution(
 
     return True
 
+
 # ------------------------------------------------------------
 # 2️⃣ GENERIC FALLBACK (LAST — DO NOT MOVE UP)
 # ------------------------------------------------------------
@@ -600,11 +681,10 @@ def resolve_layer0_missing_required(
     Generic fallback for missing required fields.
     MUST be last so that specific resolvers run first.
     """
-
     print("\n--- Missing required field ---")
-    print(f"[{finding.layer}] {finding.path}: {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
-    raw = input(f"Enter value for {finding.path}: ").strip()
+    raw = input("  Enter value: ").strip()
 
     if raw.lower() in {"true", "false"}:
         val: Any = raw.lower() == "true"
@@ -620,12 +700,12 @@ def resolve_layer0_missing_required(
     set_at_path(cfg, finding.path, val)
     return True
 
+
 @REGISTRY.register(
     layer="Layer0",
     severity="error",
     message_regex=r"Missing required field",
 )
-
 @REGISTRY.register(
     layer="Layer0",
     severity="error",
@@ -656,8 +736,8 @@ def resolve_layer0_invalid_procurement_type(
         return True
 
     print("\n--- Invalid procurement type ---")
-    print(f"Inventory item : {item.get('name')}")
-    print(f"Current type   : {item.get('procurement_scheme', {}).get('type')}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Current type : {item.get('procurement_scheme', {}).get('type')}")
 
     PROCUREMENT_TYPES = [
         (
@@ -693,6 +773,8 @@ def resolve_layer0_invalid_procurement_type(
     item["procurement_scheme"]["type"] = proc_type
     print(f"Updated procurement_scheme.type → '{proc_type}'")
     return True
+
+
 def resolve_layer0_missing_required_field_error(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
@@ -701,9 +783,9 @@ def resolve_layer0_missing_required_field_error(
     Prompts user to enter a value and patches the config.
     """
     print("\n--- Missing required field ---")
-    print(f"[{finding.layer}] {finding.path}: {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
-    raw = input(f"Enter value for {finding.path}: ").strip()
+    raw = input("  Enter value: ").strip()
 
     if not raw:
         print("No value entered — skipping.")
@@ -721,7 +803,7 @@ def resolve_layer0_missing_required_field_error(
                 val = raw
 
     set_at_path(cfg, finding.path, val)
-    print(f"Set {finding.path} → {val}")
+    print(f"  ✓ Set → {val}")
     return True
 
 
@@ -738,10 +820,6 @@ def resolve_layer0_invalid_distribution_numeric(
     Universal resolver for ALL invalid *.distribution fields.
     Forces numeric selection from allowed distributions.
     """
-
-    # ---------------------------------
-    # Allowed distributions (ORDERED)
-    # ---------------------------------
     ALLOWED_DISTS = [
         "poisson",
         "exponential",
@@ -753,8 +831,8 @@ def resolve_layer0_invalid_distribution_numeric(
     ]
 
     print("\n--- Invalid distribution detected ---")
-    print(f"[{finding.layer}] {finding.path}")
-    print(f"Issue: {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Issue: {finding.message}")
 
     print("\nSelect a valid distribution:")
     for i, d in enumerate(ALLOWED_DISTS, 1):
@@ -771,11 +849,7 @@ def resolve_layer0_invalid_distribution_numeric(
         print("Invalid selection.")
         return False
 
-    # ---------------------------------
-    # Patch config at exact path
-    # ---------------------------------
     set_at_path(cfg, finding.path, chosen)
-
     print(f"\nUpdated distribution → '{chosen}'")
     return True
 
@@ -788,14 +862,8 @@ def resolve_layer0_invalid_distribution_numeric(
 def resolve_layer0_supplier_payment_lead_time(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolver for missing supplier_payment_lead_time.
-    Prompts user to define a distribution + parameters.
-    """
-
     import re
 
-    # Extract supplier index
     m = re.match(r"supplier\[(\d+)\]\.supplier_payment_lead_time", finding.path)
     if not m:
         return False
@@ -809,11 +877,8 @@ def resolve_layer0_supplier_payment_lead_time(
     supplier = suppliers[idx]
 
     print("\n--- Missing supplier payment lead time ---")
-    print(f"Supplier: {supplier.get('name')}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
-    # -------------------------------
-    # Choose distribution
-    # -------------------------------
     ALLOWED_DISTS = [
         "poisson",
         "exponential",
@@ -836,7 +901,6 @@ def resolve_layer0_supplier_payment_lead_time(
         print("Invalid distribution selection.")
         return False
 
-
     print("\nEnter distribution parameters (press Enter to skip optional ones):")
     params = {}
 
@@ -849,7 +913,6 @@ def resolve_layer0_supplier_payment_lead_time(
                 print(f"Invalid value for parameter '{p}'.")
                 return False
 
-
     supplier["supplier_payment_lead_time"] = {
         "distribution": dist,
         "parameters": params,
@@ -860,6 +923,7 @@ def resolve_layer0_supplier_payment_lead_time(
 
     return True
 
+
 @REGISTRY.register(
     layer="Layer0",
     severity="error",
@@ -868,13 +932,8 @@ def resolve_layer0_supplier_payment_lead_time(
 def resolve_layer0_customer_payment_lead_time(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolves missing customer_payment_lead_time by interactively
-    collecting distribution and parameters.
-    """
-
     print("\n--- Missing customer payment lead time ---")
-    print(f"[{finding.layer}] {finding.path}: {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
     dist = input(
         "Enter customer_payment_lead_time distribution "
@@ -901,13 +960,13 @@ def resolve_layer0_customer_payment_lead_time(
         "parameters": params,
     }
 
-    # Patch config at the exact failing path
     set_at_path(cfg, finding.path, payment_lead_time)
 
     print("\nAdded customer_payment_lead_time:")
     print(payment_lead_time)
 
     return True
+
 
 # ============================================================
 # Layer B resolvers
@@ -922,19 +981,8 @@ def resolve_layer0_customer_payment_lead_time(
 def resolve_layerb_invalid_warehouse_node(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolve invalid 'warehouse' node category.
-
-    Options:
-      1) Delete warehouse node(s)
-      2) Move to facility
-      3) Move to supplier
-      4) Abort
-    """
-
     import re
 
-    # Extract node index
     m = re.match(r"nodes\[(\d+)\]\.warehouse", finding.path)
     if not m:
         return False
@@ -953,8 +1001,8 @@ def resolve_layerb_invalid_warehouse_node(
         return False
 
     print("\n--- Invalid warehouse node detected ---")
-    print(f"Node index : {idx}")
-    print(f"Warehouses : {warehouses}")
+    print(f"  Node index : {idx}")
+    print(f"  Warehouses : {warehouses}")
 
     print("\nChoose how to resolve:")
     print("  1) Delete warehouse node(s)")
@@ -964,17 +1012,11 @@ def resolve_layerb_invalid_warehouse_node(
 
     choice = input("Select option #: ").strip()
 
-    # ==================================================
-    # OPTION 1 — Delete warehouse
-    # ==================================================
     if choice == "1":
         del entry["warehouse"]
         print("Deleted 'warehouse' node entry.")
         return True
 
-    # ==================================================
-    # OPTION 2 — Move to facility (RECOMMENDED)
-    # ==================================================
     if choice == "2":
         entry.setdefault("facility", [])
         for w in warehouses:
@@ -984,9 +1026,6 @@ def resolve_layerb_invalid_warehouse_node(
         print(f"Moved {warehouses} → nodes[{idx}].facility")
         return True
 
-    # ==================================================
-    # OPTION 3 — Move to supplier
-    # ==================================================
     if choice == "3":
         entry.setdefault("supplier", [])
         for w in warehouses:
@@ -996,13 +1035,11 @@ def resolve_layerb_invalid_warehouse_node(
         print(f"Moved {warehouses} → nodes[{idx}].supplier")
         return True
 
-    # ==================================================
-    # OPTION 4 — Abort
-    # ==================================================
     if choice == "4":
         raise SystemExit("Aborted by user.")
 
     return False
+
 
 @REGISTRY.register(
     layer="LayerB",
@@ -1013,11 +1050,6 @@ def resolve_layerb_invalid_warehouse_node(
 def resolve_layerb_missing_node_for_edge_source(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolve edge source not present in nodes by optionally
-    adding it to nodes as supplier or facility.
-    """
-
     import re
 
     m = re.search(r"Edge source '(.+)' not found in nodes", finding.message)
@@ -1027,10 +1059,9 @@ def resolve_layerb_missing_node_for_edge_source(
     node_name = m.group(1)
 
     print("\n--- Edge source missing from nodes ---")
-    print(f"Missing node: {node_name}")
-    print(f"Edge path  : {finding.path}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Missing node: {node_name}")
 
-    # Determine what this node *could* be
     is_supplier = any(
         s.get("name") == node_name for s in cfg.get("supplier", [])
         if isinstance(s, dict)
@@ -1062,32 +1093,19 @@ def resolve_layerb_missing_node_for_edge_source(
         print("Invalid selection.")
         return False
 
-    # ==================================================
-    # OPTION: Add to nodes
-    # ==================================================
     if action in {"supplier", "facility"}:
         nodes = cfg.setdefault("nodes", [])
-
-        # Always operate on first node entry (consistent with your model)
         if not nodes:
             nodes.append({})
-
         entry = nodes[0]
         entry.setdefault(action, [])
-
         if node_name not in entry[action]:
             entry[action].append(node_name)
-
-        print(f"Added '{node_name}' to nodes[{0}].{action}")
+        print(f"Added '{node_name}' to nodes[0].{action}")
         return True
 
-    # ==================================================
-    # OPTION: Change edge source
-    # ==================================================
     if action == "change":
-        # Collect all valid node names
         valid_nodes = set()
-
         for entry in cfg.get("nodes", []):
             if isinstance(entry, dict):
                 for lst in entry.values():
@@ -1111,20 +1129,16 @@ def resolve_layerb_missing_node_for_edge_source(
             print("Invalid selection.")
             return False
 
-        # Patch edge source
         edge_idx = int(re.search(r"edges\[(\d+)\]", finding.path).group(1))
         cfg["edges"][edge_idx]["source"] = new_src
-
         print(f"Edge source updated → '{new_src}'")
         return True
 
-    # ==================================================
-    # OPTION: Abort
-    # ==================================================
     if action == "abort":
         raise SystemExit("Aborted by user.")
 
     return False
+
 
 @REGISTRY.register(
     layer="LayerC",
@@ -1137,7 +1151,6 @@ def resolve_layerc_unknown_resource_required(
 ) -> bool:
     import re
 
-    # extract facility index
     m = re.match(r"facility\[(\d+)\]", finding.path)
     if not m:
         return False
@@ -1152,16 +1165,14 @@ def resolve_layerc_unknown_resource_required(
     fac = facilities[idx]
     op  = fac.get("operation", {}) or {}
 
-    # ── if no resources defined at all → bypass ────────────
     if not resources:
         op["resource_required"] = ""
         print(f"  No resources defined — clearing resource_required for {fac.get('name')}")
         return True
 
     print(f"\n--- Unknown resource_required ---")
-    print(f"Facility  : {fac.get('name')}")
-    print(f"Operation : {op.get('name')}")
-    print(f"Current   : {op.get('resource_required')}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Current : {op.get('resource_required')}")
 
     print("\nOptions:")
     print("  1) No resource required — clear this field")
@@ -1188,6 +1199,7 @@ def resolve_layerc_unknown_resource_required(
         except ValueError:
             print("Invalid selection. Try again.")
 
+
 @REGISTRY.register(
     layer="LayerC",
     severity="error",
@@ -1200,19 +1212,16 @@ def resolve_layerc_invalid_distribution_parameters(
     import re
 
     print(f"\n--- Invalid distribution parameters ---")
-    print(f"  Path  : {finding.path}")
+    print(f"  {describe_finding(cfg, finding.path)}")
     print(f"  Issue : {finding.message}")
 
-    # ── Resolve the block from path ────────────────────────
-    # Path format: inventory[name=microprocessor].procurement_scheme
-    # or: supplier[name=X].supplier_lead_time etc.
     block = None
 
     m = re.match(r"^(\w+)\[name=(.+?)\]\.(.+)$", finding.path)
     if m:
-        section   = m.group(1)   # e.g. inventory
-        name      = m.group(2)   # e.g. microprocessor
-        field     = m.group(3)   # e.g. procurement_scheme
+        section = m.group(1)
+        name    = m.group(2)
+        field   = m.group(3)
 
         entries = cfg.get(section, [])
         for entry in entries:
@@ -1231,7 +1240,6 @@ def resolve_layerc_invalid_distribution_parameters(
 
     print(f"\n  Distribution : {dist}")
 
-    # ── keep prompting until valid ─────────────────────────
     while True:
         print(f"  Current params: {block.get('parameters', {})}")
         print(f"  Issue         : {finding.message}")
@@ -1271,110 +1279,7 @@ def resolve_layerc_invalid_distribution_parameters(
             block["parameters"] = new_params
             print(f"\n  ✓ Updated parameters → {new_params}")
             return True
-# @REGISTRY.register(
-#     layer="Layer0",
-#     severity="error",
-#     path_regex=r"^inventory\[\d+\]\.procurement_scheme$",
-#     message_regex=r"Missing required field|Expected <class 'dict'>",
-# )
-# def resolve_layer0_incomplete_procurement_scheme(
-#     cfg: Dict[str, Any], finding: FindingLike
-# ) -> bool:
-#     """
-#     Resolver for missing or invalid procurement_scheme.
-#     Prompts user to select a procurement type and enter parameters.
-#     """
-#     import re
 
-#     m = re.match(r"inventory\[(\d+)\]", finding.path)
-#     if not m:
-#         return False
-
-#     idx = int(m.group(1))
-#     inventory = cfg.get("inventory", [])
-
-#     if idx >= len(inventory):
-#         return False
-
-#     item = inventory[idx]
-
-#     print("\n--- Missing procurement scheme ---")
-#     print(f"Inventory item : {item.get('name')}")
-#     print(f"Type           : {item.get('type')}")
-
-#     # ── Step 1: Select procurement type ───────────────────
-#     PROCUREMENT_TYPES = [
-#         (
-#             "periodic_supply",
-#             "Supply arrives at regular intervals — define arrival distribution and quantity distribution"
-#         ),
-#         (
-#             "inventory_threshold",
-#             "Order placed when stock falls below minimum (s) — replenish up to maximum (S)"
-#         ),
-#         (
-#             "demand_driven",
-#             "Order placed based on customer demand — define quantity distribution"
-#         ),
-#     ]
-
-#     print("\nSelect procurement scheme type:")
-#     for i, (ptype, description) in enumerate(PROCUREMENT_TYPES, 1):
-#         print(f"  {i}) {ptype}")
-#         print(f"     {description}")
-
-#     while True:
-#         raw = input("Select #: ").strip()
-#         try:
-#             idx_p = int(raw) - 1
-#             if not (0 <= idx_p < len(PROCUREMENT_TYPES)):
-#                 raise ValueError
-#             proc_type = PROCUREMENT_TYPES[idx_p][0]
-#             break
-#         except ValueError:
-#             print("Invalid selection. Try again.")
-
-#     # ── Step 2: Get parameters based on type ──────────────
-#     ps = {"type": proc_type}
-
-#     if proc_type == "inventory_threshold":
-#         # (s, S) policy — only needs a and b
-#         print(f"\nInventory threshold (s, S) policy:")
-#         while True:
-#             try:
-#                 s = float(input("  a — minimum threshold (small s): ").strip())
-#                 S = float(input("  b — maximum threshold (big S)  : ").strip())
-#                 if S <= s:
-#                     print(f"  big S ({S}) must be greater than small s ({s}). Try again.")
-#                     continue
-#                 break
-#             except ValueError:
-#                 print("  Invalid number. Try again.")
-
-#         ps["distribution"] = "uniform"
-#         ps["parameters"]   = {"a": s, "b": S, "c": 0, "d": 0, "e": 0}
-
-#     elif proc_type in {"periodic_supply", "demand_driven"}:
-#         # needs a distribution + parameters
-#         print(f"\nQuantity distribution for {proc_type}:")
-#         dist, params = _prompt_distribution_and_parameters()
-#         ps["distribution"] = dist
-#         ps["parameters"]   = params
-
-#     # ── Step 3: Procurement arrival (periodic_supply only) ─
-#     if proc_type == "periodic_supply":
-#         print("\nProcurement arrival distribution (how often orders arrive):")
-#         arrival_dist, arrival_params = _prompt_distribution_and_parameters()
-#         item["procurement_arrival"] = {
-#             "distribution": arrival_dist,
-#             "parameters":   arrival_params,
-#         }
-
-#     item["procurement_scheme"] = ps
-
-#     print(f"\nUpdated procurement_scheme:")
-#     print(json.dumps(ps, indent=2))
-#     return True
 
 @REGISTRY.register(
     layer="LayerB",
@@ -1385,11 +1290,6 @@ def resolve_layerc_invalid_distribution_parameters(
 def resolve_layerb_missing_node_for_edge_destination(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolve edge destination missing from nodes.
-    Destinations must be facilities (warehouses are facilities).
-    """
-
     import re
 
     m = re.search(r"Edge destination '(.+)' not found in nodes", finding.message)
@@ -1399,8 +1299,8 @@ def resolve_layerb_missing_node_for_edge_destination(
     node_name = m.group(1)
 
     print("\n--- Edge destination missing from nodes ---")
-    print(f"Missing node : {node_name}")
-    print(f"Edge path   : {finding.path}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Missing node : {node_name}")
 
     print("\nChoose how to resolve:")
     print("  1) Add to nodes as facility (recommended)")
@@ -1409,31 +1309,19 @@ def resolve_layerb_missing_node_for_edge_destination(
 
     choice = input("Select option #: ").strip()
 
-    # ==================================================
-    # OPTION 1 — Add as facility
-    # ==================================================
     if choice == "1":
         nodes = cfg.setdefault("nodes", [])
-
-        # operate on first node entry (consistent model)
         if not nodes:
             nodes.append({})
-
         entry = nodes[0]
         entry.setdefault("facility", [])
-
         if node_name not in entry["facility"]:
             entry["facility"].append(node_name)
-
         print(f"Added '{node_name}' to nodes[0].facility")
         return True
 
-    # ==================================================
-    # OPTION 2 — Change edge destination
-    # ==================================================
     if choice == "2":
         valid_nodes = set()
-
         for entry in cfg.get("nodes", []):
             if isinstance(entry, dict):
                 for lst in entry.values():
@@ -1459,13 +1347,9 @@ def resolve_layerb_missing_node_for_edge_destination(
 
         edge_idx = int(re.search(r"edges\[(\d+)\]", finding.path).group(1))
         cfg["edges"][edge_idx]["destination"] = new_dst
-
         print(f"Edge destination updated → '{new_dst}'")
         return True
 
-    # ==================================================
-    # OPTION 3 — Abort
-    # ==================================================
     if choice == "3":
         raise SystemExit("Aborted by user.")
 
@@ -1480,16 +1364,12 @@ def resolve_layerb_missing_node_for_edge_destination(
 def resolve_layer0_invalid_parameter_type(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolver for distribution parameters that are not int or float.
-    Prompts user to enter a valid non-negative numeric value.
-    """
     print("\n--- Invalid distribution parameter ---")
-    print(f"[{finding.layer}] {finding.path}: {finding.message}")
-    print(f"Current value: {get_at_path(cfg, finding.path)}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Current value: {get_at_path(cfg, finding.path)}")
 
     while True:
-        raw = input(f"Enter a valid non-negative number for {finding.path}: ").strip()
+        raw = input("  Enter a valid non-negative number: ").strip()
 
         if not raw:
             print("No value entered — skipping.")
@@ -1511,8 +1391,9 @@ def resolve_layer0_invalid_parameter_type(
         break
 
     set_at_path(cfg, finding.path, val)
-    print(f"Set {finding.path} → {val}")
+    print(f"  ✓ Set → {val}")
     return True
+
 
 @REGISTRY.register(
     layer="LayerB",
@@ -1523,12 +1404,6 @@ def resolve_layer0_invalid_parameter_type(
 def resolve_layerb_unknown_supplier_in_nodes(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Resolver for unknown supplier referenced in nodes.
-    Options:
-      1) Remove unknown supplier from nodes
-      2) Add supplier back to supplier section
-    """
     import re
 
     m = re.search(r"Unknown supplier '(.+)' in nodes", finding.message)
@@ -1538,9 +1413,8 @@ def resolve_layerb_unknown_supplier_in_nodes(
     supplier_name = m.group(1)
 
     print(f"\n--- Unknown supplier in nodes ---")
-    print(f"Supplier '{supplier_name}' is in nodes but not in supplier section.")
+    print(f"  Supplier '{supplier_name}' is in nodes but not in supplier section.")
 
-    # collect valid supplier names
     valid_suppliers = [
         s.get("name") for s in cfg.get("supplier", [])
         if isinstance(s, dict) and isinstance(s.get("name"), str)
@@ -1554,7 +1428,6 @@ def resolve_layerb_unknown_supplier_in_nodes(
 
     choice = input("Select option #: ").strip()
 
-    # ── Option 1 — Remove from nodes ──
     if choice == "1":
         for entry in cfg.get("nodes", []):
             if isinstance(entry, dict) and "supplier" in entry:
@@ -1564,12 +1437,10 @@ def resolve_layerb_unknown_supplier_in_nodes(
         print(f"Removed '{supplier_name}' from nodes.")
         return True
 
-    # ── Option 2 — Skip, user will add manually ──
     if choice == "2":
         print("Skipping — add supplier manually to the supplier section.")
         return False
 
-    # ── Option 3 — Replace with existing supplier ──
     if choice == "3":
         if not valid_suppliers:
             print("No valid suppliers available to replace with.")
@@ -1595,11 +1466,11 @@ def resolve_layerb_unknown_supplier_in_nodes(
         print(f"Replaced '{supplier_name}' → '{new_supplier}' in nodes.")
         return True
 
-    # ── Option 4 — Abort ──
     if choice == "4":
         raise SystemExit("Aborted by user.")
 
     return False
+
 
 @REGISTRY.register(
     layer="LayerB",
@@ -1608,15 +1479,6 @@ def resolve_layerb_unknown_supplier_in_nodes(
     message_regex=r"No supplier found for raw material '(.+)'",
 )
 def resolve_layerb_missing_supplier(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    """
-    Resolves:
-      No supplier found for raw material 'X'
-
-    Options:
-      1) Add a new supplier for this raw material
-      2) Delete the raw material entirely
-    """
-
     import re
 
     m = re.search(r"raw material '(.+)'", finding.message)
@@ -1633,9 +1495,6 @@ def resolve_layerb_missing_supplier(cfg: Dict[str, Any], finding: FindingLike) -
 
     choice = input("Select option #: ").strip()
 
-    # ==================================================
-    # OPTION 1 — Add supplier
-    # ==================================================
     if choice == "1":
         sname = input("Enter new supplier name: ").strip()
         if not sname:
@@ -1678,7 +1537,6 @@ def resolve_layerb_missing_supplier(cfg: Dict[str, Any], finding: FindingLike) -
 
         cfg.setdefault("supplier", []).append(supplier)
 
-        # Ensure supplier node exists
         nodes = cfg.setdefault("nodes", [])
         if nodes:
             entry = nodes[0]
@@ -1690,35 +1548,27 @@ def resolve_layerb_missing_supplier(cfg: Dict[str, Any], finding: FindingLike) -
         print(supplier)
         return True
 
-    # ==================================================
-    # OPTION 2 — Delete raw material
-    # ==================================================
     if choice == "2":
         cfg["raw_materials"] = [
             r for r in cfg.get("raw_materials", [])
             if r.get("name") != raw
         ]
-
         cfg["inventory"] = [
             i for i in cfg.get("inventory", [])
             if i.get("name") != raw
         ]
-
         cfg["supplier"] = [
             s for s in cfg.get("supplier", [])
             if s.get("supply_material_name") != raw
         ]
-
         print(f"Deleted raw material '{raw}' and all dependent entries.")
         return True
 
-    # ==================================================
-    # OPTION 3 — Abort
-    # ==================================================
     if choice == "3":
         raise SystemExit("Aborted by user.")
 
     return False
+
 
 @REGISTRY.register(
     layer="LayerB",
@@ -1726,19 +1576,13 @@ def resolve_layerb_missing_supplier(cfg: Dict[str, Any], finding: FindingLike) -
     path_regex=r"^edges\[\d+\]\.material_name$",
     message_regex=r"Supplier '(.+)' supplies '(.+)' but edge transports '(.+)'",
 )
-
 def _delete_edge_by_path(cfg: Dict[str, Any], path: str) -> bool:
-    """
-    Delete an edge given any path that starts with edges[<idx>].*
-    e.g. edges[4].material_name or edges[7].material_type
-    """
     m = re.match(r"^edges\[(\d+)\]\.", path)
     if not m:
         print("Could not determine edge index from path:", path)
         return False
 
     idx = int(m.group(1))
-
     edges = cfg.get("edges", [])
     if not isinstance(edges, list) or idx >= len(edges):
         print("Edge index out of range.")
@@ -1749,18 +1593,10 @@ def _delete_edge_by_path(cfg: Dict[str, Any], path: str) -> bool:
     print(removed)
     return True
 
+
 def resolve_layerb_supplier_edge_material_mismatch(
     cfg: Dict[str, Any], finding: FindingLike
 ) -> bool:
-    """
-    Fix supplier-edge material mismatch.
-
-    Options:
-      1) Delete the edge
-      2) Change material_name in edge to supplier's material
-      3) Change supplier source in edge
-    """
-
     import re
 
     m = re.search(
@@ -1773,10 +1609,10 @@ def resolve_layerb_supplier_edge_material_mismatch(
     supplier, supplied_material, edge_material = m.groups()
 
     print("\n--- Supplier / Edge material mismatch ---")
-    print(f"Supplier          : {supplier}")
-    print(f"Supplied material : {supplied_material}")
-    print(f"Edge material     : {edge_material}")
-    print(f"Edge path         : {finding.path}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Supplier          : {supplier}")
+    print(f"  Supplied material : {supplied_material}")
+    print(f"  Edge material     : {edge_material}")
 
     print("\nChoose how to resolve:")
     print("  1) Delete this edge")
@@ -1786,27 +1622,15 @@ def resolve_layerb_supplier_edge_material_mismatch(
 
     choice = input("Select option #: ").strip()
 
-    # --------------------------------------------------
-    # OPTION 1 — Delete edge
-    # --------------------------------------------------
     if choice == "1":
         return _delete_edge_by_path(cfg, finding.path)
 
-    # --------------------------------------------------
-    # OPTION 2 — Fix material_name
-    # --------------------------------------------------
     if choice == "2":
         set_at_path(cfg, finding.path, supplied_material)
-        print(
-            f"Edge material updated: '{edge_material}' → '{supplied_material}'"
-        )
+        print(f"Edge material updated: '{edge_material}' → '{supplied_material}'")
         return True
 
-    # --------------------------------------------------
-    # OPTION 3 — Change supplier (edge source)
-    # --------------------------------------------------
     if choice == "3":
-        # Collect valid suppliers that supply this edge material
         valid_suppliers = [
             s["name"]
             for s in cfg.get("supplier", [])
@@ -1814,10 +1638,7 @@ def resolve_layerb_supplier_edge_material_mismatch(
         ]
 
         if not valid_suppliers:
-            print(
-                f"No supplier supplies '{edge_material}'. "
-                f"Cannot reassign supplier."
-            )
+            print(f"No supplier supplies '{edge_material}'. Cannot reassign supplier.")
             return False
 
         print("\nSelect new supplier:")
@@ -1831,22 +1652,16 @@ def resolve_layerb_supplier_edge_material_mismatch(
             print("Invalid selection.")
             return False
 
-        # Replace source field
         edge_idx = int(re.search(r"edges\[(\d+)\]", finding.path).group(1))
         cfg["edges"][edge_idx]["source"] = new_supplier
-
-        print(
-            f"Edge source updated: '{supplier}' → '{new_supplier}'"
-        )
+        print(f"Edge source updated: '{supplier}' → '{new_supplier}'")
         return True
 
-    # --------------------------------------------------
-    # OPTION 4 — Abort
-    # --------------------------------------------------
     if choice == "4":
         raise SystemExit("Aborted by user.")
 
     return False
+
 
 @REGISTRY.register(
     layer="LayerB",
@@ -1857,13 +1672,8 @@ def resolve_layerb_supplier_edge_material_mismatch(
                   r"is products but inventory.type is '.+'",
 )
 def resolve_layerb_inventory_type_mismatch(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    """
-    Fix inventory.type mismatch with material category.
-    """
-
     import re
 
-    # Extract inventory index
     m = re.match(r"inventory\[(\d+)\]\.type", finding.path)
     if not m:
         return False
@@ -1878,11 +1688,9 @@ def resolve_layerb_inventory_type_mismatch(cfg: Dict[str, Any], finding: Finding
     mat_name = inv_item.get("name")
 
     print("\n--- Inventory type mismatch ---")
-    print(f"Material: {mat_name}")
-    print(f"Current inventory.type: {inv_item.get('type')}")
-    print(f"Issue: {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Issue: {finding.message}")
 
-    # Determine correct type
     correct_type = None
     for sec, tname in [
         ("raw_materials", "raw_materials"),
@@ -1917,6 +1725,7 @@ def resolve_layerb_inventory_type_mismatch(cfg: Dict[str, Any], finding: Finding
 
     return False
 
+
 @REGISTRY.register(
     layer="LayerB",
     severity="error",
@@ -1924,13 +1733,8 @@ def resolve_layerb_inventory_type_mismatch(cfg: Dict[str, Any], finding: Finding
     message_regex=r"material_type '.+' mismatches '.+' category '.+'",
 )
 def resolve_layerb_edge_material_type_mismatch(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    """
-    Fix material_type mismatch in an edge.
-    """
-
     import re
 
-    # Extract edge index
     m = re.match(r"edges\[(\d+)\]\.material_type", finding.path)
     if not m:
         return False
@@ -1945,12 +1749,9 @@ def resolve_layerb_edge_material_type_mismatch(cfg: Dict[str, Any], finding: Fin
     material = edge.get("material_name")
 
     print("\n--- Edge material_type mismatch ---")
-    print(f"Edge index   : {idx}")
-    print(f"Material     : {material}")
-    print(f"Current type : {edge.get('material_type')}")
-    print(f"Issue        : {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Issue        : {finding.message}")
 
-    # Determine correct category
     correct_type = None
     for sec, tname in [
         ("raw_materials", "raw_materials"),
@@ -1970,17 +1771,11 @@ def resolve_layerb_edge_material_type_mismatch(cfg: Dict[str, Any], finding: Fin
 
     choice = input("Select option #: ").strip()
 
-    # --------------------------------------------------
-    # Option 1 — Fix material_type
-    # --------------------------------------------------
     if choice == "1":
         edge["material_type"] = correct_type
         print(f"Updated material_type to '{correct_type}'")
         return True
 
-    # --------------------------------------------------
-    # Option 2 — Rename material_name
-    # --------------------------------------------------
     if choice == "2":
         allowed = set()
         for sec in ("raw_materials", "intermediate_materials", "products"):
@@ -2003,7 +1798,6 @@ def resolve_layerb_edge_material_type_mismatch(cfg: Dict[str, Any], finding: Fin
 
         edge["material_name"] = new_mat
 
-        # auto-fix material_type too
         for sec, tname in [
             ("raw_materials", "raw_materials"),
             ("intermediate_materials", "intermediate_materials"),
@@ -2019,22 +1813,17 @@ def resolve_layerb_edge_material_type_mismatch(cfg: Dict[str, Any], finding: Fin
         print(f"Updated edge to material '{new_mat}'")
         return True
 
-    # --------------------------------------------------
-    # Option 3 — Delete edge
-    # --------------------------------------------------
     if choice == "3":
         removed = edges.pop(idx)
         print("Deleted edge:")
         print(removed)
         return True
 
-    # --------------------------------------------------
-    # Option 4 — Abort
-    # --------------------------------------------------
     if choice == "4":
         raise SystemExit("Aborted by user.")
 
     return False
+
 
 @REGISTRY.register(
     layer="LayerC",
@@ -2043,13 +1832,8 @@ def resolve_layerb_edge_material_type_mismatch(cfg: Dict[str, Any], finding: Fin
     message_regex=r"Customer demands '.+' but it is not declared in products",
 )
 def resolve_layerc_customer_demands_nonproduct(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    """
-    Fix customer demanding a non-product material.
-    """
-
     import re
 
-    # Extract customer index and material
     m1 = re.search(r"customer\[(\d+)\]", finding.path)
     m2 = re.search(r"demands '(.+)'", finding.message)
 
@@ -2066,10 +1850,9 @@ def resolve_layerc_customer_demands_nonproduct(cfg: Dict[str, Any], finding: Fin
     cust = customers[idx]
 
     print("\n--- Customer demands non-product ---")
-    print(f"Customer : {cust.get('name')}")
-    print(f"Demands  : {bad_material}")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Demands  : {bad_material}")
 
-    # Collect valid products
     products = [
         p.get("name")
         for p in cfg.get("products", [])
@@ -2084,9 +1867,6 @@ def resolve_layerc_customer_demands_nonproduct(cfg: Dict[str, Any], finding: Fin
 
     choice = input("Select option #: ").strip()
 
-    # ==================================================
-    # OPTION 1 — Change demanded product
-    # ==================================================
     if choice == "1":
         if not products:
             print("No products available.")
@@ -2106,17 +1886,12 @@ def resolve_layerc_customer_demands_nonproduct(cfg: Dict[str, Any], finding: Fin
         print(f"Customer demand updated → '{new_prod}'")
         return True
 
-    # ==================================================
-    # OPTION 2 — Convert material back to product
-    # ==================================================
     if choice == "2":
-        # remove from intermediate_materials
         cfg["intermediate_materials"] = [
             x for x in cfg.get("intermediate_materials", [])
             if x.get("name") != bad_material
         ]
 
-        # add to products if not present
         if bad_material not in products:
             cfg.setdefault("products", []).append({
                 "name": bad_material,
@@ -2126,22 +1901,17 @@ def resolve_layerc_customer_demands_nonproduct(cfg: Dict[str, Any], finding: Fin
         print(f"Material '{bad_material}' converted back to product.")
         return True
 
-    # ==================================================
-    # OPTION 3 — Delete customer
-    # ==================================================
     if choice == "3":
         removed = customers.pop(idx)
         print("Deleted customer:")
         print(removed)
         return True
 
-    # ==================================================
-    # OPTION 4 — Abort
-    # ==================================================
     if choice == "4":
         raise SystemExit("Aborted by user.")
 
     return False
+
 
 @REGISTRY.register(
     layer="LayerB",
@@ -2159,8 +1929,8 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
     material = m.group(1)
 
     print("\n--- Missing producer detected ---")
-    print(f"Material: {material}")
-    print(f"Issue   : {finding.message}")
+    print(f"  Material: {material}")
+    print(f"  Issue   : {finding.message}")
 
     print("\nChoose how to resolve:")
     print("  1) Add producing facility operation (recommended)")
@@ -2170,9 +1940,6 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
 
     choice = input("Select option #: ").strip()
 
-    # ==================================================
-    # OPTION 1 — Add producing facility operation
-    # ==================================================
     if choice == "1":
         facilities = cfg.setdefault("facility", [])
 
@@ -2187,7 +1954,6 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
             print("Invalid selection.")
             return False
 
-        # ---- create new facility ----
         if sel == len(facilities):
             fname = input("Enter new facility name: ").strip()
             if not fname:
@@ -2207,22 +1973,6 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
             print("Invalid selection.")
             return False
 
-        # ---- ALWAYS add operation ----
-        # inputs = [
-        #     x.strip()
-        #     for x in input(
-        #         "Enter input materials (comma-separated): "
-        #     ).split(",")
-        #     if x.strip()
-        # ]
-
-        # resource = input(
-        #     "Enter resource_required (existing resource name): "
-        # ).strip()
-
-        # --------------------------------------------------
-        # Select INPUT materials (guided)
-        # --------------------------------------------------
         all_materials = sorted(
             {x.get("name") for sec in ("raw_materials", "intermediate_materials", "products")
             for x in cfg.get(sec, []) if isinstance(x, dict)}
@@ -2238,10 +1988,6 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
             print("At least one input material is required.")
             return False
 
-
-        # --------------------------------------------------
-        # Select RESOURCE (guided, with add-new option)
-        # --------------------------------------------------
         resources = cfg.setdefault("resource", [])
         resource_names = [r.get("name") for r in resources if isinstance(r, dict)]
 
@@ -2256,7 +2002,6 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
             print("Invalid selection.")
             return False
 
-        # ---- Add NEW resource ----
         if sel == len(resource_names):
             rname = input("Enter new resource name: ").strip()
             if not rname:
@@ -2287,13 +2032,11 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
             resource = rname
             print(f"Created new resource '{rname}'.")
 
-        # ---- Existing resource ----
         elif 0 <= sel < len(resource_names):
             resource = resource_names[sel]
         else:
             print("Invalid selection.")
             return False
-
 
         op = {
             "name": f"produce_{material}",
@@ -2312,9 +2055,6 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
         print(op)
         return True
 
-    # ==================================================
-    # OPTION 2 — Add inventory
-    # ==================================================
     if choice == "2":
         qty = int(input("Enter initial inventory quantity: ").strip())
 
@@ -2339,9 +2079,6 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
         print(inv)
         return True
 
-    # ==================================================
-    # OPTION 3 — Delete material
-    # ==================================================
     if choice == "3":
         for sec in ("products", "intermediate_materials"):
             cfg[sec] = [x for x in cfg.get(sec, []) if x.get("name") != material]
@@ -2353,181 +2090,11 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
         print(f"Deleted material '{material}'.")
         return True
 
-    # ==================================================
-    # OPTION 4 — Abort
-    # ==================================================
     if choice == "4":
         raise SystemExit("Aborted by user.")
 
     return False
 
-# @REGISTRY.register(
-#     layer="LayerB",
-#     severity="error",
-#     path_regex=r"^producibility$",
-#     message_regex=r"is intermediate/product but has no producing facility operation",
-# )
-# def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-#     """
-#     Resolves missing producibility for intermediate/product materials.
-#     """
-
-#     import re
-
-#     # Extract material name
-#     m = re.search(r"'(.+)' is intermediate/product", finding.message)
-#     if not m:
-#         return False
-
-#     material = m.group(1)
-
-#     print("\n--- Missing producer detected ---")
-#     print(f"Material: {material}")
-#     print(f"Issue   : {finding.message}")
-
-#     print("\nChoose how to resolve:")
-#     print("  1) Add producing facility operation (recommended)")
-#     print("  2) Add inventory (exogenous supply)")
-#     print("  3) Delete material entirely")
-#     print("  4) Abort")
-
-#     choice = input("Select option #: ").strip()
-
-#     # ==================================================
-#     # OPTION 1 — Add producing facility operation
-#     # ==================================================
-#     if choice == "1":
-#         facilities = cfg.get("facility", [])
-#         if not facilities:
-#             print("No facilities available.")
-#             return False
-
-#         print("\nSelect facility:")
-#         for i, f in enumerate(facilities, 1):
-#             print(f"  {i}) {f.get('name')}")
-        
-#         print(f"  {len(facilities) + 1}) Add NEW facility")
-
-#         raw = input("Select #: ").strip()
-
-#     try:
-#         fidx = int(raw) - 1
-#     except Exception:
-#         print("Invalid selection.")
-#         return False
-
-#     # -----------------------------------
-#     # OPTION: Add NEW facility
-#     # -----------------------------------
-#     if fidx == len(facilities):
-#         fname = input("Enter new facility name: ").strip()
-#         if not fname:
-#             print("Facility name is required.")
-#             return False
-
-#         fac = {
-#             "name": fname,
-#             "type": "manufacturing",
-#             "inventory_managed": [],
-#             "operation": {},
-#         }
-
-#         cfg.setdefault("facility", []).append(fac)
-#         facilities.append(fac)
-
-#         print(f"Created new facility '{fname}'.")
-
-#     # -----------------------------------
-#     # OPTION: Existing facility
-#     # -----------------------------------
-#     elif 0 <= fidx < len(facilities):
-#         fac = facilities[fidx]
-
-#     else:
-#         print("Invalid selection.")
-#         return False
-
-
-#         inputs = input(
-#             "Enter input materials (comma-separated): "
-#         ).strip().split(",")
-
-#         inputs = [x.strip() for x in inputs if x.strip()]
-
-#         resource = input(
-#             "Enter resource_required (existing resource name): "
-#         ).strip()
-
-#         op = {
-#             "name": f"produce_{material}",
-#             "input": inputs,
-#             "output": [material],
-#             "resource_required": resource,
-#         }
-
-#         fac["operation"] = op
-
-#         # ensure inventory_managed includes the new material
-#         inv = fac.setdefault("inventory_managed", [])
-#         if material not in inv:
-#             inv.append(material)
-
-#         print("\nAdded producing operation:")
-#         print(op)
-#         return True
-
-#     # ==================================================
-#     # OPTION 2 — Add inventory
-#     # ==================================================
-#     if choice == "2":
-#         qty = int(input("Enter initial inventory quantity: ").strip())
-
-#         inv = {
-#             "name": material,
-#             "type": "products" if material in {x.get("name") for x in cfg.get("products", [])} else "intermediate_materials",
-#             "procurement_scheme": {
-#                 "type": "exogenous",
-#                 "parameters": {},
-#             },
-#             "initial_inventory": qty,
-#             "inventory_costs": {
-#                 "holding_cost": 1,
-#                 "shortage_cost": 1,
-#                 "review_time": 1,
-#             },
-#         }
-
-#         cfg.setdefault("inventory", []).append(inv)
-
-#         print("\nAdded exogenous inventory:")
-#         print(inv)
-#         return True
-
-#     # ==================================================
-#     # OPTION 3 — Delete material
-#     # ==================================================
-#     if choice == "3":
-#         for sec in ("products", "intermediate_materials"):
-#             cfg[sec] = [
-#                 x for x in cfg.get(sec, [])
-#                 if x.get("name") != material
-#             ]
-
-#         cfg["inventory"] = [
-#             i for i in cfg.get("inventory", [])
-#             if i.get("name") != material
-#         ]
-
-#         print(f"Deleted material '{material}'.")
-#         return True
-
-#     # ==================================================
-#     # OPTION 4 — Abort
-#     # ==================================================
-#     if choice == "4":
-#         raise SystemExit("Aborted by user.")
-
-#     return False
 
 @REGISTRY.register(
     layer="LayerB",
@@ -2537,7 +2104,7 @@ def resolve_layerb_missing_producer(cfg: Dict[str, Any], finding: FindingLike) -
 )
 def resolve_layerb_unknown_bom_material(cfg: Dict[str, Any], finding: FindingLike) -> bool:
     print("\n--- Unknown BOM material ---")
-    print(f"[{finding.layer}] {finding.path}: {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
     unknown = finding.path.split(".")[-1]
     bom_path = ".".join(finding.path.split(".")[:-1])
@@ -2561,6 +2128,7 @@ def resolve_layerb_unknown_bom_material(cfg: Dict[str, Any], finding: FindingLik
     bom[new_name] = qty
     return True
 
+
 @REGISTRY.register(
     layer="LayerB",
     severity="error",
@@ -2568,10 +2136,6 @@ def resolve_layerb_unknown_bom_material(cfg: Dict[str, Any], finding: FindingLik
     message_regex=r"Node '(.+)' is declared but does not appear in any edge",
 )
 def resolve_layerb_unused_node(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    """
-    Fix unused node by interactively adding an edge.
-    """
-
     import re
 
     m = re.search(r"Node '(.+)'", finding.message)
@@ -2599,6 +2163,7 @@ def resolve_layerb_unused_node(cfg: Dict[str, Any], finding: FindingLike) -> boo
 
     return False
 
+
 def _remove_node(cfg: Dict[str, Any], node: str) -> bool:
     for entry in cfg.get("nodes", []):
         if not isinstance(entry, dict):
@@ -2609,6 +2174,7 @@ def _remove_node(cfg: Dict[str, Any], node: str) -> bool:
 
     print(f"Removed node '{node}' from nodes.")
     return True
+
 
 def _add_edge_for_node(cfg: Dict[str, Any], node: str) -> bool:
     edges = cfg.setdefault("edges", [])
@@ -2651,11 +2217,11 @@ def _add_edge_for_node(cfg: Dict[str, Any], node: str) -> bool:
     }
 
     edges.append(edge)
-
     print("Added edge:")
     print(edge)
 
     return True
+
 
 @REGISTRY.register(
     layer="LayerB",
@@ -2664,19 +2230,6 @@ def _add_edge_for_node(cfg: Dict[str, Any], node: str) -> bool:
     message_regex=r"Supplier '(.+)' supplies '(.+)' but has no edge transporting it",
 )
 def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    """
-    Resolves:
-      Supplier 'X' supplies 'M' but has no edge transporting it
-
-    Strategy:
-      - Ask user to add an edge
-      - Collect destination, transfer_time distribution, parameters
-      - Append a valid edge dict
-    """
-
-    # --------------------------------------------------
-    # Parse supplier + material from message
-    # --------------------------------------------------
     try:
         supplier = finding.message.split("'")[1]
         material = finding.message.split("'")[3]
@@ -2695,13 +2248,7 @@ def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLi
 
     choice = input("Select option #: ").strip()
 
-    # ==================================================
-    # OPTION 1 — Add edge
-    # ==================================================
     if choice == "1":
-        # -----------------------------
-        # Choose destination
-        # -----------------------------
         nodes = set()
         for entry in cfg.get("nodes", []):
             if isinstance(entry, dict):
@@ -2709,7 +2256,6 @@ def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLi
                     if isinstance(lst, list):
                         nodes.update(lst)
 
-        # remove supplier itself
         destinations = sorted(n for n in nodes if n != supplier)
 
         if not destinations:
@@ -2726,9 +2272,6 @@ def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLi
             print("Invalid destination selection.")
             return False
 
-        # -----------------------------
-        # Transfer time distribution
-        # -----------------------------
         dist = input(
             "Enter transfer_time distribution (e.g., poisson, normal): "
         ).strip()
@@ -2748,9 +2291,6 @@ def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLi
                     print(f"Invalid value for parameter '{p}'.")
                     return False
 
-        # -----------------------------
-        # Construct edge
-        # -----------------------------
         edge = {
             "source": supplier,
             "destination": dst,
@@ -2763,21 +2303,16 @@ def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLi
         }
 
         cfg.setdefault("edges", []).append(edge)
-
         print("\nAdded edge:")
         print(edge)
         return True
 
-    # ==================================================
-    # OPTION 2 — Delete supplier
-    # ==================================================
     if choice == "2":
         cfg["supplier"] = [
             s for s in cfg.get("supplier", [])
             if s.get("name") != supplier
         ]
 
-        # Also remove from nodes
         for n in cfg.get("nodes", []):
             if isinstance(n, dict) and "supplier" in n:
                 n["supplier"] = [x for x in n["supplier"] if x != supplier]
@@ -2785,9 +2320,6 @@ def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLi
         print(f"Deleted supplier '{supplier}'.")
         return True
 
-    # ==================================================
-    # OPTION 3 — Abort
-    # ==================================================
     if choice == "3":
         raise SystemExit("Aborted by user.")
 
@@ -2802,7 +2334,7 @@ def resolve_layerb_missing_supplier_edge(cfg: Dict[str, Any], finding: FindingLi
 )
 def resolve_layerb_invalid_bom_qty(cfg: Dict[str, Any], finding: FindingLike) -> bool:
     print("\n--- Invalid BOM quantity ---")
-    print(f"[{finding.layer}] {finding.path}: {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
     bom_path = ".".join(finding.path.split(".")[:-1])
     key = finding.path.split(".")[-1]
@@ -2871,6 +2403,7 @@ def resolve_layerb_unused_raw_material(cfg: Dict[str, Any], finding: FindingLike
 
     raise SystemExit("Aborted by user.")
 
+
 @REGISTRY.register(
     layer="LayerB",
     severity="error",
@@ -2878,13 +2411,8 @@ def resolve_layerb_unused_raw_material(cfg: Dict[str, Any], finding: FindingLike
     message_regex=r"Unknown material '(.+)' in edge",
 )
 def resolve_layerb_unknown_edge_material(cfg: Dict[str, Any], finding: FindingLike) -> bool:
-    """
-    Fix unknown material_name in an edge by renaming it to a valid material.
-    """
-
     import re
 
-    # Extract unknown material
     m = re.search(r"Unknown material '(.+)'", finding.message)
     if not m:
         return False
@@ -2892,10 +2420,9 @@ def resolve_layerb_unknown_edge_material(cfg: Dict[str, Any], finding: FindingLi
     bad_material = m.group(1)
 
     print("\n--- Unknown material in edge ---")
-    print(f"Edge path: {finding.path}")
-    print(f"Unknown material: '{bad_material}'")
+    print(f"  {describe_finding(cfg, finding.path)}")
+    print(f"  Unknown material: '{bad_material}'")
 
-    # Collect allowed material names
     allowed = set()
 
     for sec in ("raw_materials", "intermediate_materials", "products"):
@@ -2931,18 +2458,13 @@ def resolve_layerb_unknown_edge_material(cfg: Dict[str, Any], finding: FindingLi
         return False
 
     new_material = choices[idx]
-
-    # Patch config
     set_at_path(cfg, finding.path, new_material)
-
     print(f"Replaced material '{bad_material}' → '{new_material}'")
 
     return True
 
+
 def _delete_edge(cfg: Dict[str, Any], path: str) -> bool:
-    """
-    Delete an edge given a path like edges[8].material_name
-    """
     import re
 
     m = re.match(r"edges\[(\d+)\]\.", path)
@@ -2951,7 +2473,6 @@ def _delete_edge(cfg: Dict[str, Any], path: str) -> bool:
         return False
 
     idx = int(m.group(1))
-
     edges = cfg.get("edges", [])
     if not isinstance(edges, list) or idx >= len(edges):
         print("Edge index out of range.")
@@ -2962,6 +2483,7 @@ def _delete_edge(cfg: Dict[str, Any], path: str) -> bool:
     print(removed)
 
     return True
+
 
 # ============================================================
 # Layer C resolvers
@@ -2976,15 +2498,12 @@ def resolve_layerc_inventory_threshold(cfg: Dict[str, Any], finding: FindingLike
     import re
 
     print("\n--- Invalid (s, S) policy ---")
-    print(f"[{finding.layer}] {finding.message}")
+    print(f"  {describe_finding(cfg, finding.path)}")
 
-    # ── Extract inventory item name from path ─────────────
-    # Path format: inventory[name=Dopant Phosphorus Source].procurement_scheme.parameters
     m = re.search(r"inventory\[name=(.+?)\]", finding.path)
     if m:
         inv_name = m.group(1)
     else:
-        # Fallback — try index format: inventory[2].procurement_scheme
         m2 = re.search(r"inventory\[(\d+)\]", finding.path)
         if m2:
             idx = int(m2.group(1))
@@ -2998,9 +2517,6 @@ def resolve_layerc_inventory_threshold(cfg: Dict[str, Any], finding: FindingLike
             print("Could not determine inventory item from path.")
             return False
 
-    print(f"Inventory item : {inv_name}")
-
-    # ── Find the inventory item ────────────────────────────
     inv = next(
         (i for i in cfg.get("inventory", []) if i.get("name") == inv_name),
         None
@@ -3012,7 +2528,7 @@ def resolve_layerc_inventory_threshold(cfg: Dict[str, Any], finding: FindingLike
 
     params = inv["procurement_scheme"].setdefault("parameters", {})
 
-    print(f"Current values : a (small s) = {params.get('a')}  |  b (big S) = {params.get('b')}")
+    print(f"  Current values : a (small s) = {params.get('a')}  |  b (big S) = {params.get('b')}")
     print("\nEnter new (s, S) values — big S must be greater than small s:")
 
     while True:
