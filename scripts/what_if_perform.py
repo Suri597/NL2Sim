@@ -44,6 +44,9 @@ runner = InteractiveRepairRunner(
 
 final_config = runner.run()
 
+with open("active_config_whatif.json", "w") as f:
+    json.dump(final_config, f, indent=2)
+    
 print("##################")
 print("FINAL CONFIG (after interactive repair)")
 print(final_config)

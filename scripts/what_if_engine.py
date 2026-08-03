@@ -9,13 +9,7 @@ class WhatIfError(Exception):
     pass
 
 
-# ============================================================
-# Public API
-# ============================================================
 def _normalize_value(value: Any) -> Any:
-    """
-    Normalize JSON/LLM values into Python-native types.
-    """
     if isinstance(value, str):
         v = value.strip().lower()
         if v == "true":
@@ -31,16 +25,7 @@ def apply_what_if_config(
     base_config: Dict[str, Any],
     what_if_config: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """
-    Applies a bounded what-if change set to a base config.
-
-    - Does NOT validate
-    - Does NOT prompt
-    - Deterministic
-    """
-
     cfg = deepcopy(base_config)
-
     changes = what_if_config.get("changes", [])
     if not isinstance(changes, list):
         raise WhatIfError("what_if_config.changes must be a list")
@@ -49,17 +34,12 @@ def apply_what_if_config(
         try:
             if "value" in change:
                 change["value"] = _normalize_value(change["value"])
-
             _apply_single_change(cfg, change)
         except Exception as e:
             raise WhatIfError(f"Failed applying change[{i}]: {e}") from e
 
     return cfg
 
-
-# ============================================================
-# Change dispatcher
-# ============================================================
 
 def _apply_single_change(cfg: Dict[str, Any], change: Dict[str, Any]) -> None:
     op = change.get("op")
@@ -71,7 +51,6 @@ def _apply_single_change(cfg: Dict[str, Any], change: Dict[str, Any]) -> None:
 
     if op not in {"create", "update", "delete", "link", "unlink"}:
         raise WhatIfError(f"Unsupported op '{op}'")
-
     if entity_type is None:
         raise WhatIfError("entity_type is required")
 
@@ -80,7 +59,12 @@ def _apply_single_change(cfg: Dict[str, Any], change: Dict[str, Any]) -> None:
     elif op == "create":
         _apply_create(cfg, entity_type, value)
     elif op == "delete":
-        _apply_delete(cfg, entity_type, entity_id)
+        # FIX: relation must be passed through here, mirroring _apply_update
+        # -- edges (and only edges) have no 'name' field, so entity_id
+        # alone can never identify one. Previously relation was dropped
+        # entirely on this path, meaning natural-language edge deletion
+        # could never work regardless of what the LLM produced.
+        _apply_delete(cfg, entity_type, entity_id, relation)
     elif op == "link":
         _apply_link(cfg, relation)
     elif op == "unlink":
@@ -88,10 +72,6 @@ def _apply_single_change(cfg: Dict[str, Any], change: Dict[str, Any]) -> None:
     else:
         raise WhatIfError(f"Unhandled op '{op}'")
 
-
-# ============================================================
-# UPDATE
-# ============================================================
 
 def _apply_update(
     cfg: Dict[str, Any],
@@ -102,47 +82,39 @@ def _apply_update(
     value: Any,
 ) -> None:
     target = _resolve_entity(cfg, entity_type, entity_id, relation)
-
     if path is None:
         raise WhatIfError("update requires 'path'")
-
     _set_by_path(target, path, value)
 
 
-# ============================================================
-# CREATE
-# ============================================================
-
-def _apply_create(
-    cfg: Dict[str, Any],
-    entity_type: str,
-    value: Any,
-) -> None:
+def _apply_create(cfg: Dict[str, Any], entity_type: str, value: Any) -> None:
     section = _entity_section(entity_type)
-
     if section not in cfg:
         cfg[section] = []
-
     if not isinstance(cfg[section], list):
         raise WhatIfError(f"Config section '{section}' is not a list")
-
     cfg[section].append(value)
 
-
-# ============================================================
-# DELETE
-# ============================================================
 
 def _apply_delete(
     cfg: Dict[str, Any],
     entity_type: str,
     entity_id: Dict[str, Any] | None,
+    relation: Dict[str, Any] | None = None,
 ) -> None:
     section = _entity_section(entity_type)
     items = cfg.get(section)
 
     if not isinstance(items, list):
         raise WhatIfError(f"Config section '{section}' is not deletable")
+
+    # FIX: edges have no 'name' -- resolve deletion via the same
+    # (source, destination, material_name) relation scheme _resolve_edge
+    # already uses for updates, instead of falling through to the
+    # name/index-only path below, which no edge can ever satisfy.
+    if entity_type == "edge":
+        _apply_delete_edge(cfg, relation)
+        return
 
     name = entity_id.get("name") if entity_id else None
     index = entity_id.get("index") if entity_id else None
@@ -158,9 +130,79 @@ def _apply_delete(
     raise WhatIfError("delete requires entity_id.name or entity_id.index")
 
 
-# ============================================================
-# LINK / UNLINK (reserved for future)
-# ============================================================
+def _apply_delete_edge(cfg: Dict[str, Any], relation: Dict[str, Any] | None) -> None:
+    """
+    Deletes edge(s) matching a PARTIAL relation -- only fields actually
+    provided need to match (e.g. an instruction naming only a source,
+    like "delete the edge from TechRetail Corp", matches on source alone;
+    fields not specified act as wildcards). If more than one edge
+    matches an under-specified relation, ALL of them are deleted, but
+    the count is reported clearly so an unintentionally-broad deletion
+    is visible rather than silently ambiguous.
+
+    SELF-LOOP FALLBACK: a real, observed failure mode is the upstream
+    LLM producing relation.from == relation.to when the instruction only
+    specified a source (e.g. "delete the edge from TechRetail Corp") --
+    with no destination given, it appears to default "to" to the same
+    value as "from" rather than omitting it, describing a self-loop that
+    almost never exists in this domain instead of the real, differently-
+    destined edge the person meant. If an exact from==to match fails,
+    retry once treating the destination as unspecified (source+material
+    only) before giving up -- a genuine self-loop deletion still works
+    correctly, since the exact match is always tried FIRST.
+    """
+    if not relation:
+        raise WhatIfError("edge delete requires relation")
+
+    src = relation.get("from")
+    dst = relation.get("to")
+    mat = relation.get("attributes", {}).get("material_name") if relation.get("attributes") else None
+
+    if src is None and dst is None and mat is None:
+        raise WhatIfError(
+            "edge delete requires at least one of relation.from, "
+            "relation.to, or relation.attributes.material_name"
+        )
+
+    edges = cfg.get("edges", [])
+    if not isinstance(edges, list):
+        raise WhatIfError("Config section 'edges' is not deletable")
+
+    def find_matches(src, dst, mat):
+        def matches(edge):
+            if src is not None and edge.get("source") != src:
+                return False
+            if dst is not None and edge.get("destination") != dst:
+                return False
+            if mat is not None and edge.get("material_name") != mat:
+                return False
+            return True
+        return [e for e in edges if matches(e)], matches
+
+    matching, matches = find_matches(src, dst, mat)
+
+    if not matching and src is not None and dst is not None and src == dst:
+        # Exact self-loop match failed -- likely a hallucinated "to" that
+        # just copied "from" because the destination was never actually
+        # specified. Retry treating destination as unspecified.
+        fallback_matching, fallback_matches = find_matches(src, None, mat)
+        if fallback_matching:
+            print(f"  Note: relation specified a self-loop ({src!r} -> {dst!r}), "
+                  f"which doesn't match any real edge -- treating destination as "
+                  f"unspecified and matching on source (and material, if given) instead.")
+            matching, matches = fallback_matching, fallback_matches
+            dst = None
+
+    if not matching:
+        raise WhatIfError(
+            f"No edge found matching source={src!r}, destination={dst!r}, "
+            f"material_name={mat!r}"
+        )
+
+    cfg["edges"] = [e for e in edges if not matches(e)]
+    print(f"  Deleted {len(matching)} edge(s) matching "
+          f"source={src!r}, destination={dst!r}, material_name={mat!r}.")
+
 
 def _apply_link(cfg: Dict[str, Any], relation: Dict[str, Any]) -> None:
     raise WhatIfError("link operation not implemented yet")
@@ -170,72 +212,45 @@ def _apply_unlink(cfg: Dict[str, Any], relation: Dict[str, Any]) -> None:
     raise WhatIfError("unlink operation not implemented yet")
 
 
-# ============================================================
-# Entity resolution
-# ============================================================
-
 def _resolve_entity(
     cfg: Dict[str, Any],
     entity_type: str,
     entity_id: Dict[str, Any] | None,
     relation: Dict[str, Any] | None,
 ) -> Dict[str, Any]:
-    """
-    Resolves the target object to mutate.
-    """
-
-    # --- Edge resolution (special case)
     if entity_type == "edge":
         return _resolve_edge(cfg, relation)
 
     section = _entity_section(entity_type)
     items = cfg.get(section)
-
     if not isinstance(items, list):
         raise WhatIfError(f"Section '{section}' not found")
-
     if entity_id is None:
         raise WhatIfError("entity_id required")
-
     if "index" in entity_id and entity_id["index"] is not None:
         return items[entity_id["index"]]
-
     name = entity_id.get("name")
     if name is not None:
         for item in items:
             if item.get("name") == name:
                 return item
-
     raise WhatIfError(f"Entity not found in '{section}': {entity_id}")
 
 
 def _resolve_edge(cfg: Dict[str, Any], relation: Dict[str, Any]) -> Dict[str, Any]:
     if not relation:
         raise WhatIfError("edge update requires relation")
-
     if relation.get("type") != "edge":
         raise WhatIfError("relation.type must be 'edge'")
-
     src = relation.get("from")
     dst = relation.get("to")
     mat = relation.get("attributes", {}).get("material_name")
-
     for edge in cfg.get("edges", []):
-        if (
-            edge.get("source") == src
-            and edge.get("destination") == dst
-            and edge.get("material_name") == mat
-        ):
+        if (edge.get("source") == src and edge.get("destination") == dst
+                and edge.get("material_name") == mat):
             return edge
+    raise WhatIfError(f"Edge not found: {src} → {dst} ({mat})")
 
-    raise WhatIfError(
-        f"Edge not found: {src} → {dst} ({mat})"
-    )
-
-
-# ============================================================
-# Helpers
-# ============================================================
 
 def _entity_section(entity_type: str) -> str:
     return {
@@ -255,10 +270,8 @@ def _entity_section(entity_type: str) -> str:
 def _set_by_path(obj: Dict[str, Any], path: str, value: Any) -> None:
     parts = path.split(".")
     cur = obj
-
     for p in parts[:-1]:
         if p not in cur or not isinstance(cur[p], dict):
             cur[p] = {}
         cur = cur[p]
-
     cur[parts[-1]] = value
