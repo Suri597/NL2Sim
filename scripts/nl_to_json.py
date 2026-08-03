@@ -85,11 +85,48 @@ def _get_azure_client():
 
 def build_prompt(description: str) -> str:
     return f"""
-Convert the following supply chain description into JSON structured representation following adhere to provided schema:
+Convert the following supply chain description into JSON structured representation following adhere to provided schema and atleast one edge should be connecting the node customer and node warehouse sharing the same product.:
 
 {SCHEMA_EXAMPLE}
 
 Place "missing" if any information is not provided. Do not assume any information.
+
+RULE — Connect the customer to their product's source:
+Every customer[] entry MUST have a corresponding edge whose destination
+is that customer's name, and whose source is whichever facility actually
+delivers their product — a warehouse if one manages that product,
+otherwise the manufacturing facility that produces it directly.
+
+RULE — Production rate → operation_cycle:
+When the scenario states a production RATE (e.g. "X units per day",
+"produces X per hour", "throughput of X/day"), do NOT put X into
+operation_cycle directly. operation_cycle represents the TIME to
+produce ONE unit, not a quantity — there is no separate batch-size
+field on operation.
+
+Transform: operation_cycle.parameters.a = 1 / X, expressed in the
+SAME time unit as simulation.time_unit.
+
+Use "constant" as the distribution unless the description explicitly
+signals variability (e.g. "on average", "varies", "roughly") — a
+flatly stated rate like "5 units per day" is deterministic, not stochastic.
+
+Example:
+  Input: "production is 5 units per day" (simulation.time_unit = "days")
+  Output: operation.operation_cycle = {{
+    "distribution": "constant",
+    "parameters": {{"a": 0.2}}
+  }}
+  (i.e. 1/5 = 0.2 days per unit)
+
+RULE — Demand rate → arrival_time + demand (contrast case):
+When the scenario states a demand/order RATE (e.g. "demand is 2 units
+per day"), this DOES map directly: customer.arrival_time = 1 (one
+order event per day) and customer.demand = 2 (quantity per event).
+Do NOT apply the inverse-rate transformation here — that's only for
+production/operation_cycle.
+
+
 
 Supply chain description:
 {description}

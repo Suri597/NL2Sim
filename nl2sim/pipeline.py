@@ -23,7 +23,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from nl_to_json        import generate_json
-from iterative_repair  import InteractiveRepairRunner, canonicalize_config, deep_sort, resolve_missing_placeholders
+from repair_orchestrator      import run_repair_loop, canonicalize_config, deep_sort
 from score_reliability import compute_reliability_score, print_score_report
 from simulate          import run_simulation
 from nl_to_whatif      import generate_whatif
@@ -90,18 +90,12 @@ class Pipeline:
     def validate(self, cfg: Dict[str, Any]) -> Dict[str, Any]:
         print("\nStep 2/4 — Validating and repairing JSON...")
 
-        # ── Pre-pass: resolve all "missing" placeholders ───────
-        # Uses filter_config as oracle — only required fields are scanned
-        # Full config is patched in-place before validators run
-        resolve_missing_placeholders(cfg)
+        repaired, remaining = run_repair_loop(cfg, max_iterations=60, verbose=True)
+        if remaining:
+            print(f"\n  {len(remaining)} issue(s) could not be fully resolved:")
+            for issue in remaining:
+                print("   ", issue)
 
-        # ── Full patched JSON → validation layers ──────────────
-        runner = InteractiveRepairRunner(
-            cfg,
-            strict_layer0=True,
-            max_passes_per_layer=20,
-        )
-        repaired = runner.run()
         repaired = deep_sort(canonicalize_config(repaired))
         self._save("config.json", repaired)
         print(f"  ✓ Config validated → {self.output_dir / 'config.json'}")
@@ -169,9 +163,12 @@ class Pipeline:
         modified = apply_what_if_config(deepcopy(cfg), whatif_json)
 
         print(f"  Validating modified config...")
-        runner   = InteractiveRepairRunner(
-            modified, strict_layer0=True, max_passes_per_layer=20)
-        repaired = deep_sort(canonicalize_config(runner.run()))
+        repaired, remaining = run_repair_loop(modified, max_iterations=60, verbose=True)
+        if remaining:
+            print(f"\n  {len(remaining)} issue(s) could not be fully resolved:")
+            for issue in remaining:
+                print("   ", issue)
+        repaired = deep_sort(canonicalize_config(repaired))
         self._save(f"whatif_{n}_config.json", repaired)
         print(f"  ✓ What-if config → {self.output_dir / f'whatif_{n}_config.json'}")
 
