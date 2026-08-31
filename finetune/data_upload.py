@@ -42,17 +42,17 @@ from openai import AzureOpenAI  # the official Azure OpenAI Python library
 # Your Azure OpenAI API key.
 # Find it in: Azure Portal → Your OpenAI Resource → Keys and Endpoint → KEY 1
 # AZURE_OPENAI_API_KEY = "YOUR_API_KEY_HERE"
-AZURE_OPENAI_API_KEY = "G2mOoZHZcozFM6t2iGJoz35xYwI1Is8J7dhlK2GhDcGGfQuODfv7JQQJ99CEACYeBjFXJ3w3AAAAACOGutIl"
+
 
 
 # Your Azure OpenAI endpoint URL.
 # Find it in: Azure Portal → Your OpenAI Resource → Keys and Endpoint → Endpoint
 # It looks like: https://your-resource-name.openai.azure.com/
-AZURE_OPENAI_ENDPOINT = "https://intel-demo.openai.azure.com/"
+
 
 
 # The API version — do not change this unless instructed.
-AZURE_API_VERSION = "2024-10-21"
+
 
 # The name of your .jsonl file to upload.
 # Make sure this file is in the SAME folder as this script.
