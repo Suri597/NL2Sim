@@ -1,5 +1,5 @@
 """
-scripts2/orchestrator.py
+scripts/orchestrator.py
 --------------------------
 The verify -> repair -> re-verify LOOP. Kept separate from repair.py by
 design: repair.py is a library of individual repair actions (pure
@@ -31,7 +31,7 @@ import re
 
 from issue_types import Severity
 from repair import dispatch_repair
-
+from repair import dispatch_repair, set_repair_context
 from verification_layer1 import check_field_requirements
 from verification_layer2 import (
     check_intermediate_bom_references, check_product_bom_references,
@@ -175,7 +175,7 @@ def _section_priority(issue) -> int:
         return len(SECTION_PRIORITY_ORDER)
 
 
-def run_repair_loop(config: dict, max_iterations: int = 200, verbose: bool = True) -> tuple:
+def run_repair_loop(config: dict, max_iterations: int = 200, verbose: bool = True, description: str = "") -> tuple:
     """
     The core loop: verify -> pick the first non-skipped BLOCKING issue ->
     repair it -> re-verify from scratch -> repeat. An issue that
@@ -196,6 +196,9 @@ def run_repair_loop(config: dict, max_iterations: int = 200, verbose: bool = Tru
     everything got fixed, otherwise it's whatever's left (each either
     unrepairable by any current action, or the loop hit max_iterations).
     """
+
+    set_repair_context(description)
+
     permanent_skip = set()
     temporary_skip = set()
 
@@ -223,8 +226,8 @@ def run_repair_loop(config: dict, max_iterations: int = 200, verbose: bool = Tru
         actionable.sort(key=_section_priority)
 
         issue = actionable[0]
-        if verbose:
-            print(f"\n--- Repairing ({iteration + 1}): {issue} ---")
+        # if verbose:
+        #     print(f"\n--- Repairing ({iteration + 1}): {issue} ---")
 
         try:
             success = dispatch_repair(config, issue)

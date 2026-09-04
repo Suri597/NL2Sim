@@ -1,5 +1,5 @@
 """
-scripts2/verification_layer1.py
+scripts/verification_layer1.py
 ---------------------------------
 STEP 1 OF 3 (this file currently implements Step 1 only):
     1. Field requirement checking (presence)      <- THIS FILE, current scope
@@ -162,6 +162,7 @@ MATERIAL_TYPES = ["raw_material", "intermediate_material", "product"]
 PROCUREMENT_SCHEME_TYPES = ["periodic_supply", "demand_driven", "inventory_threshold"]
 FACILITY_TYPES = ["manufacturing", "warehouse"]
 SHORTAGE_POLICIES = ["salelost", "backorder", "salelost_partial", "backorder_partial"]
+TIME_UNITS = ["seconds", "minutes", "hours", "days", "weeks", "months"]
 
 
 # ----------------------------------------------------------------------
@@ -244,7 +245,7 @@ SECTION_SPECS = {
             "supply_material_name": FIELD(required=True, is_name=True),
             "supplier_lead_time": FIELD_DISTRIBUTION(required=True),
             "supplier_capacity": FIELD(required=False, silent=True),
-            "supplier_cost": FIELD(required=False),
+            "supplier_cost": FIELD(required=True),
             "supplier_payment_lead_time": FIELD_DISTRIBUTION(required=True),
         },
     },
@@ -317,7 +318,7 @@ SECTION_SPECS = {
 # "nodes" and "simulation" are irregular shapes, handled separately below.
 
 SIMULATION_FIELDS = {
-    "time_unit": FIELD(required=True),
+    "time_unit": FIELD(required=True, enum_values=TIME_UNITS),
     "horizon": FIELD(required=True),
     "warm_up": FIELD(required=True),
     "replications": FIELD(required=True),

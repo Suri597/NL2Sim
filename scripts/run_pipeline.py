@@ -23,35 +23,110 @@ if str(ROOT) not in sys.path:
 
 from nl2sim.pipeline import Pipeline
 
+# capture_sketch lives in scripts/graph_input, already added to sys.path
+# by nl2sim.pipeline's module-level path setup.
+from capture_sketch import main as capture_sketch_main
 
-def ask_model_choice() -> bool:
+
+def ask_input_mode() -> str:
     """
-    Interactively ask the user which model backend to use.
-    Returns True if Azure, False if OpenAI.
+    Asks how the scenario should be provided.
+    Returns one of: "text", "graph", "both".
     """
-    import os
-    from dotenv import load_dotenv
-    load_dotenv(ROOT / ".env")
-
-    openai_model = os.environ.get("OPENAI_MODEL", "ft:gpt-4.1-2025-04-14:personal:nl2sim-ft:Dkz8vnRw")
-    azure_model  = os.environ.get("AZURE_FINETUNED_MODEL") or os.environ.get("AZURE_BASE_MODEL", "Azure fine-tuned model")
-
     print("\n" + "─" * 60)
-    print("Which model would you like to use?")
-    print(f"  1) OpenAI  — {openai_model}")
-    print(f"  2) Azure   — {azure_model} (Microsoft Foundry)")
+    print("How would you like to provide the scenario?")
+    print("  1) Text only")
+    print("  2) Graph only")
+    print("  3) Graph + Text")
+    print("─" * 60)
+
+    while True:
+        choice = input("Select option (1, 2 or 3): ").strip()
+        if choice == "1":
+            return "text"
+        elif choice == "2":
+            return "graph"
+        elif choice == "3":
+            return "both"
+        else:
+            print("  Invalid selection. Please enter 1, 2 or 3.")
+
+
+def ask_image_path() -> str:
+    """Asks capture-live vs. select-existing, returns a path to the image."""
+    print("\n" + "─" * 60)
+    print("How would you like to provide the sketch?")
+    print("  1) Capture live (webcam)")
+    print("  2) Select an existing image")
     print("─" * 60)
 
     while True:
         choice = input("Select option (1 or 2): ").strip()
         if choice == "1":
-            print("  ✓ Using OpenAI fine-tuned model.")
-            return False
+            captured = capture_sketch_main()
+            if not captured:
+                print("No image captured — cannot proceed with graph input.")
+                sys.exit(1)
+            return captured[-1]  # last captured frame
         elif choice == "2":
-            print("  ✓ Using Azure fine-tuned model.")
-            return True
+            while True:
+                filepath = input("\nEnter path to image file: ").strip()
+                p = Path(filepath)
+                if p.exists() and p.is_file():
+                    print(f"  ✓ Using image {filepath}")
+                    return str(p)
+                print(f"  File not found: {filepath}. Please try again.")
         else:
             print("  Invalid selection. Please enter 1 or 2.")
+
+
+def ask_description() -> str:
+    print("\nHow would you like to provide the supply chain description?")
+    print("  1) Load from a .txt file")
+    print("  2) Type directly in the terminal")
+
+    while True:
+        choice = input("\nSelect option (1 or 2): ").strip()
+        if choice in {"1", "2"}:
+            break
+        print("Invalid selection. Please enter 1 or 2.")
+
+    if choice == "1":
+        while True:
+            filepath = input("Enter path to description file: ").strip()
+            p = Path(filepath)
+            if p.exists() and p.is_file():
+                description = p.read_text(encoding="utf-8")
+                print(f"  ✓ Loaded description from {filepath}")
+                return description
+            print(f"  File not found: {filepath}. Please try again.")
+
+    print("\nEnter your supply chain description.")
+    print("Press Enter on an empty line when done.\n")
+    lines = []
+    while True:
+        line = input()
+        if line == "":
+            break
+        lines.append(line)
+    description = "\n".join(lines).strip()
+    if not description:
+        print("No description entered. Exiting.")
+        sys.exit(1)
+    print("  ✓ Description received.")
+    return description
+
+
+def ask_use_context() -> bool:
+    print("\n" + "─" * 60)
+    print("⚠️  WARNING: Including system instructions significantly")
+    print("   increases token usage and API cost.")
+    print("   Only recommended if JSON quality is poor without it.")
+    print("─" * 60)
+    ctx = input("Include system instructions? (yes/no) [default: no]: ").strip().lower()
+    use_context = ctx in {"yes", "y"}
+    print(f"  System instructions: {'included' if use_context else 'excluded'}")
+    return use_context
 
 
 if __name__ == "__main__":
@@ -89,8 +164,6 @@ if __name__ == "__main__":
 
         print(f"\n  ✓ Loaded config from {config_path} — skipping LLM step")
 
-       
-
         pipeline = Pipeline(
             description="",
             output_dir=output_dir,
@@ -102,64 +175,34 @@ if __name__ == "__main__":
         pipeline.validate_and_simulate(cfg)
         sys.exit(0)
 
-    # ── Normal flow: LLM → validate → simulate ────────────
+    # ── Normal flow: input mode → (image) → description → run ─
     print("\n" + "=" * 60)
     print("NL2Sim Pipeline")
     print("=" * 60)
 
-    # ── Ask model choice first ─────────────────────────────
-    use_azure = ask_model_choice()
+    # OpenAI is the default and only backend asked about here.
+    use_azure = False
 
-    # ── Ask for description ────────────────────────────────
-    print("\nHow would you like to provide the supply chain description?")
-    print("  1) Load from a .txt file")
-    print("  2) Type directly in the terminal")
+    input_mode = ask_input_mode()
 
-    while True:
-        choice = input("\nSelect option (1 or 2): ").strip()
-        if choice in {"1", "2"}:
-            break
-        print("Invalid selection. Please enter 1 or 2.")
+    image_path = None
+    if input_mode in ("graph", "both"):
+        image_path = ask_image_path()
 
-    # ── Option 1 — file ────────────────────────────────────
-    if choice == "1":
-        while True:
-            filepath = input("Enter path to description file: ").strip()
-            p = Path(filepath)
-            if p.exists() and p.is_file():
-                description = p.read_text(encoding="utf-8")
-                print(f"  ✓ Loaded description from {filepath}")
-                break
-            else:
-                print(f"  File not found: {filepath}. Please try again.")
+    if input_mode == "graph":
+        pipeline = Pipeline(
+            description="",
+            output_dir=output_dir,
+            use_context=False,
+            simulate=not args.no_simulate,
+            use_azure=use_azure,
+        )
+        pipeline.run_with_graph_only(image_path)
+        sys.exit(0)
 
-    # ── Option 2 — direct text ─────────────────────────────
-    else:
-        print("\nEnter your supply chain description.")
-        print("Press Enter on an empty line when done.\n")
-        lines = []
-        while True:
-            line = input()
-            if line == "":
-                break
-            lines.append(line)
-        description = "\n".join(lines).strip()
-        if not description:
-            print("No description entered. Exiting.")
-            sys.exit(1)
-        print("  ✓ Description received.")
+    description = ask_description()
+    use_context = ask_use_context()
 
-    # ── Ask about system instructions ─────────────────────
-    print("\n" + "─" * 60)
-    print("⚠️  WARNING: Including system instructions significantly")
-    print("   increases token usage and API cost.")
-    print("   Only recommended if JSON quality is poor without it.")
-    print("─" * 60)
-    ctx = input("Include system instructions? (yes/no) [default: no]: ").strip().lower()
-    use_context = ctx in {"yes", "y"}
-    print(f"  System instructions: {'included' if use_context else 'excluded'}")
-
-    # ── Run pipeline ───────────────────────────────────────
     pipeline = Pipeline(
         description=description,
         output_dir=output_dir,
@@ -168,4 +211,7 @@ if __name__ == "__main__":
         use_azure=use_azure,
     )
 
-    pipeline.run()
+    if input_mode == "both":
+        pipeline.run_with_graph(image_path)
+    else:
+        pipeline.run()

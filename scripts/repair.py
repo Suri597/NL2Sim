@@ -11,28 +11,17 @@ separate script (not yet built). Keeping these separate means the repair
 actions stay simple, testable in isolation, and swappable without
 touching the loop logic.
 
-Built in the same sequence verification_layer1.py's conditions were
-built, starting with the simplest case.
-
-Implemented so far:
-    1. Scalar missing/placeholder field repair: given a MISSING_REQUIRED_VALUE
-       issue on a plain scalar field (str/num), insert the field at the
-       correct location and prompt the user for a value, validating its
-       type before accepting it.
-
-NOT yet implemented (planned, in order):
-    2. Dict-shaped missing fields (e.g. bom) -- insert {} then prompt for
-       key/value pairs.
-    3. List-shaped missing fields (e.g. inventory_managed, operation.input/
-       output, nodes[0].supplier/facility/customer) -- insert [] then
-       prompt for one or more entries.
-    4. Distribution-object missing fields -- insert the {distribution,
-       parameters} shape, prompt for distribution type first, THEN only
-       prompt for the parameters that distribution type actually needs
-       (reusing verification_layer1.py's DISTRIBUTION_PARAM_COUNTS).
-    5. Nested multi-field entities with conditional requirements (e.g. a
-       whole missing supplier[] entry, or resource.batching where
-       batch_size is only asked for if enabled=True).
+QUESTION FRAMING: every repair action's introductory "here's the problem,
+choose a fix" line is now generated via llm_humanize.generate_question()
+rather than a hardcoded f-string -- passed the issue's location, the
+config, and the user's original description/sketch-context, so the
+phrasing is natural and scenario-grounded rather than templated. The
+NUMBERED OPTIONS themselves (candidate facilities, materials, etc.) are
+NOT LLM-generated -- those are computed directly from live config state
+and printed as-is, since they encode real structural logic that must
+stay exact. Only the sentence framing the choice is LLM-authored; the
+choices are still deterministic. Each call passes the original template
+text as fallback_text, so a failed API call still shows something usable.
 """
 
 from __future__ import annotations
@@ -47,14 +36,41 @@ from verification_layer1 import (
     SECTION_SPECS, SIMULATION_FIELDS, is_required,
     DISTRIBUTION_PARAM_COUNTS, PARAM_KEYS,
     MATERIAL_TYPES, PROCUREMENT_SCHEME_TYPES, FACILITY_TYPES, SHORTAGE_POLICIES,
+    TIME_UNITS,
 )
+from llm_humanize import generate_question
+
+_CURRENT_DESCRIPTION = ""
+
+def set_repair_context(description: str = "") -> None:
+    """Called once per repair run (by orchestrator.run_repair_loop) so
+    every prompt in this module can pass the user's original NL
+    description to the LLM question generator without threading it
+    through every function signature individually."""
+    global _CURRENT_DESCRIPTION
+    _CURRENT_DESCRIPTION = description or ""
 
 
-# ============================================================
-# Natural-language description helpers
-# (originally a separate humanize.py -- merged in here since every
-# actual USE of these functions is from repair actions in this file)
-# ============================================================
+def _ask(config: dict, location: str, fallback_text: str) -> str:
+    """
+    Shared helper for the custom multi-option repair menus below: wraps
+    generate_question() with the module's current description context,
+    used to frame just the INTRO sentence of a "choose a fix" menu --
+    never the numbered options themselves, which stay computed exactly
+    as before. location may be a real issue.location, or a best-effort
+    constructed string when no ValidationIssue is directly available
+    (e.g. the shared facility-inbound/outbound helpers, called with just
+    a facility dict) -- in that case entity-specific caching is weaker,
+    but the call still succeeds and still gets scenario context via the
+    description.
+
+    answer_type is always 'num' here -- every one of these menus is
+    followed by "Enter number:", never a yes/no or free-text response,
+    so the question should always be phrased as "which one/what should
+    happen", never as a yes/no question.
+    """
+    return generate_question(config, location, description=_CURRENT_DESCRIPTION, fallback_text=fallback_text, answer_type="num")
+    return generate_question(config, location, description=_CURRENT_DESCRIPTION, fallback_text=fallback_text)
 
 # ============================================================
 # Entity resolution
@@ -130,107 +146,19 @@ def _describe_edge(config: dict, idx: int) -> str:
 
 
 # ============================================================
-# Field-path -> question templates
-# ============================================================
-# Keyed by (section, field_path_within_entity) -- field_path is the
-# location string with the "section[idx]." prefix stripped. Each
-# template is a function(config, entry, extra) -> question string.
-# "extra" carries any regex-captured group needed (e.g. distribution
-# parameter letter, or which sub-object like customer_lead_time).
-
-def _distribution_question(entry_desc: str, what: str) -> str:
-    return (f"For {entry_desc}: {what} Is it always the same, or does it "
-            f"vary according to some distribution?")
-
-
-def _param_question(entry_desc: str, what_noun: str, param_letter: str) -> str:
-    return f"For {entry_desc}: what number describes {what_noun} (this specific value, not the overall pattern)?"
-
-
-# Static field -> question-fragment lookup for the most common leaf
-# fields across the schema. Each value is the "what" clause plugged
-# into _distribution_question, or a standalone full question for
-# non-distribution fields.
-_DISTRIBUTION_FIELD_LABELS = {
-    "customer_lead_time": "how long does it usually take for this customer to receive their order once it ships?",
-    "customer_payment_lead_time": "how long after delivery does this customer usually pay?",
-    "arrival_time": "how often does this customer place an order?",
-    "demand": "how many units does this customer order each time?",
-    "supplier_lead_time": "how long does it usually take this supplier to deliver after an order is placed?",
-    "supplier_payment_lead_time": "how long after delivery do you usually pay this supplier?",
-    "operation_cycle": "how long does it take to produce one unit (or one batch)?",
-    "service_time": "how long does this resource take to process one unit?",
-    "transfer_time": "how long does this delivery usually take?",
-    "procurement_arrival": "how often do periodic supply orders arrive?",
-}
-
-# Noun-phrase form of the same fields, for composing parameter
-# sub-questions cleanly (avoids mangling a question into a clause).
-_DISTRIBUTION_FIELD_NOUNS = {
-    "customer_lead_time": "the delivery time to this customer",
-    "customer_payment_lead_time": "this customer's payment delay",
-    "arrival_time": "how often this customer orders",
-    "demand": "the order quantity",
-    "supplier_lead_time": "this supplier's delivery time",
-    "supplier_payment_lead_time": "the payment delay to this supplier",
-    "operation_cycle": "the production time per unit/batch",
-    "service_time": "this resource's processing time per unit",
-    "transfer_time": "this delivery's transfer time",
-    "procurement_arrival": "how often supply orders arrive",
-}
-
-_SCALAR_FIELD_QUESTIONS = {
-    "shortage_policy": "For {entity}: if there isn't enough stock to fill an order, what should happen -- should the sale be lost, backordered, or partially fulfilled?",
-    "unit_selling_price": "For {entity}: what price is charged per unit sold?",
-    "initial_inventory": "For {entity}: how many units are on hand at the very start of the simulation?",
-    "name": "What should this entry be named?",
-    "type": "For {entity}: what type is this?",
-    "supply_material_name": "For {entity}: which raw material does this supplier provide?",
-    "supplier_cost": "For {entity}: what does one unit cost from this supplier?",
-    "supplier_capacity": "For {entity}: is there a maximum amount this supplier can deliver at once? (Leave as unlimited if not.)",
-    "capacity": "For {entity}: how many units can this resource handle at the same time?",
-    "resource_required": "For {entity}: does this operation need a specific resource (machine/worker) to run, or none at all?",
-    "product": "For {entity}: which product does this customer order?",
-}
-
-
-def _procurement_scheme_type_question(entity_desc: str) -> str:
-    return (
-        f"For {entity_desc}: how is this material restocked -- "
-        f"delivered on a regular schedule (periodic supply), "
-        f"ordered only when stock runs low (inventory threshold, using a reorder point and a refill-up-to level), "
-        f"or ordered directly in response to demand (demand-driven)?"
-    )
-
-
-def _procurement_threshold_param_question(entity_desc: str, param_letter: str) -> str:
-    if param_letter == "a":
-        return f"For {entity_desc}: at what stock level should a reorder be triggered (the reorder point, 's')?"
-    if param_letter == "b":
-        return f"For {entity_desc}: when reordering, what level should stock be refilled up to (the order-up-to level, 'S')?"
-    return f"For {entity_desc}: what should parameter '{param_letter}' be?"
-
-
-# ============================================================
-# Breadcrumb-style description (simpler alternative to full questions)
+# Breadcrumb-style description (used as fallback_text source)
 # ============================================================
 
 def describe_location(config: dict, location: str) -> str:
     """
-    Converts a technical location string into a readable breadcrumb,
-    matching the reference implementation's describe_finding() style --
+    Converts a technical location string into a readable breadcrumb --
     NOT a full question, just the path made human-readable: array
     indices replaced with the entry's name where one exists, dots/
     brackets replaced with ' -> ', section/field names title-cased.
 
-    Examples:
-      inventory[1].procurement_scheme.parameters.a
-        -> Inventory -> 'lead frame' -> Procurement scheme -> Parameters -> a
-      customer[0].shortage_policy
-        -> Customer -> 'Ross Associates' -> Shortage policy
-      edges[0].transfer_time.parameters.a
-        -> Edges -> 'WaferSource Inc. -> Wafer Fab (silicon wafer)' -> Transfer time -> Parameters -> a
-
+    Used as the fallback_text source for generate_question() throughout
+    this file -- if the LLM call fails, this breadcrumb text (not a full
+    question, but always accurate and displayable) is shown instead.
     Falls back to the raw location string on any unexpected shape --
     never raises.
     """
@@ -281,154 +209,49 @@ def describe_location(config: dict, location: str) -> str:
         return location
 
 
-# ============================================================
-# Main entry point
-# ============================================================
-
-def humanize_question(config: dict, location: str) -> str:
+def _parse_location_steps(location: str) -> list:
     """
-    The main entry point: given a ValidationIssue.location string and
-    the config, returns a natural-language QUESTION. Falls back to a
-    generic breadcrumb-based phrasing if no specific template exists
-    for the field involved -- never raises, always returns something
-    displayable.
+    Parses a ValidationIssue.location string into a list of navigation
+    steps. Each step is either a string (dict key) or an int (list index).
+
+    "supplier[0].supplier_cost" -> ["supplier", 0, "supplier_cost"]
+
+    The repair actions genuinely depend on this raising ValueError on a
+    malformed location (that's how a repair action's failure correctly
+    propagates up to the orchestration loop's skip-tracking).
     """
-    try:
-        return _humanize_question_inner(config, location)
-    except Exception:
-        return f"Please provide a value for '{location}'."
+    steps = []
+    for part in location.split("."):
+        match = re.match(r"^([a-zA-Z_][a-zA-Z0-9_]*)(\[(\d+)\])?$", part)
+        if not match:
+            raise ValueError(f"Could not parse location segment: '{part}' in '{location}'")
+        key, _, index = match.groups()
+        steps.append(key)
+        if index is not None:
+            steps.append(int(index))
+    return steps
 
 
-def _humanize_question_inner(config: dict, location: str) -> str:
-    steps = _parse_location_steps(location)
-    if not steps:
-        return f"Please provide a value for '{location}'."
-
-    section = steps[0]
-
-    # ---- edges: distinct entity description (no simple "name") ----
-    if section == "edges" and len(steps) >= 2 and isinstance(steps[1], int):
-        idx = steps[1]
-        entity_desc = _describe_edge(config, idx)
-        remainder = ".".join(str(s) for s in steps[2:])
-        if remainder.startswith("transfer_time"):
-            what = _DISTRIBUTION_FIELD_LABELS["transfer_time"]
-            pm = re.search(r"parameters\.([a-e])$", remainder)
-            if pm:
-                return _param_question(entity_desc, _DISTRIBUTION_FIELD_NOUNS["transfer_time"], pm.group(1))
-            if remainder.endswith(".distribution") or remainder == "transfer_time":
-                return _distribution_question(entity_desc, what)
-        if remainder == "material_type":
-            return f"For {entity_desc}: what category is this material -- raw material, intermediate material, or product?"
-        if remainder == "material_name":
-            return f"For {entity_desc}: what material is being delivered?"
-        return f"For {entity_desc}: please provide '{remainder}'."
-
-    # ---- sectioned entities with a numeric index ----
-    if len(steps) >= 2 and isinstance(steps[1], int):
-        idx = steps[1]
-        entity_desc = describe_entity(config, section, idx)
-        remainder_steps = steps[2:]
-        remainder = ".".join(str(s) for s in remainder_steps)
-
-        if not remainder:
-            return f"Please provide details for {entity_desc}."
-
-        # ---- procurement_scheme: special three-way structure ----
-        if remainder.startswith("procurement_scheme"):
-            if remainder == "procurement_scheme.type" or remainder == "procurement_scheme":
-                return _procurement_scheme_type_question(entity_desc)
-            pm = re.search(r"parameters\.([a-e])$", remainder)
-            if pm:
-                entry = _entry_at(config, section, idx)
-                ps = (entry or {}).get("procurement_scheme") or {}
-                if ps.get("type") == "inventory_threshold":
-                    return _procurement_threshold_param_question(entity_desc, pm.group(1))
-                return _param_question(entity_desc, "the amount of variability in the order quantity", pm.group(1))
-            if remainder.endswith(".distribution"):
-                return _distribution_question(entity_desc, "how much does the order quantity vary?")
-
-        # ---- generic distribution-shaped fields ----
-        for field_key, what in _DISTRIBUTION_FIELD_LABELS.items():
-            if remainder == field_key or remainder.startswith(field_key + "."):
-                pm = re.search(r"parameters\.([a-e])$", remainder)
-                if pm:
-                    return _param_question(entity_desc, _DISTRIBUTION_FIELD_NOUNS[field_key], pm.group(1))
-                if remainder.endswith(".distribution") or remainder == field_key:
-                    return _distribution_question(entity_desc, what)
-
-        # ---- known scalar fields (TOP-LEVEL on the entity only -- a
-        # nested field sharing a leaf name, e.g. operation.name, is a
-        # different question and must not match here) ----
-        if len(remainder_steps) == 1 and isinstance(remainder_steps[0], str):
-            leaf = remainder_steps[0]
-            if leaf in _SCALAR_FIELD_QUESTIONS:
-                return _SCALAR_FIELD_QUESTIONS[leaf].format(entity=entity_desc)
-
-        # ---- nested "name" fields (e.g. facility[1].operation.name) --
-        # still get entity context, just phrased for the sub-object ----
-        if remainder.endswith(".name") and len(remainder_steps) > 1:
-            container = remainder_steps[-2]
-            if isinstance(container, str):
-                container_label = container.replace("_", " ")
-                return f"For {entity_desc}: what should its {container_label} be named?"
-
-        # ---- inventory_costs ----
-        if remainder.startswith("inventory_costs"):
-            cost_labels = {
-                "holding_cost": "what does it cost to hold one unit in stock for one time period?",
-                "shortage_cost": "what's the cost of being short one unit when it's needed?",
-                "review_time": "how often is stock level reviewed?",
-            }
-            leaf2 = remainder.split(".")[-1]
-            if leaf2 in cost_labels:
-                return f"For {entity_desc}: {cost_labels[leaf2]}"
-
-        # ---- fallback: generic, still names the entity ----
-        field_label = remainder.replace("_", " ").replace(".", " ")
-        return f"For {entity_desc}: please provide a value for {field_label}."
-
-    # ---- bare section-level (e.g. "raw_materials", "products") ----
-    if len(steps) == 1:
-        label = section.replace("_", " ")
-        return f"At least one {label.rstrip('s')} is needed -- what should it be?"
-
-    # ---- top-level dict fields (e.g. "simulation.horizon", "nodes[0].facility") ----
-    if section == "simulation":
-        sim_labels = {
-            "horizon": "How many time units should the simulation run for?",
-            "warm_up": "Should any initial warm-up period be excluded from results? If so, how long?",
-            "time_unit": "What time unit are you using (e.g. days, hours)?",
-            "replications": "How many times should the simulation be repeated (for statistical confidence)?",
-            "random_seed": "Any specific random seed to use for reproducibility? (Leave default if not.)",
-        }
-        leaf = steps[-1] if isinstance(steps[-1], str) else None
-        if leaf in sim_labels:
-            return sim_labels[leaf]
-
-    if section == "nodes":
-        return "Which entities should be registered here?"
-
-    return f"Please provide a value for '{location}'."
-
+def _navigate_to_parent(config: dict, steps: list):
+    """
+    Walks all but the last step, returning (parent_container, last_step).
+    Raises if an intermediate container doesn't exist -- this repair
+    action only handles the LEAF field being missing, not missing
+    intermediate containers (that's handled by earlier steps in the
+    orchestrator, which repairs top-down).
+    """
+    current = config
+    for step in steps[:-1]:
+        if isinstance(step, int):
+            current = current[step]
+        else:
+            current = current[step]
+    return current, steps[-1]
 
 
 # ----------------------------------------------------------------------
 # Field type lookup
 # ----------------------------------------------------------------------
-# Derived directly from scripts/schema.py's structure. Kept local to this
-# file rather than added to verification_layer1.py's FIELD() spec, per
-# instruction -- container/type shape is inferred here at repair time
-# from a lookup table mirroring the schema, not from a modified spec.
-#
-# Keyed by a NORMALIZED path: array indices stripped, section name kept
-# singular-vs-plural exactly as it appears in the schema (e.g.
-# "supplier.supplier_cost", not "supplier[2].supplier_cost").
-#
-# "str"  -> free-text string field
-# "num"  -> numeric field (int or float)
-# Fields not in this table are either dict/list-shaped (handled by later
-# repair actions, not this one) or don't exist as scalars in the schema.
 
 SCALAR_FIELD_TYPES = {
     "config_info.name": "name",
@@ -482,8 +305,6 @@ SCALAR_FIELD_TYPES = {
     "simulation.replications": "num",
     "simulation.random_seed": "num",
 
-    # Distribution object's own internal scalar fields (not the object
-    # itself, which is dict-shaped -- see planned action #4).
     "*.distribution": "str",
     "*.parameters.a": "num",
     "*.parameters.b": "num",
@@ -497,10 +318,6 @@ def normalize_location(location: str) -> str:
     """
     Strips array indices from a ValidationIssue.location string so it can
     be matched against SCALAR_FIELD_TYPES.
-
-    "supplier[0].supplier_cost"                              -> "supplier.supplier_cost"
-    "inventory[2].procurement_scheme.parameters.a"            -> "inventory.procurement_scheme.parameters.a"
-    "facility[0].operation.operation_cycle.parameters.a"      -> "facility.operation.operation_cycle.parameters.a"
     """
     return re.sub(r"\[\d+\]", "", location)
 
@@ -509,16 +326,11 @@ def _lookup_field_type(normalized_location: str) -> str | None:
     """
     Look up the expected scalar type for a normalized location. Falls
     back to matching the "*.distribution" / "*.parameters.X" wildcard
-    entries for any distribution object, regardless of which field it's
-    nested under (supplier_lead_time, transfer_time, operation_cycle,
-    etc. all share the same internal shape).
+    entries for any distribution object.
     """
     if normalized_location in SCALAR_FIELD_TYPES:
         return SCALAR_FIELD_TYPES[normalized_location]
 
-    # Wildcard fallback for distribution internals: anything ending in
-    # ".distribution" or ".parameters.<key>" matches regardless of what
-    # precedes it.
     for suffix in (".distribution", ".parameters.a", ".parameters.b",
                    ".parameters.c", ".parameters.d", ".parameters.e"):
         if normalized_location.endswith(suffix):
@@ -532,31 +344,30 @@ def _lookup_field_type(normalized_location: str) -> str | None:
 # ----------------------------------------------------------------------
 # Enum constraints
 # ----------------------------------------------------------------------
-# Some scalar fields aren't just "a string" -- they're one of a fixed,
-# known set of values. Keyed the same way as SCALAR_FIELD_TYPES
-# (normalized path, with "*" wildcard support for fields that appear
-# inside any distribution object regardless of which parent field it's
-# nested under).
-#
-# When a field has an enum constraint, the prompt validates against this
-# list instead of just checking the general "str" type -- any free-text
-# string would pass the type check but could still be a nonsense value
-# (e.g. "sometimes" for a distribution type), which is exactly the kind
-# of error verification_layer1/2 can't catch after the fact since they
-# only check presence/references, not value correctness.
 
 DISTRIBUTION_TYPES = list(DISTRIBUTION_PARAM_COUNTS.keys())
 
-# Fields whose distribution describes a QUANTITY (units), not a TIME
-# duration/delay -- "Instant" (meaning "zero delay") is semantically
-# meaningless for these ("the order quantity is instant" doesn't mean
-# anything), so the Instant shortcut must never be offered here.
-# procurement_scheme's own distribution is ALSO quantity-based but is
-# handled entirely by its own dedicated repair action
-# (repair_procurement_scheme_field), which never reaches the generic
-# paths this set is checked against -- so it doesn't need to be listed
-# here as well.
 QUANTITY_BASED_DISTRIBUTION_FIELDS = {"customer.demand"}
+
+# Fields where "Instant" (constant, a=0) is dangerous even though they're
+# genuinely time-based (unlike QUANTITY_BASED_DISTRIBUTION_FIELDS, where
+# Instant is semantically meaningless). These generate a RECURRING event
+# stream -- a customer placing another order, a facility starting its
+# next production cycle, a resource finishing its next unit, a resource
+# failing/recovering -- so Instant means "this happens infinitely often
+# at the same simulated instant," which can spin the discrete-event
+# engine in a zero-time loop that never advances the simulation clock
+# (observed: an Instant customer.arrival_time froze a real run). A
+# one-shot delay field (supplier_lead_time, transfer_time, etc.) has no
+# such risk, since it fires once per event rather than regenerating
+# itself -- those keep Instant as an option.
+NO_INSTANT_RISK_FIELDS = {
+    "customer.arrival_time",
+    "facility.operation.operation_cycle",
+    "resource.service_time",
+    "resource.failure.uptime",
+    "resource.failure.downtime",
+}
 
 ENUM_FIELD_VALUES = {
     "*.distribution": DISTRIBUTION_TYPES,
@@ -564,6 +375,7 @@ ENUM_FIELD_VALUES = {
     "edges.material_type": MATERIAL_TYPES,
     "facility.type": FACILITY_TYPES,
     "customer.shortage_policy": SHORTAGE_POLICIES,
+    "simulation.time_unit": TIME_UNITS,
 }
 
 
@@ -579,92 +391,26 @@ def _lookup_enum_values(normalized_location: str) -> list | None:
 
 
 # ----------------------------------------------------------------------
-# Path navigation
-# ----------------------------------------------------------------------
-
-def _parse_location_steps(location: str) -> list:
-    """
-    Parses a ValidationIssue.location string into a list of navigation
-    steps. Each step is either a string (dict key) or an int (list index).
-
-    "supplier[0].supplier_cost" -> ["supplier", 0, "supplier_cost"]
-
-    NOTE: this single definition serves BOTH the natural-language
-    description helpers above and the repair actions below -- when
-    humanize.py was a separate file it had its own independent (lenient)
-    copy to avoid a circular import; merged into this file, only one
-    definition is needed. The repair actions genuinely depend on this
-    raising ValueError on a malformed location (that's how a repair
-    action's failure correctly propagates up to the orchestration loop's
-    skip-tracking); the description helpers that also call this are
-    already wrapped in their own outer exception handling, so they
-    degrade gracefully to a fallback string either way.
-    """
-    steps = []
-    for part in location.split("."):
-        match = re.match(r"^([a-zA-Z_][a-zA-Z0-9_]*)(\[(\d+)\])?$", part)
-        if not match:
-            raise ValueError(f"Could not parse location segment: '{part}' in '{location}'")
-        key, _, index = match.groups()
-        steps.append(key)
-        if index is not None:
-            steps.append(int(index))
-    return steps
-
-
-def _navigate_to_parent(config: dict, steps: list):
-    """
-    Walks all but the last step, returning (parent_container, last_step).
-    Raises if an intermediate container doesn't exist -- this repair
-    action only handles the LEAF field being missing, not missing
-    intermediate containers (that's handled by earlier steps in the
-    orchestrator, which repairs top-down).
-    """
-    current = config
-    for step in steps[:-1]:
-        if isinstance(step, int):
-            current = current[step]
-        else:
-            current = current[step]
-    return current, steps[-1]
-
-
-# ----------------------------------------------------------------------
 # Type-checked user prompting
 # ----------------------------------------------------------------------
 
 def _prompt_select_single(location: str, candidates: list, allow_none: bool = False, config: dict = None):
     """
     Presents a numbered menu for picking ONE value from a derived
-    candidate list -- the single-value counterpart to _fill_list_select
-    (which builds a whole list) and _fill_bom_by_selection (which builds
-    a dict). Used for scalar reference fields whose valid values are
-    fully determined by other data already in the config (e.g.
-    supply_material_name must be a real raw material).
-
-    allow_none=True adds an explicit "0) None" option that returns None
-    -- used for fields that are legitimately optional (e.g.
-    resource_required), where clearing the field is a valid outcome.
-
-    config is OPTIONAL, matching _prompt_for_value's pattern -- when
-    provided, the prompt header is generated via describe_location()
-    instead of the raw technical location string. This matters
-    particularly for edges.source/destination: describe_location's
-    edge-specific handling already shows the OTHER known fields (the
-    edge's source, its material_name) even when the field being asked
-    about itself is missing -- e.g. "Edges -> 'ChipSource Inc. -> ?
-    (silicon)' -> Destination" instead of a bare "edges[2].destination"
-    with zero context about which edge is being discussed at all.
+    candidate list. The prompt header is generated via generate_question()
+    (LLM-framed), with describe_location()'s breadcrumb text passed as
+    fallback_text in case the API call fails.
     """
     if not candidates and not allow_none:
-        return None  # signal to caller: nothing to select from, fall back
+        return None
 
-    prompt_header = f"  Select a value for '{location}':"
+    fallback_text = f"Select a value for '{location}':"
     if config is not None:
         try:
-            prompt_header = f"  {describe_location(config, location)}:"
+            fallback_text = f"{describe_location(config, location)}:"
         except Exception:
             pass
+    prompt_header = f"  {generate_question(config or {}, location, description=_CURRENT_DESCRIPTION, fallback_text=fallback_text, answer_type='num')}"
 
     print(prompt_header)
     if allow_none:
@@ -695,9 +441,7 @@ def _resource_name_candidates(config: dict, entry: dict = None) -> list:
 
 
 def _node_endpoint_candidates(config: dict, entry: dict = None) -> list:
-    """Candidates for edges.source / edges.destination: any real supplier,
-    facility, or customer name -- matches verification_layer2.py's
-    check_edge_node_references."""
+    """Candidates for edges.source / edges.destination."""
     return sorted(
         _collect_names(config, "supplier")
         | _collect_names(config, "facility")
@@ -706,23 +450,18 @@ def _node_endpoint_candidates(config: dict, entry: dict = None) -> list:
 
 
 def _inventory_name_candidates(config: dict, entry: dict) -> list:
-    """
-    CASCADING: inventory.name candidates depend on the sibling
-    inventory.type already set on the same entry -- narrows to whichever
-    material-category section that type points to.
-    """
+    """CASCADING: inventory.name candidates depend on the sibling
+    inventory.type already set on the same entry."""
     inv_type = (entry or {}).get("type")
     section = INVENTORY_TYPE_TO_SECTION.get(inv_type)
     if section is None:
-        return []  # type not set/recognized yet -- nothing to narrow by
+        return []
     return sorted(_collect_names(config, section))
 
 
 def _edge_material_name_candidates(config: dict, entry: dict) -> list:
-    """
-    CASCADING: edges.material_name candidates depend on the sibling
-    edges.material_type already set on the same entry.
-    """
+    """CASCADING: edges.material_name candidates depend on the sibling
+    edges.material_type already set on the same entry."""
     material_type = (entry or {}).get("material_type")
     section = INVENTORY_TYPE_TO_SECTION.get(material_type)
     if section is None:
@@ -730,10 +469,6 @@ def _edge_material_name_candidates(config: dict, entry: dict) -> list:
     return sorted(_collect_names(config, section))
 
 
-# Fields whose SINGLE value should be selected from a derived candidate
-# set rather than free-typed, keyed by normalized location. Each maps to
-# a function(config, entry) -> list[str], where entry is the owning dict
-# (needed for cascading lookups like inventory.name / edges.material_name).
 SCALAR_SELECT_CANDIDATE_FNS = {
     "supplier.supply_material_name": _raw_material_candidates,
     "customer.product": _product_candidates,
@@ -744,9 +479,6 @@ SCALAR_SELECT_CANDIDATE_FNS = {
     "edges.material_name": _edge_material_name_candidates,
 }
 
-# Fields where "no valid selection" is an acceptable outcome (clears/skips
-# the field) rather than an error -- currently just resource_required,
-# since it's legitimately optional.
 SCALAR_SELECT_ALLOW_NONE = {"facility.operation.resource_required"}
 
 
@@ -756,29 +488,21 @@ def _prompt_for_value(location: str, expected_kind: str, enum_values: list = Non
     against expected_kind ("str" / "num" / "bool") before accepting it.
     Re-prompts on a type mismatch rather than silently coercing.
 
-    If enum_values is given, the value must be one of that list (checked
-    on top of / instead of the general type check) -- a free-text string
-    that happens to be a valid "str" isn't enough if the field is
-    actually constrained to a known set (e.g. distribution type,
-    procurement_scheme.type, material type).
-
-    config is OPTIONAL and keyword-only-in-practice (appended at the end
-    so every existing call site remains valid unchanged, defaulting to
-    None). When provided, the prompt text is generated via
-    humanize.describe_location() instead of the raw technical
-    "Missing required field 'X.Y.Z'" text -- e.g. "Customer -> 'Ross
-    Associates' -> Customer lead time -> Distribution:" instead of
-    "Missing required field 'customer[0].customer_lead_time.distribution'".
-    Falls back to the technical text if config is None (not yet wired
-    at this call site) or if describe_location itself raises for any
-    reason (never blocks the actual prompt from working).
+    The prompt text is generated via generate_question() (LLM-framed),
+    with describe_location()'s breadcrumb text as fallback_text in case
+    the API call fails.
     """
-    prompt_prefix = f"  Missing required field '{location}'."
+    fallback_text = f"Missing required field '{location}'."
     if config is not None:
         try:
-            prompt_prefix = f"  {describe_location(config, location)}:"
+            fallback_text = f"{describe_location(config, location)}:"
         except Exception:
             pass
+    # When enum_values is given, the actual input is always "Enter number:"
+    # (a menu selection) regardless of expected_kind -- so the question
+    # should be phrased for that, not for expected_kind's raw type.
+    effective_answer_type = "num" if enum_values is not None else expected_kind
+    prompt_prefix = f"  {generate_question(config or {}, location, description=_CURRENT_DESCRIPTION, fallback_text=fallback_text, answer_type=effective_answer_type)}"
 
     if enum_values is not None:
         print(f"{prompt_prefix} Select one:")
@@ -805,14 +529,11 @@ def _prompt_for_value(location: str, expected_kind: str, enum_values: list = Non
                 continue
             try:
                 float(raw)
-                # If float() succeeds, the value is purely numeric --
-                # not acceptable for an identifier/name field (e.g. a
-                # supplier or material name shouldn't be "12345").
                 print(f"    '{raw}' is purely numeric -- names must contain "
                       f"non-numeric characters. Try again.")
                 continue
             except ValueError:
-                pass  # good -- not purely numeric
+                pass
             return raw
 
         elif expected_kind == "num":
@@ -834,9 +555,6 @@ def _prompt_for_value(location: str, expected_kind: str, enum_values: list = Non
                 continue
 
         else:
-            # Unknown kind -- shouldn't happen if _lookup_field_type is
-            # complete, but fail loudly rather than silently accepting
-            # anything.
             raise ValueError(f"No type-checking rule for kind '{expected_kind}'")
 
 
@@ -844,27 +562,22 @@ def _prompt_for_distribution(location: str, config: dict = None, allow_instant: 
     """
     Prompts for a full distribution object (distribution type +
     parameters) in ONE combined step, with "Instant" offered as an
-    additional FIRST menu option when allow_instant=True -- a common,
-    useful shortcut for TIME-based distributions (lead times, transfer
-    times, cycle times, etc.), where "instant" unambiguously means a
-    fixed zero delay/duration.
+    additional FIRST menu option when allow_instant=True.
 
-    allow_instant MUST be False for QUANTITY-based distributions (e.g.
-    procurement_scheme's own distribution, which describes order-
-    quantity variability, or customer.demand) -- "instant" is
-    semantically meaningless there ("the order quantity is instant"
-    doesn't mean anything); offering it would just be a confusing,
-    wrong-category shortcut. Callers are responsible for knowing which
-    kind of field they're filling and passing this correctly.
+    allow_instant MUST be False for QUANTITY-based distributions.
+
+    The prompt text is generated via generate_question() (LLM-framed),
+    with describe_location()'s output as fallback_text.
 
     Returns (distribution_name, parameters_dict).
     """
-    prompt_prefix = f"  Missing required field '{location}'."
+    fallback_text = f"Missing required field '{location}'."
     if config is not None:
         try:
-            prompt_prefix = f"  {describe_location(config, location)}:"
+            fallback_text = f"{describe_location(config, location)}:"
         except Exception:
             pass
+    prompt_prefix = f"  {generate_question(config or {}, location, description=_CURRENT_DESCRIPTION, fallback_text=fallback_text, answer_type='num')}"
 
     if allow_instant:
         options = ["Instant (always exactly 0 -- no delay or variability)"] + list(DISTRIBUTION_TYPES)
@@ -895,31 +608,13 @@ def _prompt_for_distribution(location: str, config: dict = None, allow_instant: 
 
 
 # ----------------------------------------------------------------------
-# The repair action itself
-# ----------------------------------------------------------------------
-
-# ----------------------------------------------------------------------
 # Schema-driven recursive repair (missing containers, not just leaves)
 # ----------------------------------------------------------------------
-# Reuses SECTION_SPECS (imported from verification_layer1.py) as the
-# single source of truth for structure -- once we know a field is
-# missing, the spec tells us whether it's a distribution object, a
-# dict-with-dynamic-keys (bom), a fixed-name nested object (batching,
-# operation, procurement_scheme), or a plain scalar, and what its
-# children are. We walk that tree and prompt for each REQUIRED field in
-# turn, re-evaluating conditional requirements live as sibling values are
-# entered (e.g. batch_size only gets asked if the user just answered
-# enabled=True).
 
 def find_spec_node(normalized_location: str):
     """
     Walks SECTION_SPECS (or SIMULATION_FIELDS for the simulation section)
     to find the FIELD spec dict describing the node at normalized_location.
-    Raises if the path can't be resolved -- e.g. it crosses through a
-    distribution/dict-values node that has no further "fields" to
-    traverse (those are terminal from a structural-walk perspective; any
-    issue located deeper than that is a leaf, handled by a different
-    repair action).
     """
     parts = normalized_location.split(".")
     section = parts[0]
@@ -970,11 +665,7 @@ def _add_to_inventory_managed(entity: dict, material_name: str) -> None:
     """
     Shared helper for adding a real material to any entity's
     inventory_managed list. First strips out any literal "missing"
-    placeholder entries (e.g. a facility whose inventory_managed was
-    left as ["missing"] by the LLM) before appending the real material --
-    otherwise repeated appends leave the stale placeholder behind
-    forever, re-triggering a DANGLING_REFERENCE on every subsequent
-    verification pass even after the real fix was applied.
+    placeholder entries before appending the real material.
     """
     current = entity.setdefault("inventory_managed", [])
     cleaned = [m for m in current if m != "missing"]
@@ -986,14 +677,8 @@ def _add_to_inventory_managed(entity: dict, material_name: str) -> None:
 
 def _fill_bom_by_selection(config: dict, owning_entry: dict, location: str, section_name: str):
     """
-    bom keys are chosen from a menu, not typed freely and not derived
-    from operation.input. The candidate set depends on which section owns
-    this bom -- matches verification_layer2.py's own reference rules:
-      - intermediate_materials[].bom keys must come from raw_materials
-      - products[].bom keys must come from raw_materials OR intermediate_materials
-    The user picks a material by number, enters its quantity, and repeats
-    (blank to finish) -- this guarantees every key is a real, valid
-    reference by construction, rather than risking a typo'd free-typed name.
+    bom keys are chosen from a menu, not typed freely. The candidate set
+    depends on which section owns this bom.
     """
     material_name = owning_entry.get("name")
 
@@ -1013,8 +698,8 @@ def _fill_bom_by_selection(config: dict, owning_entry: dict, location: str, sect
     bom = {}
     owning_entry["bom"] = bom
 
-    print(f"  Select materials for '{material_name}'s bom (blank to finish, enter 0 for "
-          f"a material's quantity to exclude it):")
+    fallback_text = f"Select materials for '{material_name}'s bom (blank to finish, enter 0 for a material's quantity to exclude it):"
+    print(f"  {_ask(config, location, fallback_text)}")
     excluded = set()
     while True:
         remaining = [c for c in candidates if c not in bom and c not in excluded]
@@ -1038,12 +723,10 @@ def _fill_bom_by_selection(config: dict, owning_entry: dict, location: str, sect
             bom[selected] = qty
 
 
-def _fill_list_select(owning_dict: dict, key: str, candidates: list, location: str):
+def _fill_list_select(owning_dict: dict, key: str, candidates: list, location: str, config: dict = None):
     """
     Builds a list-shaped field by letting the user pick entries from a
-    candidate list, by number, repeating until they choose to stop --
-    same UX pattern as _fill_bom_by_selection, applied to plain lists of
-    names instead of a dict of name->quantity.
+    candidate list, by number, repeating until they choose to stop.
     """
     if not candidates:
         raise ValueError(f"No candidates available for '{location}' -- nothing to select from.")
@@ -1051,7 +734,8 @@ def _fill_list_select(owning_dict: dict, key: str, candidates: list, location: s
     selected = []
     owning_dict[key] = selected
 
-    print(f"  Select entries for '{location}' (blank to finish):")
+    fallback_text = f"Select entries for '{location}' (blank to finish):"
+    print(f"  {_ask(config or {}, location, fallback_text)}")
     while True:
         remaining = [c for c in candidates if c not in selected]
         if not remaining:
@@ -1083,19 +767,8 @@ def _material_stage(config: dict, material_name: str):
 def _try_auto_derive_operation_list(config: dict, section_entry: dict, which: str):
     """
     Auto-derives operation.input or operation.output purely from the
-    facility's own inventory_managed, using a stage ordering
-    (raw=0 < intermediate=1 < product=2):
-        raw + raw + intermediate  -> input=[raws], output=[intermediate]
-        raw + product             -> input=[raw],  output=[product]
-        intermediate + product    -> input=[intermediate], output=[product]
-        raw + intermediate + product -> input=[raw, intermediate], output=[product]
-
-    Returns None (meaning "fall back to manual selection") only when
-    genuinely ambiguous: a single stage present, with nothing at any
-    other stage to distinguish input from output (e.g. two raw materials
-    and nothing else -- this also gets flagged separately as an
-    infeasibility by verification_layer3.py's
-    check_manufacturing_facility_material_stage_span).
+    facility's own inventory_managed, using a stage ordering.
+    Returns None if genuinely ambiguous.
     """
     managed = [m for m in (section_entry or {}).get("inventory_managed", []) if isinstance(m, str)]
     if not managed:
@@ -1110,13 +783,12 @@ def _try_auto_derive_operation_list(config: dict, section_entry: dict, which: st
     stages_present = sorted(staged.keys())
 
     if len(stages_present) < 2:
-        return None  # single stage only -- nothing to split, fall back (Layer3 also flags this as infeasible)
+        return None
 
     if len(stages_present) == 2:
         min_stage, max_stage = stages_present[0], stages_present[-1]
         return staged[min_stage] if which == "input" else staged[max_stage]
 
-    # All three stages present: raw + intermediate -> input, product -> output.
     if which == "input":
         return staged.get(0, []) + staged.get(1, [])
     else:
@@ -1132,20 +804,6 @@ def _all_material_names(config: dict, section_entry: dict = None) -> list:
 
 
 def _operation_input_candidates(config: dict, section_entry: dict = None) -> list:
-    """
-    operation.input candidates = (raw_material UNION intermediate_material)
-    INTERSECTED with this facility's own inventory_managed -- an operation
-    never consumes a finished product, AND its input should already be
-    something this facility is set up to manage (matches
-    verification_layer2.py's check_facility_operation_inventory_consistency
-    by construction, rather than relying on that check to catch a
-    mismatch after the fact).
-
-    Falls back to the category-only set (no inventory_managed
-    intersection) if inventory_managed isn't populated yet -- this can
-    happen if operation is being filled before inventory_managed has a
-    chance to be set.
-    """
     category_set = _collect_names(config, "raw_materials") | _collect_names(config, "intermediate_materials")
     managed = set(
         m for m in ((section_entry or {}).get("inventory_managed") or []) if isinstance(m, str)
@@ -1156,15 +814,6 @@ def _operation_input_candidates(config: dict, section_entry: dict = None) -> lis
 
 
 def _operation_output_candidates(config: dict, section_entry: dict = None) -> list:
-    """
-    operation.output candidates = (intermediate_material UNION product)
-    INTERSECTED with this facility's own inventory_managed -- an
-    operation never produces a raw material, AND its output should
-    already be something this facility is set up to manage.
-
-    Same inventory_managed-not-yet-populated fallback as
-    _operation_input_candidates.
-    """
     category_set = _collect_names(config, "intermediate_materials") | _collect_names(config, "products")
     managed = set(
         m for m in ((section_entry or {}).get("inventory_managed") or []) if isinstance(m, str)
@@ -1174,11 +823,6 @@ def _operation_output_candidates(config: dict, section_entry: dict = None) -> li
     return sorted(category_set & managed)
 
 
-# Fields whose value is a LIST selected from a derivable candidate set,
-# keyed by normalized location. Each maps to a function(config, section_entry) -> list
-# of valid candidate names. section_entry is the owning top-level list
-# entry (e.g. the specific facility[idx] dict) -- needed by operation.input/
-# output to intersect against that facility's own inventory_managed.
 LIST_SELECT_CANDIDATE_FNS = {
     "facility.inventory_managed": _all_material_names,
     "facility.operation.input": _operation_input_candidates,
@@ -1186,29 +830,46 @@ LIST_SELECT_CANDIDATE_FNS = {
 }
 
 
+def _build_procurement_scheme(config: dict, location: str):
+    """
+    Builds a fresh procurement_scheme dict from scratch: prompts for
+    "type" first (enum-constrained, never free text), then whatever that
+    type requires.
+    """
+    type_val = _prompt_for_value(
+        f"{location}.type", "str",
+        enum_values=PROCUREMENT_SCHEME_TYPES, config=config,
+    )
+    obj = {"type": type_val}
+
+    if type_val == "periodic_supply":
+        dist_value, params = _prompt_for_distribution(location, config=config, allow_instant=False)
+        obj["distribution"] = dist_value
+        obj["parameters"] = params
+
+    elif type_val == "inventory_threshold":
+        params = {}
+        for pkey in ("a", "b"):
+            params[pkey] = _prompt_for_value(f"{location}.parameters.{pkey}", "num", config=config)
+        obj["parameters"] = params
+
+    return obj
+
+
 def _fill_node(config: dict, parent: dict, key: str, fspec: dict, location: str, normalized: str, section_entry: dict = None):
     """
     Creates parent[key] and recursively fills in every REQUIRED field
-    beneath it, per fspec's shape. This is the SINGLE recursive entry
-    point -- special-case candidate-derived fields (bom, inventory_managed,
-    operation.input/output) are checked FIRST, at every level of
-    recursion, not just when this field happens to be the outermost
-    missing field.
-
-    section_entry: the owning top-level list entry (e.g. the specific
-    facility[idx] dict), threaded through recursion unchanged -- needed
-    so nested fields (like operation.input, two levels below the
-    facility) can look up sibling data on their OWNING entry (like
-    inventory_managed) rather than just global config state.
-
-    Optional/silent fields are left out entirely -- matching Layer1's own
-    rule that an absent optional field is not a problem.
+    beneath it, per fspec's shape.
     """
-    # -- Special cases: candidate-derived fields, checked before anything else --
     if key == "bom" and fspec.get("is_dict_values"):
         section_name = normalized.split(".")[0]
         _fill_bom_by_selection(config, parent, location, section_name)
         return parent[key]
+
+    if fspec.get("is_procurement_scheme"):
+        obj = _build_procurement_scheme(config, location)
+        parent[key] = obj
+        return obj
 
     if normalized in ("facility.operation.input", "facility.operation.output"):
         which = "input" if normalized.endswith(".input") else "output"
@@ -1217,28 +878,19 @@ def _fill_node(config: dict, parent: dict, key: str, fspec: dict, location: str,
             parent[key] = derived
             print(f"  '{location}' auto-derived from inventory_managed: {derived}")
             return derived
-        # Ambiguous (single stage, or all three stages present) -- fall
-        # back to manual selection, still narrowed by category + intersection.
         candidates = LIST_SELECT_CANDIDATE_FNS[normalized](config, section_entry)
-        _fill_list_select(parent, key, candidates, location)
+        _fill_list_select(parent, key, candidates, location, config=config)
         return parent[key]
 
     if normalized in LIST_SELECT_CANDIDATE_FNS:
         candidates = LIST_SELECT_CANDIDATE_FNS[normalized](config, section_entry)
-        _fill_list_select(parent, key, candidates, location)
+        _fill_list_select(parent, key, candidates, location, config=config)
         return parent[key]
 
-    # -- Generic shape-driven handling --
     if fspec.get("is_distribution"):
         obj = {}
         parent[key] = obj
 
-        # extra_fields (e.g. procurement_scheme.type) are asked FIRST --
-        # "type" (periodic_supply/demand_driven/inventory_threshold) is
-        # the more fundamental choice; what "distribution" even MEANS
-        # here depends on it (e.g. for periodic_supply, distribution
-        # describes order-quantity variability), so it reads more
-        # naturally to settle that before asking about the distribution.
         extra_fields = fspec.get("extra_fields")
         if extra_fields:
             for fname, child_fspec in extra_fields.items():
@@ -1249,7 +901,8 @@ def _fill_node(config: dict, parent: dict, key: str, fspec: dict, location: str,
 
         dist_value, params = _prompt_for_distribution(
             location, config=config,
-            allow_instant=(normalized not in QUANTITY_BASED_DISTRIBUTION_FIELDS),
+            allow_instant=(normalized not in QUANTITY_BASED_DISTRIBUTION_FIELDS
+                           and normalized not in NO_INSTANT_RISK_FIELDS),
         )
         obj["distribution"] = dist_value
         obj["parameters"] = params
@@ -1257,13 +910,12 @@ def _fill_node(config: dict, parent: dict, key: str, fspec: dict, location: str,
         return obj
 
     elif fspec.get("is_dict_values"):
-        # Generic fallback for any FUTURE dict-values field that isn't
-        # "bom" and has no dedicated candidate-selection action yet.
         obj = {}
         parent[key] = obj
         value_kind = fspec.get("value_kind", "num")
 
-        print(f"  '{location}' is empty -- add entries below (blank name to finish).")
+        fallback_text = f"'{location}' is empty -- add entries below (blank name to finish)."
+        print(f"  {_ask(config, location, fallback_text)}")
         while True:
             name = input(f"    Enter key name for '{location}' (blank to finish): ").strip()
             if name == "":
@@ -1285,8 +937,6 @@ def _fill_node(config: dict, parent: dict, key: str, fspec: dict, location: str,
         return obj
 
     else:
-        # Plain scalar leaf -- fall back to the same lookup used by
-        # repair_scalar_missing_field, for consistency.
         select_fn = SCALAR_SELECT_CANDIDATE_FNS.get(normalized)
         if select_fn is not None:
             candidates = select_fn(config, parent)
@@ -1304,27 +954,10 @@ def _fill_node(config: dict, parent: dict, key: str, fspec: dict, location: str,
         return value
 
 
-# ----------------------------------------------------------------------
-# Building brand-new array entries (Layer3 feasibility repairs)
-# ----------------------------------------------------------------------
-# Layer1/Layer2 repairs above all fix something INSIDE an existing entry.
-# Layer3 issues are different in kind: "raw material X has no supplier"
-# means no supplier ENTRY exists at all -- the fix is to create one.
-#
-# _build_new_entry reuses _fill_node for this: the schema (SECTION_SPECS)
-# already defines exactly what a new entry of any section needs, so
-# rather than writing a bespoke prompt sequence per Layer3 check, we
-# append an empty dict, pre-seed whatever fields the issue's own context
-# already tells us (e.g. supply_material_name is already known -- it's
-# the material that triggered the issue), and let the existing recursive
-# filler ask for everything else that's actually required.
-
 def _build_new_entry(config: dict, section_name: str, presets: dict, location_prefix: str) -> tuple:
     """
     Appends a new entry to config[section_name], pre-filling any fields
-    given in `presets` (already known from the triggering issue's
-    context), then asks for every other REQUIRED field via _fill_node.
-    Returns (new_entry, index).
+    given in `presets`, then asks for every other REQUIRED field.
     """
     new_entry = dict(presets)
     config.setdefault(section_name, []).append(new_entry)
@@ -1333,7 +966,7 @@ def _build_new_entry(config: dict, section_name: str, presets: dict, location_pr
     fields_spec = SECTION_SPECS[section_name]["fields"]
     for fname, child_fspec in fields_spec.items():
         if fname in new_entry:
-            continue  # already preset from context -- nothing to ask
+            continue
         required_now = is_required(child_fspec["required"], new_entry)
         should_ask = required_now or child_fspec.get("always_ask", False)
         if should_ask:
@@ -1344,32 +977,10 @@ def _build_new_entry(config: dict, section_name: str, presets: dict, location_pr
     return new_entry, idx
 
 
-# ----------------------------------------------------------------------
-# Cascading material deletion
-# ----------------------------------------------------------------------
-# Sometimes the right fix for a problematic material isn't to make it
-# work (create a supplier, add it to a recipe, retarget an edge) -- it's
-# to remove it from the config entirely, because it shouldn't have been
-# there in the first place. This cascades the deletion through every
-# place a material can be referenced, so it doesn't leave the config in
-# an even more broken state (a dangling bom key, an orphaned supplier, a
-# phantom edge) than before.
-
 def _delete_material_and_associations(config: dict, material_name: str) -> list:
     """
-    Removes material_name from everywhere it can appear:
-      - its own entry in raw_materials / intermediate_materials / products
-      - every bom that references it as an ingredient
-      - its inventory[] entry, if any
-      - every facility's inventory_managed / operation.input / operation.output
-      - any supplier whose supply_material_name IS this material (a supplier
-        only ever supplies one material, so the supplier itself is removed,
-        along with its nodes[0] registration)
-      - any edge referencing this material_name, or sourced from a supplier
-        just removed
-
-    Returns a list of human-readable strings describing what was removed,
-    for confirmation/logging.
+    Removes material_name from everywhere it can appear. Returns a list
+    of human-readable strings describing what was removed.
     """
     removed = []
 
@@ -1444,9 +1055,10 @@ def _delete_material_and_associations(config: dict, material_name: str) -> list:
 def _offer_delete_material_option(config: dict, material_name: str) -> bool:
     """
     Prompts for confirmation, then runs the cascading deletion if
-    confirmed. Returns True if deletion happened (caller should stop and
-    return immediately), False if declined (caller should proceed with
-    its own normal repair flow).
+    confirmed. This is a yes/no confirmation, not a "choose a fix"
+    question -- left as plain text rather than LLM-framed, since its
+    exact wording ("Type 'yes' to confirm") is also the literal string
+    the input is matched against.
     """
     confirm = input(
         f"  Type 'yes' to confirm deleting '{material_name}' and everything associated "
@@ -1463,23 +1075,8 @@ def _offer_delete_material_option(config: dict, material_name: str) -> bool:
 def repair_intermediate_material_not_producible(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer3 check 5: an intermediate material is never produced by any
-    facility's operation.output. Three options:
-      1) Add it to an existing manufacturing facility's operation.output
-         (and inventory_managed, to stay consistent).
-      2) Create a brand-new manufacturing facility for it.
-      3) Delete the intermediate material entirely.
-
-    For option 2, the new facility is built via the standard
-    schema-driven filler (asking for name, inventory_managed selection,
-    operation details, etc.) -- since the filler doesn't currently
-    support pre-seeding a list-select field while still letting the user
-    add MORE to it, this doesn't force-preselect the target material
-    during inventory_managed's selection (the user is reminded to pick
-    it). As a safety net, once the facility is built, this function
-    force-appends the material into inventory_managed and
-    operation.output if it isn't already there -- guaranteeing the fix
-    actually works regardless of what the user picked during the
-    interactive fill.
+    facility's operation.output. Three options: add to an existing
+    manufacturing facility, create a new one, or delete the material.
     """
     material_name = issue.context.get("referenced_name") if issue.context else None
     if not material_name:
@@ -1500,7 +1097,8 @@ def repair_intermediate_material_not_producible(config: dict, issue: ValidationI
         if isinstance(f, dict) and f.get("type") == "manufacturing" and isinstance(f.get("name"), str)
     ]
 
-    print(f"Intermediate material '{material_name}' is not produced by any facility. Choose a fix:")
+    fallback_text = f"Intermediate material '{material_name}' is not produced by any facility. Choose a fix:"
+    print(_ask(config, issue.location, fallback_text))
     print("    0) Delete this intermediate material entirely")
     for i, (facility_idx, name, current_output) in enumerate(manufacturing_facilities, start=1):
         output_hint = f" (currently makes: {', '.join(current_output)})" if current_output else " (no output yet)"
@@ -1547,21 +1145,7 @@ def repair_product_end_to_end_path(config: dict, issue: ValidationIssue) -> dict
     """
     Layer3 check 11: a product's producing facility is disconnected --
     either no supplier can reach it (upstream), or it can't reach any
-    ordering customer (downstream). Fires as TWO variants sharing
-    identical location/defect_type/context (only detail text differs),
-    same pattern as check 9 -- disambiguated here by re-checking live
-    graph reachability directly, not by parsing detail text.
-
-    Reuses check 9's exact _fix_facility_missing_inbound/
-    _fix_facility_missing_outbound helpers on the producing facility --
-    "connect this facility to a supplier/consumer" is the same mechanism
-    whether triggered by "zero edges at all" (check 9) or "edges exist
-    locally but don't trace back/forward to the full chain" (check 11).
-
-    SCOPE NOTE: if multiple facilities produce this product, only ONE
-    needs to end up connected for the check to pass (matches check 11's
-    own "at least one" logic) -- this operates on a single chosen
-    facility, not all of them.
+    ordering customer (downstream).
     """
     product_name = issue.context.get("referenced_name") if issue.context else None
     if not product_name:
@@ -1609,17 +1193,22 @@ def repair_product_end_to_end_path(config: dict, issue: ValidationIssue) -> dict
     errors = []
 
     if not upstream_ok:
-        print(f"Product '{product_name}': producing facility '{facility_name}' is not "
-              f"reachable from any supplier.")
+        print(_ask(config, issue.location,
+                    f"Product '{product_name}': producing facility '{facility_name}' is not reachable from any supplier."))
         try:
             _fix_facility_missing_inbound(config, facility)
             made_progress = True
         except ValueError as e:
             errors.append(str(e))
 
-    if not downstream_ok:
-        print(f"Product '{product_name}': producing facility '{facility_name}' cannot "
-              f"reach any customer ordering it.")
+    still_exists = any(
+        isinstance(f, dict) and f.get("name") == facility_name
+        for f in config.get("facility", []) or []
+    )
+
+    if not downstream_ok and still_exists:
+        print(_ask(config, issue.location,
+                    f"Product '{product_name}': producing facility '{facility_name}' cannot reach any customer ordering it."))
         try:
             _fix_facility_missing_outbound(config, facility)
             made_progress = True
@@ -1635,14 +1224,7 @@ def repair_product_end_to_end_path(config: dict, issue: ValidationIssue) -> dict
 def repair_product_not_producible(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer3 check 6: a product is never produced by any facility's
-    operation.output. Same three options as check 5's intermediate
-    material version: extend an existing manufacturing facility, create
-    a new one, or delete the product.
-
-    SAFETY NOTE: shares "products[idx]" + INCONSISTENT_CROSS_FIELD with
-    check 4 (product_has_customer) and check 11 (end_to_end_path, not
-    yet built). Re-checks the live "is this genuinely not producible"
-    condition before acting.
+    operation.output.
     """
     product_name = issue.context.get("referenced_name") if issue.context else None
     if not product_name:
@@ -1667,7 +1249,8 @@ def repair_product_not_producible(config: dict, issue: ValidationIssue) -> dict:
         if isinstance(f, dict) and f.get("type") == "manufacturing" and isinstance(f.get("name"), str)
     ]
 
-    print(f"Product '{product_name}' is not produced by any facility. Choose a fix:")
+    fallback_text = f"Product '{product_name}' is not produced by any facility. Choose a fix:"
+    print(_ask(config, issue.location, fallback_text))
     print("    0) Delete this product entirely")
     for i, (facility_idx, name, current_output) in enumerate(manufacturing_facilities, start=1):
         output_hint = f" (currently makes: {', '.join(current_output)})" if current_output else " (no output yet)"
@@ -1712,19 +1295,7 @@ def repair_product_not_producible(config: dict, issue: ValidationIssue) -> dict:
 
 def repair_product_missing_customer(config: dict, issue: ValidationIssue) -> dict:
     """
-    Layer3 check 4: a product has no customer ordering it. Creates a new
-    customer entry with `product` pre-seeded to the known product name --
-    everything else (arrival_time, demand, customer_lead_time,
-    shortage_policy, unit_selling_price, customer_payment_lead_time) is
-    asked via the standard schema-driven filler.
-
-    SAFETY NOTE: location shape ("products[idx]", INCONSISTENT_CROSS_FIELD)
-    is shared by THREE checks: check 4 (no customer, this one), check 6
-    (not producible by any facility), and check 11 (end-to-end path
-    disconnected) -- none of the latter two are built yet, but this guard
-    is here now so it stays collision-safe once they are. Re-verifies the
-    actual "does this product have zero customers right now" condition
-    before acting.
+    Layer3 check 4: a product has no customer ordering it.
     """
     product_name = issue.context.get("referenced_name") if issue.context else None
     if not product_name:
@@ -1741,7 +1312,7 @@ def repair_product_missing_customer(config: dict, issue: ValidationIssue) -> dic
             f"the same location shape. Not acting."
         )
 
-    print(f"Product '{product_name}' has no customer.")
+    print(_ask(config, issue.location, f"Product '{product_name}' has no customer."))
     choice = input("  Type 'delete' to remove this product entirely, or press Enter to "
                     "create a customer for it: ").strip().lower()
     if choice == "delete":
@@ -1756,34 +1327,18 @@ def repair_product_missing_customer(config: dict, issue: ValidationIssue) -> dic
 
 def repair_at_least_one_raw_material(config: dict, issue: ValidationIssue) -> dict:
     """
-    Layer3 check 2: raw_materials is empty (or absent). Creates one new
-    entry via the standard schema-driven filler -- raw_materials only
-    needs a name, so this is a single prompt.
-
-    NOTE: shares the exact location shape ("raw_materials", no index,
-    MISSING_REQUIRED_VALUE) with Layer1's own "section entirely absent"
-    check -- both fire when the key is missing outright, only check 2
-    additionally fires when the key exists as an empty list. dispatch_repair
-    routes bare "raw_materials"/"products" locations here directly, ahead
-    of the generic scalar/find_spec_node path (which isn't designed for
-    bare section-level creation and would raise).
+    Layer3 check 2: raw_materials is empty (or absent).
     """
-    print("No raw materials declared -- creating one.")
+    print(_ask(config, issue.location, "No raw materials declared -- creating one."))
     _build_new_entry(config, "raw_materials", {}, "raw_materials")
     return config
 
 
 def repair_at_least_one_product(config: dict, issue: ValidationIssue) -> dict:
     """
-    Layer3 check 3: products is empty (or absent). Creates one new entry
-    via the standard schema-driven filler -- this naturally triggers the
-    bom-selection flow too, since bom is required for products. If no
-    raw_materials/intermediate_materials exist yet to choose from, the
-    resulting bom will be left empty and Layer1's min_items=1 check will
-    catch that on the next verification pass (graceful partial progress,
-    not a crash) -- create raw materials first if this happens.
+    Layer3 check 3: products is empty (or absent).
     """
-    print("No products declared -- creating one.")
+    print(_ask(config, issue.location, "No products declared -- creating one."))
     _build_new_entry(config, "products", {}, "products")
     return config
 
@@ -1791,15 +1346,7 @@ def repair_at_least_one_product(config: dict, issue: ValidationIssue) -> dict:
 def repair_material_missing_inventory_entry(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer2 check 20: a declared material has no corresponding inventory[]
-    entry. Creates one, with 'name' and 'type' pre-seeded from the
-    issue's own context (both already known -- never asked, never picked
-    wrong) -- everything else (initial_inventory, and conditionally
-    procurement_scheme/procurement_arrival if type=="raw_material") is
-    asked via the standard schema-driven filler.
-
-    SAFETY NOTE: fires at "raw_materials[idx]" / "intermediate_materials[idx]"
-    / "products[idx]" -- shapes shared with several Layer3 checks. Verifies
-    the material genuinely still lacks an inventory entry before acting.
+    entry.
     """
     name = issue.context.get("referenced_name") if issue.context else None
     expected_type = issue.context.get("expected_type") if issue.context else None
@@ -1812,7 +1359,7 @@ def repair_material_missing_inventory_entry(config: dict, issue: ValidationIssue
             f"different check sharing the same location shape. Not acting."
         )
 
-    print(f"'{name}' has no inventory entry -- creating one.")
+    print(_ask(config, issue.location, f"'{name}' has no inventory entry -- creating one."))
     _build_new_entry(config, "inventory", {"name": name, "type": expected_type}, "inventory")
 
     return config
@@ -1820,20 +1367,7 @@ def repair_material_missing_inventory_entry(config: dict, issue: ValidationIssue
 
 def repair_raw_material_missing_supplier(config: dict, issue: ValidationIssue) -> dict:
     """
-    Layer3 check 1: a raw material has no supplier. The material name is
-    already known from the issue's own context -- pre-seed
-    supply_material_name with it (never ask, never let it be picked
-    wrong) and build the rest of a new supplier entry from the schema.
-
-    SAFETY NOTE: check_raw_material_has_supplier (check 1) and
-    check_raw_material_is_consumed (check 7) both emit the IDENTICAL
-    location shape ("raw_materials[idx]") and defect_type
-    (INCONSISTENT_CROSS_FIELD) -- the issue alone can't distinguish which
-    check produced it. Rather than trust dispatch routing blindly, this
-    re-checks the ACTUAL live condition (does this material really have
-    zero suppliers right now?) before acting -- if it already has one,
-    this issue must actually be from check 7, and raises rather than
-    creating a redundant/wrong supplier.
+    Layer3 check 1: a raw material has no supplier.
     """
     material_name = issue.context.get("referenced_name") if issue.context else None
     if not material_name:
@@ -1851,7 +1385,7 @@ def repair_raw_material_missing_supplier(config: dict, issue: ValidationIssue) -
             f"redundant supplier."
         )
 
-    print(f"Raw material '{material_name}' has no supplier.")
+    print(_ask(config, issue.location, f"Raw material '{material_name}' has no supplier."))
     print(f"  1) Create a new supplier for it")
     print(f"  2) Delete this material entirely instead")
     choice = input("  Enter number: ").strip()
@@ -1867,15 +1401,7 @@ def repair_raw_material_missing_supplier(config: dict, issue: ValidationIssue) -
 
 def repair_raw_material_not_consumed(config: dict, issue: ValidationIssue) -> dict:
     """
-    Layer3 check 7: a raw material is never consumed (not in any bom, not
-    in any facility's operation.input). Fix: add it as an ingredient to
-    an existing intermediate_material or product's bom, chosen by menu,
-    with a user-entered quantity.
-
-    SAFETY NOTE: shares the identical location shape ("raw_materials[idx]")
-    and defect_type with check 1 (raw_material_has_supplier) -- re-checks
-    the actual live "is it consumed anywhere" condition before acting,
-    rather than trusting which check produced the issue.
+    Layer3 check 7: a raw material is never consumed.
     """
     material_name = issue.context.get("referenced_name") if issue.context else None
     if not material_name:
@@ -1911,7 +1437,7 @@ def repair_raw_material_not_consumed(config: dict, issue: ValidationIssue) -> di
             "be an ingredient of."
         )
 
-    print(f"Raw material '{material_name}' is never consumed -- choose which recipe uses it:")
+    print(_ask(config, issue.location, f"Raw material '{material_name}' is never consumed -- choose which recipe uses it:"))
     print(f"    0) Delete this material entirely instead")
     for i, (section, idx, name) in enumerate(candidates, start=1):
         print(f"    {i}) {name} ({section})")
@@ -1920,7 +1446,7 @@ def repair_raw_material_not_consumed(config: dict, issue: ValidationIssue) -> di
         if choice == "0":
             if _offer_delete_material_option(config, material_name):
                 return config
-            continue  # cancelled -- redisplay the menu
+            continue
         if not choice.isdigit() or not (1 <= int(choice) <= len(candidates)):
             print(f"    '{choice}' is not a valid selection. Try again.")
             continue
@@ -1931,14 +1457,6 @@ def repair_raw_material_not_consumed(config: dict, issue: ValidationIssue) -> di
     config[section][idx].setdefault("bom", {})[material_name] = qty
     print(f"  Added '{material_name}' (qty {qty}) to {name}'s bom.")
 
-    # Keep the recipe consistent with the physical operation: find the
-    # facility that PRODUCES `name` (operation.output includes it) and
-    # make sure it also receives/manages the new ingredient. Without
-    # this, the bom says the ingredient is needed but no facility's
-    # operation.input reflects that -- exactly the gap that let a
-    # supplier's outbound edge get created to the WRONG facility in an
-    # earlier real run (nothing referenced the material yet, so the
-    # destination had to be guessed).
     producing_facility = None
     for f in config.get("facility", []) or []:
         if not isinstance(f, dict):
@@ -1967,19 +1485,10 @@ def repair_raw_material_not_consumed(config: dict, issue: ValidationIssue) -> di
 def repair_edge_phantom_delivery(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer2 check 19: an edge delivers a CATEGORY-VALID material to a
-    facility that doesn't manage or consume it at all. Distinct from
-    check 9 (material_name doesn't even belong to the right category) --
-    here the material is a legitimate raw/intermediate/product, it's just
-    not one this particular destination facility uses.
-
-    Offers two fixes:
-      1) Retarget the edge to a facility that already uses this material
-         (if one exists).
-      2) Keep the edge as-is, and sync the CURRENT destination facility's
-         inventory_managed/operation.input to include the material.
+    facility that doesn't manage or consume it at all.
     """
     steps = _parse_location_steps(issue.location)
-    parent, _ = _navigate_to_parent(config, steps)  # parent = the edges[idx] dict itself
+    parent, _ = _navigate_to_parent(config, steps)
     material_name = parent.get("material_name")
     current_destination = parent.get("destination")
 
@@ -1999,14 +1508,7 @@ def repair_edge_phantom_delivery(config: dict, issue: ValidationIssue) -> dict:
     if len(matching_facilities) == 1:
         current_facility_idx, current_facility = matching_facilities[0]
     else:
-        # Multiple facilities share this name (allowed when their outputs
-        # are disjoint) -- an edge's destination is just a bare name
-        # string with no array index attached, so which one this edge
-        # actually means is genuinely ambiguous from the edge alone.
-        # Material context doesn't resolve it here either, since the
-        # whole point of this repair is "the facility doesn't reference
-        # this material yet" -- so ask directly instead of guessing.
-        print(f"  Multiple facilities are named '{current_destination}'. Which one does this edge mean?")
+        print(_ask(config, issue.location, f"  Multiple facilities are named '{current_destination}'. Which one does this edge mean?"))
         for i, (idx, f) in enumerate(matching_facilities, start=1):
             current_output = (f.get("operation") or {}).get("output") or []
             hint = f"makes: {', '.join(current_output)}" if current_output else "no output yet"
@@ -2037,16 +1539,6 @@ def repair_edge_phantom_delivery(config: dict, issue: ValidationIssue) -> dict:
         if material_name not in f_managed and material_name not in f_inputs:
             continue
 
-        # Skip if retargeting here would create an exact duplicate edge
-        # (same source, same destination, same material already exists
-        # as a SEPARATE edge). This is the common, entirely legitimate
-        # case of a multi-destination topology -- e.g. one factory
-        # shipping the same product to several regional warehouses, each
-        # via its own edge. In that case the current edge's destination
-        # isn't wrong at all; retargeting would just silently duplicate
-        # an edge that already exists elsewhere, and the correct fix is
-        # always "sync" (this facility legitimately needs its own copy
-        # of this delivery, its data was just incomplete).
         already_has_this_edge = any(
             isinstance(e, dict) and e.get("source") == edge_source
             and e.get("destination") == name and e.get("material_name") == material_name
@@ -2057,7 +1549,8 @@ def repair_edge_phantom_delivery(config: dict, issue: ValidationIssue) -> dict:
 
         alt_facilities.append(name)
 
-    print(f"Edge delivers '{material_name}' to '{current_destination}', which doesn't use it. Choose a fix:")
+    fallback_text = f"Edge delivers '{material_name}' to '{current_destination}', which doesn't use it. Choose a fix:"
+    print(_ask(config, issue.location, fallback_text))
     print(f"    0) Delete this material entirely instead")
     options = [("retarget", name) for name in alt_facilities]
     options.append(("sync", current_destination))
@@ -2075,7 +1568,7 @@ def repair_edge_phantom_delivery(config: dict, issue: ValidationIssue) -> dict:
         if choice == "0":
             if _offer_delete_material_option(config, material_name):
                 return config
-            continue  # cancelled -- redisplay the menu
+            continue
         if not choice.isdigit() or not (1 <= int(choice) <= len(options)):
             print(f"    '{choice}' is not a valid selection. Try again.")
             continue
@@ -2099,8 +1592,8 @@ SECTION_TO_MATERIAL_TYPE = {v: k for k, v in INVENTORY_TYPE_TO_SECTION.items()}
 
 
 def _material_type_for(config: dict, material_name: str):
-    """Reverse lookup: given a material name, which category (raw_material/
-    intermediate_material/product) does it belong to? None if not found."""
+    """Reverse lookup: given a material name, which category does it
+    belong to? None if not found."""
     for section, mtype in SECTION_TO_MATERIAL_TYPE.items():
         if material_name in _collect_names(config, section):
             return mtype
@@ -2110,15 +1603,6 @@ def _material_type_for(config: dict, material_name: str):
 def _create_edge(config: dict, source: str, destination: str, material_name: str, material_type: str, location_hint: str):
     """
     Shared helper: appends a new edge and fills its transfer_time.
-
-    HARD RULE: any edge whose destination is a customer always gets
-    transfer_time forced to constant/a=0, never asked interactively --
-    delivery lead time to a customer is already modeled by that
-    customer's own customer_lead_time field; giving the edge a real
-    transfer_time on top of that would double-count the delay. This is
-    enforced here (not per call site) so every repair action that might
-    create a customer-destined edge (check 9's outbound fix, check 10's
-    direct-warehouse path) gets it automatically, with nothing to remember.
     """
     new_edge = {
         "source": source,
@@ -2145,10 +1629,7 @@ def _create_edge(config: dict, source: str, destination: str, material_name: str
 def _fix_facility_missing_inbound(config: dict, facility: dict):
     """
     Finds candidate (source, material) pairs that could feed this
-    facility: materials in its own inventory_managed that it does NOT
-    produce itself (operation.output) -- things it needs to RECEIVE --
-    matched against suppliers that supply them or other facilities that
-    produce them.
+    facility.
     """
     facility_name = facility.get("name")
     managed = facility.get("inventory_managed") or []
@@ -2163,32 +1644,90 @@ def _fix_facility_missing_inbound(config: dict, facility: dict):
         )
 
     options = []
+    is_warehouse = facility.get("type") == "warehouse"
     for m in receivable:
-        for s in config.get("supplier", []) or []:
-            if isinstance(s, dict) and s.get("supply_material_name") == m and isinstance(s.get("name"), str):
-                options.append((s["name"], m))
+        if not is_warehouse:
+            for s in config.get("supplier", []) or []:
+                if isinstance(s, dict) and s.get("supply_material_name") == m and isinstance(s.get("name"), str):
+                    options.append((s["name"], m))
         for f in config.get("facility", []) or []:
             if isinstance(f, dict) and f.get("name") != facility_name:
                 op = f.get("operation") or {}
                 if m in (op.get("output") or []) and isinstance(f.get("name"), str):
                     options.append((f["name"], m))
 
-    if not options:
-        raise ValueError(
-            f"No supplier or facility currently produces any of {receivable} for "
-            f"'{facility_name}' to receive -- create a producer for one of these "
-            f"materials first."
-        )
+    def _pick_receivable_material(prompt: str) -> str:
+        if len(receivable) == 1:
+            return receivable[0]
+        print(f"  {prompt}")
+        for i, m in enumerate(receivable, start=1):
+            print(f"    {i}) {m}")
+        while True:
+            choice = input("  Enter number: ").strip()
+            if choice.isdigit() and 1 <= int(choice) <= len(receivable):
+                return receivable[int(choice) - 1]
+            print(f"    '{choice}' is not a valid selection. Try again.")
 
-    print(f"'{facility_name}' has no inbound edge. Choose a source:")
+    def _create_new_source_flow():
+        material = _pick_receivable_material("Which material should the new source provide?")
+        material_type = _material_type_for(config, material)
+        receiving_facility_type = facility.get("type")
+
+        if receiving_facility_type != "warehouse" and material_type == "raw_material":
+            _build_new_entry(config, "supplier", {"supply_material_name": material}, "supplier")
+            new_source_name = config["supplier"][-1]["name"]
+        else:
+            if receiving_facility_type == "warehouse":
+                print(f"  '{facility_name}' is a warehouse -- it can only receive from a "
+                      f"manufacturing facility, never directly from a supplier. Creating a "
+                      f"new producing facility for '{material}'.")
+            else:
+                print(f"  '{material}' is a {material_type or 'material'}, not a raw material -- "
+                      f"creating a new producing facility for it instead of a supplier.")
+            _build_new_entry(config, "facility", {"type": "manufacturing"}, "facility")
+            new_facility = config["facility"][-1]
+            new_source_name = new_facility["name"]
+            new_facility.setdefault("inventory_managed", [])
+            if material not in new_facility["inventory_managed"]:
+                new_facility["inventory_managed"].append(material)
+            op = new_facility.get("operation")
+            if not isinstance(op, dict):
+                op = {}
+                new_facility["operation"] = op
+            op.setdefault("output", [])
+            if material not in op["output"]:
+                op["output"].append(material)
+
+        _create_edge(config, new_source_name, facility_name, material,
+                     material_type, "edges")
+
+    def _delete_this_facility_flow():
+        removed = _delete_facility_and_associations(config, facility_name)
+        print(f"  Deleted '{facility_name}': {', '.join(removed) if removed else 'nothing found to remove'}.")
+
+    fallback_text = f"'{facility_name}' has no inbound edge. Choose a source:"
+    print(_ask(config, f"facility.{facility_name}.inbound", fallback_text))
     for i, (src, mat) in enumerate(options, start=1):
         print(f"    {i}) {src} -> {facility_name}  (material: {mat})")
+    create_new_num = len(options) + 1
+    delete_facility_num = len(options) + 2
+    print(f"    {create_new_num}) Create a new source")
+    print(f"    {delete_facility_num}) Delete '{facility_name}' entirely instead")
     while True:
         choice = input("  Enter number: ").strip()
-        if not choice.isdigit() or not (1 <= int(choice) <= len(options)):
+        if not choice.isdigit():
             print(f"    '{choice}' is not a valid selection. Try again.")
             continue
-        break
+        choice_num = int(choice)
+        if 1 <= choice_num <= len(options):
+            break
+        if choice_num == create_new_num:
+            _create_new_source_flow()
+            return
+        if choice_num == delete_facility_num:
+            _delete_this_facility_flow()
+            return
+        print(f"    '{choice}' is not a valid selection. Try again.")
 
     source, material = options[int(choice) - 1]
     material_type = _material_type_for(config, material)
@@ -2198,10 +1737,7 @@ def _fix_facility_missing_inbound(config: dict, facility: dict):
 def _fix_facility_missing_outbound(config: dict, facility: dict):
     """
     Finds candidate (destination, material) pairs for this facility's
-    outbound edge: materials it produces (operation.output) or, if it has
-    no operation (e.g. a warehouse), everything it manages -- matched
-    against other facilities that consume/manage them, or customers that
-    order them (if the material is a finished product).
+    outbound edge.
     """
     facility_name = facility.get("name")
     own_output = set((facility.get("operation") or {}).get("output") or [])
@@ -2225,21 +1761,71 @@ def _fix_facility_missing_outbound(config: dict, facility: dict):
             if isinstance(c, dict) and c.get("product") == m and isinstance(c.get("name"), str):
                 options.append((c["name"], m))
 
-    if not options:
-        raise ValueError(
-            f"No facility or customer currently uses/orders any of {sendable} from "
-            f"'{facility_name}' -- make sure a downstream consumer exists first."
-        )
+    def _pick_sendable_material(prompt: str) -> str:
+        if len(sendable) == 1:
+            return sendable[0]
+        print(f"  {prompt}")
+        for i, m in enumerate(sendable, start=1):
+            print(f"    {i}) {m}")
+        while True:
+            choice = input("  Enter number: ").strip()
+            if choice.isdigit() and 1 <= int(choice) <= len(sendable):
+                return sendable[int(choice) - 1]
+            print(f"    '{choice}' is not a valid selection. Try again.")
 
-    print(f"'{facility_name}' has no outbound edge. Choose a destination:")
+    def _create_new_destination_flow():
+        material = _pick_sendable_material("Which material should the new destination take?")
+        material_type = _material_type_for(config, material)
+
+        if material_type == "product":
+            _build_new_entry(config, "customer", {"product": material}, "customer")
+            new_dest_name = config["customer"][-1]["name"]
+        else:
+            print(f"  '{material}' is a {material_type or 'material'}, not a finished product -- "
+                  f"creating a new consuming facility for it instead of a customer.")
+            _build_new_entry(config, "facility", {"type": "manufacturing"}, "facility")
+            new_facility = config["facility"][-1]
+            new_dest_name = new_facility["name"]
+            new_facility.setdefault("inventory_managed", [])
+            if material not in new_facility["inventory_managed"]:
+                new_facility["inventory_managed"].append(material)
+            op = new_facility.get("operation")
+            if not isinstance(op, dict):
+                op = {}
+                new_facility["operation"] = op
+            op.setdefault("input", [])
+            if material not in op["input"]:
+                op["input"].append(material)
+
+        _create_edge(config, facility_name, new_dest_name, material, material_type, "edges")
+
+    def _delete_this_facility_flow():
+        removed = _delete_facility_and_associations(config, facility_name)
+        print(f"  Deleted '{facility_name}': {', '.join(removed) if removed else 'nothing found to remove'}.")
+
+    fallback_text = f"'{facility_name}' has no outbound edge. Choose a destination:"
+    print(_ask(config, f"facility.{facility_name}.outbound", fallback_text))
     for i, (dst, mat) in enumerate(options, start=1):
         print(f"    {i}) {facility_name} -> {dst}  (material: {mat})")
+    create_new_num = len(options) + 1
+    delete_facility_num = len(options) + 2
+    print(f"    {create_new_num}) Create a new destination")
+    print(f"    {delete_facility_num}) Delete '{facility_name}' entirely instead")
     while True:
         choice = input("  Enter number: ").strip()
-        if not choice.isdigit() or not (1 <= int(choice) <= len(options)):
+        if not choice.isdigit():
             print(f"    '{choice}' is not a valid selection. Try again.")
             continue
-        break
+        choice_num = int(choice)
+        if 1 <= choice_num <= len(options):
+            break
+        if choice_num == create_new_num:
+            _create_new_destination_flow()
+            return
+        if choice_num == delete_facility_num:
+            _delete_this_facility_flow()
+            return
+        print(f"    '{choice}' is not a valid selection. Try again.")
 
     destination, material = options[int(choice) - 1]
     material_type = _material_type_for(config, material)
@@ -2248,22 +1834,7 @@ def _fix_facility_missing_outbound(config: dict, facility: dict):
 
 def repair_customer_missing_inbound_edge(config: dict, issue: ValidationIssue) -> dict:
     """
-    Layer3 check 10: a customer has no inbound edge. Two kinds of source,
-    per instruction:
-      1) An existing warehouse-type facility that already manages the
-         ordered product -- a direct edge is created, asking for
-         transfer_time normally (a genuine one-hop delivery).
-      2) A manufacturing facility that produces the product directly --
-         since manufacturing facilities don't ship straight to customers
-         in this model, a new HYPOTHETICAL warehouse is created between
-         them: manufacturing -> new warehouse -> customer, with ZERO
-         transfer_time on both new edges (an idealized instant pass-through,
-         not a real logistics delay).
-
-    The new warehouse (if created) is NOT manually registered in
-    nodes[0].facility here -- consistent with how new suppliers/facilities
-    are handled elsewhere, that's left to the existing self-healing
-    nodes-registration-gap check/repair on the orchestrator's next pass.
+    Layer3 check 10: a customer has no inbound edge.
     """
     customer_name = issue.context.get("referenced_name") if issue.context else None
     entry_index = issue.context.get("entry_index") if issue.context else None
@@ -2304,7 +1875,8 @@ def repair_customer_missing_inbound_edge(config: dict, issue: ValidationIssue) -
             f"'{product_name}' -- cannot determine a delivery source yet."
         )
 
-    print(f"Customer '{customer_name}' (orders '{product_name}') has no inbound edge. Choose a delivery source:")
+    fallback_text = f"Customer '{customer_name}' (orders '{product_name}') has no inbound edge. Choose a delivery source:"
+    print(_ask(config, issue.location, fallback_text))
     options = [("warehouse", name) for name in warehouse_options] + [("manufacturing", name) for name in manufacturing_options]
     for i, (kind, name) in enumerate(options, start=1):
         label = "Warehouse" if kind == "warehouse" else "Manufacturing facility (via new hypothetical warehouse)"
@@ -2352,9 +1924,7 @@ def repair_customer_missing_inbound_edge(config: dict, issue: ValidationIssue) -
 
 def _delete_facility_and_associations(config: dict, facility_name: str) -> list:
     """
-    Removes a facility entirely: the facility entry itself, its nodes[0]
-    registration, and every edge touching it (as source or destination).
-    Same cascading philosophy as _delete_material_and_associations.
+    Removes a facility entirely.
     """
     removed = []
 
@@ -2384,9 +1954,8 @@ def _delete_facility_and_associations(config: dict, facility_name: str) -> list:
 
 
 def _prompt_unique_name(location: str, existing_names: set) -> str:
-    """Shared helper: prompts for a name (blank/numeric rejected via the
-    'name' kind) that isn't already in existing_names, re-prompting until
-    a genuinely new name is given."""
+    """Shared helper: prompts for a name that isn't already in
+    existing_names, re-prompting until a genuinely new name is given."""
     while True:
         candidate = _prompt_for_value(location, "name")
         if candidate in existing_names:
@@ -2398,17 +1967,7 @@ def _prompt_unique_name(location: str, existing_names: set) -> str:
 def repair_material_category_collision(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer2 check 13: the same name is declared in two different material
-    category lists (e.g. both raw_materials AND products). Offers a
-    choice of which entry to rename.
-
-    Only renames the entity's own 'name' field in its own list -- does
-    NOT cascade-update every place that might reference the old name
-    (bom keys, edges, customer.product, etc.), since some references are
-    genuinely ambiguous (a bom key doesn't carry category info, so we
-    can't always tell which of the two same-named entries it meant).
-    Anything left pointing at the old name will surface as an ordinary
-    DANGLING_REFERENCE on the next verification pass, which already has
-    well-tested repair actions.
+    category lists.
     """
     name = issue.context.get("referenced_name") if issue.context else None
     sections = issue.context.get("sections") if issue.context else None
@@ -2419,7 +1978,8 @@ def repair_material_category_collision(config: dict, issue: ValidationIssue) -> 
     if name not in names_by_section[sections[0]] or name not in names_by_section[sections[1]]:
         raise ValueError(f"'{name}' no longer collides between {sections} -- issue may be stale.")
 
-    print(f"'{name}' is declared in both {sections[0]} and {sections[1]}. Choose which to rename:")
+    fallback_text = f"'{name}' is declared in both {sections[0]} and {sections[1]}. Choose which to rename:"
+    print(_ask(config, issue.location, fallback_text))
     print(f"    1) Rename the {sections[0]} entry")
     print(f"    2) Rename the {sections[1]} entry")
     while True:
@@ -2451,12 +2011,7 @@ def repair_material_category_collision(config: dict, issue: ValidationIssue) -> 
 def repair_duplicate_name_within_section(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer2 check 15: the same name appears more than once within a
-    single section (e.g. two suppliers both named the same thing).
-    Keeps the first occurrence as-is, renames every subsequent duplicate
-    to a new, unique name (one at a time, re-prompting on collision).
-
-    Same non-cascading caveat as repair_material_category_collision --
-    only the entries' own 'name' fields are changed here.
+    single section.
     """
     name = issue.context.get("referenced_name") if issue.context else None
     section = issue.context.get("section") if issue.context else None
@@ -2468,8 +2023,9 @@ def repair_duplicate_name_within_section(config: dict, issue: ValidationIssue) -
     if len(current_indices) < 2:
         raise ValueError(f"'{name}' is no longer duplicated in {section} -- issue may be stale.")
 
-    print(f"'{name}' appears {len(current_indices)} times in {section} "
-          f"(indices {current_indices}). Keeping index {current_indices[0]} as-is; renaming the rest:")
+    fallback_text = (f"'{name}' appears {len(current_indices)} times in {section} "
+                      f"(indices {current_indices}). Keeping index {current_indices[0]} as-is; renaming the rest:")
+    print(_ask(config, issue.location, fallback_text))
 
     existing_names = set(e.get("name") for e in entries if isinstance(e, dict) and isinstance(e.get("name"), str))
 
@@ -2488,9 +2044,7 @@ def repair_duplicate_name_within_section(config: dict, issue: ValidationIssue) -
 def repair_duplicate_edges(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer2 check 16: the same (source, destination, material_name) triple
-    appears more than once in edges[]. Keeps the first occurrence,
-    deletes the rest (highest index first, to avoid index-shift bugs
-    during deletion).
+    appears more than once in edges[].
     """
     source = issue.context.get("source") if issue.context else None
     destination = issue.context.get("destination") if issue.context else None
@@ -2509,9 +2063,9 @@ def repair_duplicate_edges(config: dict, issue: ValidationIssue) -> dict:
             f"Edge ({source} -> {destination}, {material_name}) is no longer duplicated -- issue may be stale."
         )
 
-    print(f"Edge ({source} -> {destination}, material '{material_name}') appears "
-          f"{len(current_indices)} times. Keeping the first (index {current_indices[0]}), "
-          f"removing the rest.")
+    fallback_text = (f"Edge ({source} -> {destination}, material '{material_name}') appears "
+                      f"{len(current_indices)} times. Keeping the first (index {current_indices[0]}), removing the rest.")
+    print(_ask(config, issue.location, fallback_text))
     for idx in sorted(current_indices[1:], reverse=True):
         del edges[idx]
         print(f"    Removed duplicate at edges[{idx}].")
@@ -2522,10 +2076,9 @@ def repair_duplicate_edges(config: dict, issue: ValidationIssue) -> dict:
 def repair_self_loop_edge(config: dict, issue: ValidationIssue) -> dict:
     """
     Deletes an edge whose source and destination are the same node --
-    structurally meaningless in this domain, so there's no ambiguity to
-    resolve and nothing to ask the person about. Fully automatic, no
-    prompting, matching how transfer_time defaults are handled
-    elsewhere in this system: informs, doesn't ask.
+    structurally meaningless, no ambiguity to resolve, so this stays
+    fully automatic (no prompt, informational print only, same as
+    before).
     """
     match = re.match(r"^edges\[(\d+)\]$", issue.location)
     if not match:
@@ -2554,7 +2107,7 @@ def repair_self_loop_edge(config: dict, issue: ValidationIssue) -> dict:
 def repair_supplier_facility_name_collision(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer2 check 17: the same name is used as both a supplier and a
-    facility. Offers a choice of which side to rename.
+    facility.
     """
     name = issue.context.get("referenced_name") if issue.context else None
     if not name:
@@ -2565,7 +2118,8 @@ def repair_supplier_facility_name_collision(config: dict, issue: ValidationIssue
     if name not in supplier_names or name not in facility_names:
         raise ValueError(f"'{name}' no longer collides between supplier and facility -- issue may be stale.")
 
-    print(f"'{name}' is used as both a supplier name and a facility name. Choose which to rename:")
+    fallback_text = f"'{name}' is used as both a supplier name and a facility name. Choose which to rename:"
+    print(_ask(config, issue.location, fallback_text))
     print("    1) Rename the supplier")
     print("    2) Rename the facility")
     while True:
@@ -2595,17 +2149,7 @@ def repair_supplier_facility_name_collision(config: dict, issue: ValidationIssue
 def repair_facility_material_stage_span(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer3 check 13: a manufacturing facility's inventory_managed spans
-    only one material stage (e.g. two raw materials, nothing else) --
-    nothing at a later stage for it to actually produce. Three options:
-      1) Change its type to 'warehouse' (it doesn't convert anything;
-         removes the stage-span requirement entirely, since that only
-         applies to type=="manufacturing"). Also strips the now-stale
-         'operation' field, since a warehouse doesn't have one.
-      2) Add an existing material from a different stage to
-         inventory_managed, then attempt to re-derive operation.input/
-         output from the updated set (same stage-based auto-derivation
-         used when a facility is first built).
-      3) Delete the facility entirely.
+    only one material stage.
     """
     entry_index = issue.context.get("entry_index") if issue.context else None
     if entry_index is None:
@@ -2628,7 +2172,8 @@ def repair_facility_material_stage_span(config: dict, issue: ValidationIssue) ->
     if len(stages_present) >= 2:
         raise ValueError(f"'{facility_name}' already spans multiple stages -- issue may be stale.")
 
-    print(f"Manufacturing facility '{facility_name}' only manages material at one stage. Choose a fix:")
+    fallback_text = f"Manufacturing facility '{facility_name}' only manages material at one stage. Choose a fix:"
+    print(_ask(config, issue.location, fallback_text))
     print("    0) Delete this facility entirely")
     print("    1) Change its type to 'warehouse' (it doesn't convert anything)")
     print("    2) Add an existing material from a different stage to its inventory_managed")
@@ -2702,9 +2247,7 @@ def repair_horizon_sanity(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer3 check 12 (WARNING only, never blocks): simulation.horizon is
     shorter than a rough estimate of one full supplier-to-customer cycle.
-    Bumps horizon to comfortably exceed that estimate (1.5x margin, since
-    the estimate itself is a rough heuristic, not a guaranteed bound --
-    see check_horizon_sanity's own docstring).
+    Fully automatic (no ambiguity to resolve), informational print only.
     """
     estimated = issue.context.get("estimated_cycle_time") if issue.context else None
     current = issue.context.get("horizon") if issue.context else None
@@ -2722,11 +2265,6 @@ def repair_horizon_sanity(config: dict, issue: ValidationIssue) -> dict:
 def repair_facility_missing_edge(config: dict, issue: ValidationIssue) -> dict:
     """
     Layer3 check 9: a facility has no inbound and/or no outbound edge.
-    Fires as TWO separate issues per facility with IDENTICAL location/
-    defect_type/context (only detail text differs: "no inbound" vs "no
-    outbound") -- rather than parse that text, this checks live edge
-    state directly and fixes whichever direction(s) are actually missing
-    in one call (so if both were missing, one repair pass handles both).
     """
     facility_name = issue.context.get("referenced_name") if issue.context else None
     if not facility_name:
@@ -2759,7 +2297,12 @@ def repair_facility_missing_edge(config: dict, issue: ValidationIssue) -> dict:
         except ValueError as e:
             errors.append(str(e))
 
-    if not has_outbound:
+    still_exists = any(
+        isinstance(f, dict) and f.get("name") == facility_name
+        for f in config.get("facility", []) or []
+    )
+
+    if not has_outbound and still_exists:
         try:
             _fix_facility_missing_outbound(config, facility)
             made_progress = True
@@ -2767,9 +2310,6 @@ def repair_facility_missing_edge(config: dict, issue: ValidationIssue) -> dict:
             errors.append(str(e))
 
     if not made_progress:
-        # Neither direction could be fixed -- propagate failure so the
-        # orchestrator correctly marks this as unrepairable and moves on,
-        # instead of retrying the identical issue forever.
         raise ValueError("; ".join(errors))
 
     return config
@@ -2777,29 +2317,7 @@ def repair_facility_missing_edge(config: dict, issue: ValidationIssue) -> dict:
 
 def repair_supplier_missing_outbound_edge(config: dict, issue: ValidationIssue) -> dict:
     """
-    Layer3 check 8: a supplier has no outbound edge. Fix: create a new
-    edge from this supplier to a facility. material_name and
-    material_type are pre-seeded -- a supplier only ever supplies ONE
-    material (its own supply_material_name, always a raw_material).
-
-    Destination selection is narrowed to facilities that ACTUALLY
-    reference this material (via inventory_managed or operation.input) --
-    NOT a blind menu of every facility. Delivering material to a facility
-    that doesn't manage or consume it is physically meaningless (this was
-    a real bug: an earlier version let the user pick any facility, which
-    produced an edge to a facility that neither managed, consumed, nor
-    produced the material at all).
-
-    If exactly one facility references it: auto-selected, no prompt.
-    If multiple: menu narrowed to just those.
-    If none yet: falls back to the full facility list, but prints an
-    explicit warning that the material isn't used anywhere yet -- the
-    person should make sure some facility's operation.input/
-    inventory_managed is updated to actually consume it (adding it to a
-    bom via check_raw_material_is_consumed's repair does NOT by itself
-    update any facility's operation.input/inventory_managed -- that
-    alignment isn't currently auto-repaired and should be checked
-    separately).
+    Layer3 check 8: a supplier has no outbound edge.
     """
     supplier_name = issue.context.get("referenced_name") if issue.context else None
     if not supplier_name:
@@ -2820,7 +2338,7 @@ def repair_supplier_missing_outbound_edge(config: dict, issue: ValidationIssue) 
         raise ValueError(f"Could not find a supplier entry named '{supplier_name}'.")
     material_name = supplier_entry.get("supply_material_name")
 
-    print(f"Supplier '{supplier_name}' has no outbound edge.")
+    print(_ask(config, issue.location, f"Supplier '{supplier_name}' has no outbound edge."))
     choice = input("  Type 'delete' to remove this material (and this supplier) entirely, "
                     "or press Enter to create an edge: ").strip().lower()
     if choice == "delete":
@@ -2864,7 +2382,7 @@ def repair_supplier_missing_outbound_edge(config: dict, issue: ValidationIssue) 
     new_edge = {
         "source": supplier_name,
         "destination": destination,
-        "material_type": "raw_material",  # a supplier only ever supplies a raw material
+        "material_type": "raw_material",
         "material_name": material_name,
     }
     config.setdefault("edges", []).append(new_edge)
@@ -2880,20 +2398,8 @@ def repair_supplier_missing_outbound_edge(config: dict, issue: ValidationIssue) 
 def repair_missing_node(config: dict, issue: ValidationIssue) -> dict:
     """
     Repairs a MISSING_REQUIRED_VALUE issue whose location points at a
-    CONTAINER (a distribution object, bom-style dict, a list-select field
-    like inventory_managed/operation.input/output, or a fixed-name nested
-    object like batching/operation/procurement_scheme) rather than a
-    plain scalar. Reconstructs the entire missing subtree via _fill_node,
-    which checks candidate-derived special cases (bom, list-select) at
-    EVERY level of recursion -- not just for the field named directly by
-    this issue, but also for any nested field encountered while filling
-    a larger missing container (e.g. filling a fully-missing "operation"
-    object still correctly turns its "input" child into a material
-    selection menu, not a generic string prompt).
-
-    For a plain scalar field, this still works (falls through to the
-    same scalar-prompt logic) -- but repair_scalar_missing_field remains
-    the more direct action for that case.
+    CONTAINER rather than a plain scalar. Reconstructs the entire
+    missing subtree via _fill_node.
     """
     if issue.defect_type != DefectType.MISSING_REQUIRED_VALUE:
         raise ValueError(
@@ -2909,14 +2415,10 @@ def repair_missing_node(config: dict, issue: ValidationIssue) -> dict:
     steps = _parse_location_steps(issue.location)
     parent, last_key = _navigate_to_parent(config, steps)
 
-    # The owning top-level list entry for this issue's section (e.g.
-    # config["facility"][0]) -- section names are always followed by an
-    # integer index in every location this schema produces.
     section_entry = None
     if len(steps) >= 2 and isinstance(steps[0], str) and isinstance(steps[1], int):
         section_entry = config.get(steps[0], [None])[steps[1]] if steps[1] < len(config.get(steps[0], [])) else None
 
-    print(f"Field '{issue.location}' is missing -- reconstructing it.")
     _fill_node(config, parent, last_key, fspec, issue.location, normalized, section_entry)
 
     return config
@@ -2924,20 +2426,7 @@ def repair_missing_node(config: dict, issue: ValidationIssue) -> dict:
 
 def repair_procurement_scheme_field(config: dict, issue: ValidationIssue) -> dict:
     """
-    Handles ANY issue whose location involves procurement_scheme -- the
-    object itself missing, or any of its sub-fields (type, distribution,
-    parameters, parameters.a/b). Since procurement_scheme's valid shape
-    genuinely depends on its own "type" value (three different shapes --
-    periodic_supply needs a real distribution; demand_driven needs
-    nothing else; inventory_threshold needs exactly two fixed values s/S,
-    no distribution at all), it's treated as ONE atomic editable unit
-    here rather than patching individual sub-fields in isolation.
-    Whatever specific sub-issue triggered this call, the whole object
-    gets resolved to a consistent, complete state in one pass: type
-    first (only asked if not already validly set), then whatever the
-    resulting type requires (only asking for pieces that are actually
-    still missing or placeholder -- doesn't re-ask for anything already
-    correctly filled).
+    Handles ANY issue whose location involves procurement_scheme.
     """
     match = re.search(r"^(.*?procurement_scheme)(\..*)?$", issue.location)
     if not match:
@@ -2955,52 +2444,50 @@ def repair_procurement_scheme_field(config: dict, issue: ValidationIssue) -> dic
         type_val = current_type
     else:
         type_val = _prompt_for_value(f"{ps_location}.type", "str", enum_values=PROCUREMENT_SCHEME_TYPES, config=config)
-        obj["type"] = type_val
+
+    new_obj = {"type": type_val}
 
     if type_val == "periodic_supply":
-        dist_value = obj.get("distribution")
-        if dist_value not in DISTRIBUTION_PARAM_COUNTS:
-            dist_value, params = _prompt_for_distribution(ps_location, config=config, allow_instant=False)
-            obj["distribution"] = dist_value
-            obj["parameters"] = params
-        else:
+        old_dist = obj.get("distribution")
+        old_params = obj.get("parameters") if isinstance(obj.get("parameters"), dict) else {}
+        if old_dist in DISTRIBUTION_PARAM_COUNTS:
+            dist_value = old_dist
             param_count = DISTRIBUTION_PARAM_COUNTS.get(dist_value, 1)
-            params = obj.get("parameters")
-            if not isinstance(params, dict):
-                params = {}
-            obj["parameters"] = params
+            params = {}
             for i, pkey in enumerate(PARAM_KEYS):
-                if i < param_count and (pkey not in params or params.get(pkey) == "missing"):
-                    params[pkey] = _prompt_for_value(f"{ps_location}.parameters.{pkey}", "num", config=config)
+                if i < param_count:
+                    val = old_params.get(pkey)
+                    if val is None or val == "missing":
+                        val = _prompt_for_value(f"{ps_location}.parameters.{pkey}", "num", config=config)
+                    params[pkey] = val
+        else:
+            dist_value, params = _prompt_for_distribution(ps_location, config=config, allow_instant=False)
+        new_obj["distribution"] = dist_value
+        new_obj["parameters"] = params
 
     elif type_val == "demand_driven":
-        pass  # nothing else needed -- distribution/parameters are irrelevant for this type
+        pass
 
     elif type_val == "inventory_threshold":
-        params = obj.get("parameters")
-        if not isinstance(params, dict):
-            params = {}
-        obj["parameters"] = params
-        if "a" not in params or params.get("a") == "missing":
-            params["a"] = _prompt_for_value(f"{ps_location}.parameters.a", "num", config=config)
-        if "b" not in params or params.get("b") == "missing":
-            params["b"] = _prompt_for_value(f"{ps_location}.parameters.b", "num", config=config)
+        old_params = obj.get("parameters") if isinstance(obj.get("parameters"), dict) else {}
+        params = {}
+        for pkey in ("a", "b"):
+            val = old_params.get(pkey)
+            if val is None or val == "missing":
+                val = _prompt_for_value(f"{ps_location}.parameters.{pkey}", "num", config=config)
+            params[pkey] = val
+        new_obj["parameters"] = params
 
+    owning_entry[key] = new_obj
     return config
 
 
 def repair_transfer_time_default_instant(config: dict, issue: ValidationIssue) -> dict:
     """
     Per explicit instruction: edges[].transfer_time is ALWAYS defaulted
-    to instant (constant, a=0) automatically -- no prompt at all, in
-    either direction (missing entirely, or missing just its distribution/
-    parameters). Delivery/transfer between nodes is assumed
-    instantaneous by default; the person is only informed this happened,
-    not asked anything.
-
-    There is no what-if feature in this codebase yet to override this
-    per-edge -- the printed notice references it as a future capability,
-    not something implemented here.
+    to instant automatically -- no prompt at all, informs only. Notice
+    is a plain sentence naming source/destination, not a technical
+    breadcrumb path.
     """
     match = re.search(r"^(edges\[\d+\]\.transfer_time)(\..*)?$", issue.location)
     if not match:
@@ -3010,27 +2497,19 @@ def repair_transfer_time_default_instant(config: dict, issue: ValidationIssue) -
     owning_edge, key = _navigate_to_parent(config, tt_steps)
     owning_edge[key] = {"distribution": "constant", "parameters": {"a": 0}}
 
-    try:
-        label = describe_location(config, tt_location)
-    except Exception:
-        label = tt_location
+    src = owning_edge.get("source", "?")
+    dst = owning_edge.get("destination", "?")
 
-    print(f"  {label} -> defaulted to instant (constant, 0). Transfer times are "
-          f"assumed instantaneous by default; use the what-if feature later if "
-          f"you need to model an actual delay for this edge.")
+    print(f"  Assuming the delivery from '{src}' to '{dst}' is instant, since no "
+          f"transfer time was given. (Use the what-if feature later if you need "
+          f"to model an actual delay for this edge.)")
 
     return config
 
 
 def repair_scalar_missing_field(config: dict, issue: ValidationIssue) -> dict:
     """
-    Repairs a MISSING_REQUIRED_VALUE issue on a plain scalar field
-    (str/num/bool -- NOT dict-shaped or list-shaped fields, those are
-    separate planned actions).
-
-    Only handles issues from Layer1 (field presence / placeholder
-    detection). Assumes the issue's location resolves to a scalar field
-    per SCALAR_FIELD_TYPES -- raises if it doesn't, rather than guessing.
+    Repairs a MISSING_REQUIRED_VALUE issue on a plain scalar field.
     """
     if issue.defect_type != DefectType.MISSING_REQUIRED_VALUE:
         raise ValueError(
@@ -3053,12 +2532,6 @@ def repair_scalar_missing_field(config: dict, issue: ValidationIssue) -> dict:
     steps = _parse_location_steps(issue.location)
     parent, last_key = _navigate_to_parent(config, steps)
 
-    # Special case: edges.source / edges.destination missing a value.
-    # A missing endpoint often means the edge itself is spurious (e.g.
-    # leftover from a deleted node, or something that was never really
-    # needed) rather than something that just needs a destination filled
-    # in -- offer deleting the whole edge as an explicit option
-    # alongside the normal candidate list, rather than forcing a pick.
     if normalized in ("edges.destination", "edges.source"):
         edge_match = re.match(r"^edges\[(\d+)\]\.", issue.location)
         if edge_match:
@@ -3069,7 +2542,8 @@ def repair_scalar_missing_field(config: dict, issue: ValidationIssue) -> dict:
             except Exception:
                 edge_label = f"edges[{edge_idx}]"
 
-            print(f"{edge_label}: Select a value, or delete this edge entirely.")
+            fallback_text = f"{edge_label}: Select a value, or delete this edge entirely."
+            print(_ask(config, issue.location, fallback_text))
             print("    0) Delete this edge entirely")
             for i, name in enumerate(candidates, start=1):
                 print(f"    {i}) {name}")
@@ -3093,35 +2567,22 @@ def repair_scalar_missing_field(config: dict, issue: ValidationIssue) -> dict:
         candidates = select_fn(config, parent)
         allow_none = normalized in SCALAR_SELECT_ALLOW_NONE
         if candidates or allow_none:
-            print(f"Field '{issue.location}' is missing -- select its value below.")
+            fallback_text = f"Field '{issue.location}' is missing -- select its value below."
+            print(_ask(config, issue.location, fallback_text))
             selected = _prompt_select_single(issue.location, candidates, allow_none=allow_none, config=config)
             if selected is None:
-                return config  # "None" chosen for an allow-none field -- leave it unset
+                return config
             parent[last_key] = selected
             return config
-        # No candidates and none not allowed -- fall through to free-text
-        # entry below (e.g. cascading field where the sibling type/material_type
-        # hasn't been set yet, so nothing can be narrowed down).
         print(f"  No candidates available yet for '{issue.location}' -- falling back to manual entry.")
 
-    # Special case: a "*.distribution" field being repaired here (the
-    # object it lives in already exists, just this one sub-field is
-    # missing/placeholder) is the MOST COMMON real-world shape -- LLM
-    # output almost always has the full object present with individual
-    # "missing" placeholders inside, not the whole object absent. This
-    # needs the same "Instant" shortcut and one-step parameters
-    # resolution as the container-building path in _fill_node, or the
-    # shortcut would only ever apply to the rare "whole object missing"
-    # case. If this field is a distribution enum position, use the
-    # combined helper and also set "parameters" directly here (the
-    # sibling parameters issue, if it exists separately, simply won't
-    # re-fire on the next verification pass since it's already resolved).
     if normalized.endswith(".distribution") and enum_values == DISTRIBUTION_TYPES:
         dist_location = issue.location[: -len(".distribution")]
         dist_field = normalized[: -len(".distribution")]
         dist_value, params = _prompt_for_distribution(
             dist_location, config=config,
-            allow_instant=(dist_field not in QUANTITY_BASED_DISTRIBUTION_FIELDS),
+            allow_instant=(dist_field not in QUANTITY_BASED_DISTRIBUTION_FIELDS
+                           and dist_field not in NO_INSTANT_RISK_FIELDS),
         )
         parent[last_key] = dist_value
         if isinstance(parent, dict):
@@ -3134,18 +2595,36 @@ def repair_scalar_missing_field(config: dict, issue: ValidationIssue) -> dict:
     return config
 
 
+def repair_bom_value(config: dict, issue: ValidationIssue) -> dict:
+    """
+    Repairs a MISSING_REQUIRED_VALUE issue on a single bom ENTRY whose
+    key already exists but whose value is still the "missing" placeholder.
+    """
+    steps = _parse_location_steps(issue.location)
+    parent, key = _navigate_to_parent(config, steps)
+    value = _prompt_for_value(issue.location, "num", config=config)
+    parent[key] = value
+    return config
+
+
+def repair_config_info_version(config: dict, issue: ValidationIssue) -> dict:
+    """
+    config_info.version is never asked from the user -- it's an internal
+    revision marker, not scenario data. Base runs always get "1.0"
+    automatically; each what-if run bumps it (1.1, 1.2, ...) directly in
+    Pipeline.run_whatif before validation, so this action only ever fires
+    for a fresh base config that hasn't been assigned a version yet.
+    """
+    steps = _parse_location_steps(issue.location)
+    parent, key = _navigate_to_parent(config, steps)
+    parent[key] = "1.0"
+    print("  Assigned config version 1.0 (auto-assigned, not asked).")
+    return config
+
+
 def repair_invalid_enum_value(config: dict, issue: ValidationIssue) -> dict:
     """
-    Repairs an INVALID_VALUE issue on an enum-constrained field (e.g.
-    distribution type, inventory.type, edges.material_type,
-    procurement_scheme.type). The field already has a value -- it's just
-    not one of the recognized options -- so this OVERWRITES the existing
-    value rather than inserting a new key (that distinction is the main
-    difference from repair_scalar_missing_field).
-
-    Only handles fields with a known enum constraint (per
-    ENUM_FIELD_VALUES) -- raises if the issue's location isn't one of
-    those, rather than guessing at a generic "fix this string" action.
+    Repairs an INVALID_VALUE issue on an enum-constrained field.
     """
     if issue.defect_type != DefectType.INVALID_VALUE:
         raise ValueError(
@@ -3168,14 +2647,6 @@ def repair_invalid_enum_value(config: dict, issue: ValidationIssue) -> dict:
     parent, last_key = _navigate_to_parent(config, steps)
     current_value = parent.get(last_key) if isinstance(parent, dict) else None
 
-    print(f"  Field '{issue.location}' has an invalid value: {current_value!r}")
-
-    # Safe, deterministic auto-correction: the LLM sometimes writes the
-    # plural section name (e.g. "products", "raw_materials") instead of
-    # the singular enum value (e.g. "product", "raw_material"). This is
-    # not a genuine ambiguity requiring human judgment -- if stripping a
-    # single trailing 's' produces an EXACT match to one of the valid
-    # options, just apply it directly, no prompt.
     if isinstance(current_value, str) and current_value.endswith("s"):
         singular_candidate = current_value[:-1]
         if singular_candidate in enum_values:
@@ -3193,9 +2664,6 @@ def repair_invalid_enum_value(config: dict, issue: ValidationIssue) -> dict:
 # ----------------------------------------------------------------------
 # nodes[0] repairs
 # ----------------------------------------------------------------------
-# "nodes" has an irregular shape not covered by SECTION_SPECS (a single
-# dict with supplier/facility/customer LIST keys), so it needs its own
-# dedicated repair actions rather than going through find_spec_node.
 
 NODES_ENTITY_SECTION = {"supplier": "supplier", "facility": "facility", "customer": "customer"}
 
@@ -3203,9 +2671,7 @@ NODES_ENTITY_SECTION = {"supplier": "supplier", "facility": "facility", "custome
 def repair_missing_nodes_list(config: dict, issue: ValidationIssue) -> dict:
     """
     Repairs a MISSING_REQUIRED_VALUE issue at "nodes[0].supplier" /
-    "nodes[0].facility" / "nodes[0].customer" -- the KEY itself is absent
-    from nodes[0]. Rebuilds it as a list-select menu of real entity names
-    from the corresponding section.
+    "nodes[0].facility" / "nodes[0].customer" -- the KEY itself is absent.
     """
     m = re.match(r"^nodes\[0\]\.(supplier|facility|customer)$", issue.location)
     if not m:
@@ -3219,8 +2685,9 @@ def repair_missing_nodes_list(config: dict, issue: ValidationIssue) -> dict:
     section = NODES_ENTITY_SECTION[key]
     candidates = sorted(_collect_names(config, section))
 
-    print(f"Field '{issue.location}' is missing -- select its entries below.")
-    _fill_list_select(nodes[0], key, candidates, issue.location)
+    fallback_text = f"Field '{issue.location}' is missing -- select its entries below."
+    print(_ask(config, issue.location, fallback_text))
+    _fill_list_select(nodes[0], key, candidates, issue.location, config=config)
 
     return config
 
@@ -3228,10 +2695,8 @@ def repair_missing_nodes_list(config: dict, issue: ValidationIssue) -> dict:
 def repair_nodes_registration_gap(config: dict, issue: ValidationIssue) -> dict:
     """
     Repairs an INCONSISTENT_CROSS_FIELD issue at "nodes[0].supplier" /
-    "nodes[0].facility" / "nodes[0].customer" (NO index) -- a real entity
-    exists but isn't registered in nodes[0]. The issue's own context
-    already names exactly which entity is missing (context["referenced_name"]),
-    so this is a deterministic append, no menu needed.
+    "nodes[0].facility" / "nodes[0].customer" -- a real entity exists but
+    isn't registered in nodes[0]. Fully deterministic, no prompt.
     """
     m = re.match(r"^nodes\[0\]\.(supplier|facility|customer)$", issue.location)
     if not m:
@@ -3258,9 +2723,7 @@ def repair_nodes_phantom_entry(config: dict, issue: ValidationIssue) -> dict:
     """
     Repairs a DANGLING_REFERENCE issue at "nodes[0].supplier[i]" /
     "nodes[0].facility[i]" / "nodes[0].customer[i]" -- a name IS present
-    at that index but doesn't correspond to any real entity. Offers to
-    either remove the phantom entry or replace it with a real,
-    not-already-listed name from the corresponding section.
+    at that index but doesn't correspond to any real entity.
     """
     m = re.match(r"^nodes\[0\]\.(supplier|facility|customer)\[(\d+)\]$", issue.location)
     if not m:
@@ -3279,8 +2742,8 @@ def repair_nodes_phantom_entry(config: dict, issue: ValidationIssue) -> dict:
     section = NODES_ENTITY_SECTION[key]
     real_candidates = sorted(_collect_names(config, section) - set(entry_list))
 
-    print(f"  '{issue.location}' = '{phantom_name}' does not correspond to any real "
-          f"{key}. Choose how to resolve it:")
+    fallback_text = f"'{issue.location}' = '{phantom_name}' does not correspond to any real {key}. Choose how to resolve it:"
+    print(f"  {_ask(config, issue.location, fallback_text)}")
     print("    0) Remove this entry")
     for i, name in enumerate(real_candidates, start=1):
         print(f"    {i}) Replace with: {name}")
@@ -3306,15 +2769,7 @@ def repair_nodes_phantom_entry(config: dict, issue: ValidationIssue) -> dict:
 def repair_dangling_reference(config: dict, issue: ValidationIssue) -> dict:
     """
     Repairs a DANGLING_REFERENCE issue on a scalar field that already has
-    a value -- just not a valid one (e.g. supply_material_name pointing
-    at a nonexistent raw material). Reuses the same
-    SCALAR_SELECT_CANDIDATE_FNS candidate derivation as the missing-field
-    path, but OVERWRITES the existing bad value rather than inserting a
-    new key.
-
-    Only handles fields with a registered candidate function -- raises
-    otherwise (nodes[0][...] phantom entries and registration gaps are
-    handled by their own dedicated actions, not this one).
+    a value -- just not a valid one.
     """
     if issue.defect_type != DefectType.DANGLING_REFERENCE:
         raise ValueError(
@@ -3339,7 +2794,6 @@ def repair_dangling_reference(config: dict, issue: ValidationIssue) -> dict:
     if not candidates and not allow_none:
         raise ValueError(f"No valid candidates available to repair '{issue.location}'.")
 
-    print(f"  Field '{issue.location}' has an invalid reference: {current_value!r}")
     selected = _prompt_select_single(issue.location, candidates, allow_none=allow_none, config=config)
     if selected is None:
         del parent[last_key]
@@ -3358,16 +2812,23 @@ def dispatch_repair(config: dict, issue: ValidationIssue) -> bool:
     """
     Attempts to repair a single issue by routing it to whichever action
     actually handles its shape. Returns True if repaired, False if no
-    current action can handle it (caller should report it as unhandled,
-    not silently ignore it).
+    current action can handle it.
     """
     if issue.defect_type == DefectType.MISSING_REQUIRED_VALUE:
+        if issue.location == "config_info[0].version":
+            repair_config_info_version(config, issue)
+            return True
+
         if re.match(r"^nodes\[0\]\.(supplier|facility|customer)$", issue.location):
             repair_missing_nodes_list(config, issue)
             return True
 
         if issue.location == "raw_materials":
             repair_at_least_one_raw_material(config, issue)
+            return True
+
+        if re.match(r"^(intermediate_materials|products)\[\d+\]\.bom\.[^.]+$", issue.location):
+            repair_bom_value(config, issue)
             return True
 
         if issue.location == "products":
@@ -3422,10 +2883,6 @@ def dispatch_repair(config: dict, issue: ValidationIssue) -> bool:
         normalized = normalize_location(issue.location)
 
         if normalized == "edges.material_name":
-            # Two checks share this exact shape: check 9 (material_name's
-            # category doesn't match material_type) and check 19 (category
-            # is fine, but the destination facility doesn't use it). Test
-            # the live category-match condition to route correctly.
             steps = _parse_location_steps(issue.location)
             edge_entry, _ = _navigate_to_parent(config, steps)
             material_type = edge_entry.get("material_type")
@@ -3449,11 +2906,20 @@ def dispatch_repair(config: dict, issue: ValidationIssue) -> bool:
             return True
 
         if re.match(r"^raw_materials\[\d+\]$", issue.location):
-            # Two different checks share this exact location shape --
-            # try each candidate action in turn; each has its own live
-            # safety check and raises if its condition doesn't actually
-            # hold, so this is safe rather than guessing.
-            for action in (repair_raw_material_missing_supplier, repair_raw_material_not_consumed, repair_material_missing_inventory_entry):
+            detail = issue.detail or ""
+            if "has no supplier" in detail:
+                ordered = [repair_raw_material_missing_supplier]
+            elif "is never consumed" in detail:
+                ordered = [repair_raw_material_not_consumed]
+            elif "has no corresponding inventory" in detail:
+                ordered = [repair_material_missing_inventory_entry]
+            else:
+                ordered = []
+            ordered += [a for a in (
+                repair_raw_material_missing_supplier, repair_raw_material_not_consumed,
+                repair_material_missing_inventory_entry,
+            ) if a not in ordered]
+            for action in ordered:
                 try:
                     action(config, issue)
                     return True
@@ -3466,7 +2932,22 @@ def dispatch_repair(config: dict, issue: ValidationIssue) -> bool:
             return True
 
         if re.match(r"^products\[\d+\]$", issue.location):
-            for action in (repair_product_missing_customer, repair_product_not_producible, repair_product_end_to_end_path, repair_material_missing_inventory_entry):
+            detail = issue.detail or ""
+            if "has no customer ordering it" in detail:
+                ordered = [repair_product_missing_customer]
+            elif "is not produced by any facility operation" in detail:
+                ordered = [repair_product_not_producible]
+            elif "has a producing facility, but no" in detail:
+                ordered = [repair_product_end_to_end_path]
+            elif "has no corresponding inventory" in detail:
+                ordered = [repair_material_missing_inventory_entry]
+            else:
+                ordered = []
+            ordered += [a for a in (
+                repair_product_missing_customer, repair_product_not_producible,
+                repair_product_end_to_end_path, repair_material_missing_inventory_entry,
+            ) if a not in ordered]
+            for action in ordered:
                 try:
                     action(config, issue)
                     return True
@@ -3475,7 +2956,17 @@ def dispatch_repair(config: dict, issue: ValidationIssue) -> bool:
             return False
 
         if re.match(r"^intermediate_materials\[\d+\]$", issue.location):
-            for action in (repair_intermediate_material_not_producible, repair_material_missing_inventory_entry):
+            detail = issue.detail or ""
+            if "is not produced by any facility" in detail:
+                ordered = [repair_intermediate_material_not_producible]
+            elif "has no corresponding inventory" in detail:
+                ordered = [repair_material_missing_inventory_entry]
+            else:
+                ordered = []
+            ordered += [a for a in (
+                repair_intermediate_material_not_producible, repair_material_missing_inventory_entry,
+            ) if a not in ordered]
+            for action in ordered:
                 try:
                     action(config, issue)
                     return True

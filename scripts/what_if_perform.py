@@ -2,8 +2,7 @@ import json
 from copy import deepcopy
 
 from what_if_engine import apply_what_if_config
-# from config_v2 import config as base_config
-from interactive_repair import InteractiveRepairRunner
+from orchestrator import run_repair_loop, canonicalize_config, deep_sort
 
 
 # ------------------------------------------------------------
@@ -12,10 +11,9 @@ from interactive_repair import InteractiveRepairRunner
 with open("what_if_config.json") as f:
     what_if_config = json.load(f)
 
- # from config_v2 import config
-    
-    with open("active_config.json") as f:
-        config = json.load(f)
+with open("active_config.json") as f:
+    config = json.load(f)
+
 # ------------------------------------------------------------
 # Apply deterministic what-if changes
 # ------------------------------------------------------------
@@ -36,17 +34,18 @@ print("##################")
 # ------------------------------------------------------------
 # Interactive validation + repair
 # ------------------------------------------------------------
-runner = InteractiveRepairRunner(
-    candidate,
-    strict_layer0=True,
-    max_passes_per_layer=20,
-)
+final_config, remaining = run_repair_loop(candidate, max_iterations=60, verbose=True)
 
-final_config = runner.run()
+if remaining:
+    print(f"\n{len(remaining)} issue(s) could not be fully resolved:")
+    for issue in remaining:
+        print("   ", issue)
+
+final_config = deep_sort(canonicalize_config(final_config))
 
 with open("active_config_whatif.json", "w") as f:
     json.dump(final_config, f, indent=2)
-    
+
 print("##################")
 print("FINAL CONFIG (after interactive repair)")
 print(final_config)

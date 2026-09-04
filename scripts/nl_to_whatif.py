@@ -251,8 +251,8 @@ if __name__ == "__main__":
     print("Applying what-if changes to main config...")
     print("=" * 60)
 
-    from what_if_engine   import apply_what_if_config, WhatIfError
-    from iterative_repair import InteractiveRepairRunner, canonicalize_config, deep_sort
+    from what_if_engine import apply_what_if_config, WhatIfError
+    from repair_orchestrator   import run_repair_loop, canonicalize_config, deep_sort
     from copy import deepcopy
 
     try:
@@ -264,12 +264,11 @@ if __name__ == "__main__":
 
     # ── Validate + repair modified config ─────────────────
     print("\nRunning validation and repair on modified config...")
-    runner = InteractiveRepairRunner(
-        modified,
-        strict_layer0=True,
-        max_passes_per_layer=20,
-    )
-    final = runner.run()
+    final, remaining = run_repair_loop(modified, max_iterations=60, verbose=True)
+    if remaining:
+        print(f"\n{len(remaining)} issue(s) could not be fully resolved:")
+        for issue in remaining:
+            print("   ", issue)
     final = deep_sort(canonicalize_config(final))
 
     # ── Save final modified config ─────────────────────────
