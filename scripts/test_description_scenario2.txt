@@ -1,0 +1,13 @@
+Notes from ops sync, quick recap before I forget:
+
+Raw material side - we're pulling steel from Alpha Metals, batches of 18,000-24,000 units, constant 4 day lead time, 14 a unit. Coating comes from Beta Coatings, 9,000-13,000 unit batches, 3 day lead time, 11 a unit. Both of these get used at both of our fabrication points, more on that below.
+
+FrameWorks takes steel and coating and turns it into a Frame - 2.5 day cycle, starts empty on everything. PanelWorks does basically the same thing, steel and coating in, except what comes out there is a Panel instead - 3 day cycle, also starts at zero.
+
+Everything finished goes to MainStock for staging - we're holding 25,000 Frames and 18,000 Panels there right now.
+
+On the demand side: FrameBuyer takes Frames only, orders every 7 days, 4,000-7,000 units, 3 day delivery, 45 a unit, we get paid in 15 days. PanelBuyer takes Panels only, orders every 10 days, 3,000-5,000 units, 4 day delivery, 52 a unit, paid in 18 days.
+
+Lost sale if we can't cover an order, no backorder queue.
+
+Sim config: 180 days, daily resolution, no warm-up, 10 reps, 90% CI on inventory and cash like usual.

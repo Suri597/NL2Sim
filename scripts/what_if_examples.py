@@ -52,7 +52,7 @@ Output:
   ]
 }
 
---- Example 3: delete an entity ---
+--- Example 3: delete an entity (non-edge) ---
 Instruction: "remove Supplier B from the supply chain"
 Output:
 {
@@ -66,7 +66,7 @@ Output:
   ]
 }
 
---- Example 4: add a new entity ---
+--- Example 4: add a new entity -- fields the instruction did NOT specify use "missing" ---
 Instruction: "add a new customer called TechCorp ordering Product X every 10 days"
 Output:
 {
@@ -77,17 +77,25 @@ Output:
       "value": {
         "name": "TechCorp",
         "product": "Product X",
-        "arrival_time": {"distribution": "constant", "parameters": {"a": 10, "b": 0, "c": 0, "d": 0, "e": 0}},
-        "demand": {"distribution": "constant", "parameters": {"a": 1, "b": 0, "c": 0, "d": 0, "e": 0}},
-        "customer_lead_time": {"distribution": "constant", "parameters": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0}},
-        "shortage_policy": "backorder",
-        "unit_selling_price": 0,
-        "customer_payment_lead_time": {"distribution": "constant", "parameters": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0}}
+        "arrival_time": {"distribution": "constant", "parameters": {"a": 10, "b": "missing", "c": "missing", "d": "missing", "e": "missing"}},
+        "demand": {"distribution": "missing", "parameters": {"a": "missing", "b": "missing", "c": "missing", "d": "missing", "e": "missing"}},
+        "customer_lead_time": {"distribution": "missing", "parameters": {"a": "missing", "b": "missing", "c": "missing", "d": "missing", "e": "missing"}},
+        "shortage_policy": "missing",
+        "unit_selling_price": "missing",
+        "customer_payment_lead_time": {"distribution": "missing", "parameters": {"a": "missing", "b": "missing", "c": "missing", "d": "missing", "e": "missing"}}
       },
-      "meta": {"reason": "add new customer TechCorp"}
+      "meta": {"reason": "add new customer TechCorp, ordering every 10 days as stated -- all other fields left as 'missing' since the instruction didn't specify them"}
     }
   ]
 }
+Note: ONLY "arrival_time" was actually specified ("every 10 days" -> a=10). Every
+other field -- demand quantity, lead times, shortage policy, price -- was NEVER
+mentioned in the instruction, so it is "missing", not a confidently invented
+number. Inventing specific business values (a lead time, a price, a policy) that
+were never stated is a hallucination, even when the invented value looks
+plausible -- always use "missing" for anything genuinely unspecified, and let
+the downstream repair process ask the person directly instead of guessing on
+their behalf.
 
 --- Example 5: structural change — move entity between categories ---
 Instruction: "convert peacock from product to intermediate material and add polished_peacock as a new product"
@@ -144,4 +152,71 @@ Output:
     }
   ]
 }
+
+--- Example 7: delete an edge -- edges use "relation", NEVER "entity_id" ---
+Instruction: "stop shipping Steel from Supplier A to Manufacturing Plant"
+Output:
+{
+  "changes": [
+    {
+      "op": "delete",
+      "entity_type": "edge",
+      "relation": {
+        "type": "edge",
+        "from": "Supplier A",
+        "to": "Manufacturing Plant",
+        "attributes": {"material_name": "Steel"}
+      },
+      "meta": {"reason": "stop shipping Steel from Supplier A to Manufacturing Plant"}
+    }
+  ]
+}
+Note: edges have no "name" field. entity_id is NEVER used for an edge,
+for update OR delete -- always use "relation" for both.
+
+--- Example 8: reroute — implies deleting BOTH old edges, not just adding the new one ---
+Instruction: "Widget doesn't need to go through Central Warehouse anymore -- just have Plant A ship straight to Customer X."
+Output:
+{
+  "changes": [
+    {
+      "op": "delete",
+      "entity_type": "edge",
+      "relation": {
+        "type": "edge",
+        "from": "Plant A",
+        "to": "Central Warehouse",
+        "attributes": {"material_name": "Widget"}
+      },
+      "meta": {"reason": "Widget no longer routes through Central Warehouse -- remove inbound leg"}
+    },
+    {
+      "op": "delete",
+      "entity_type": "edge",
+      "relation": {
+        "type": "edge",
+        "from": "Central Warehouse",
+        "to": "Customer X",
+        "attributes": {"material_name": "Widget"}
+      },
+      "meta": {"reason": "Widget no longer routes through Central Warehouse -- remove outbound leg"}
+    },
+    {
+      "op": "create",
+      "entity_type": "edge",
+      "value": {
+        "source": "Plant A",
+        "destination": "Customer X",
+        "material_type": "product",
+        "material_name": "Widget",
+        "transfer_time": {"distribution": "constant", "parameters": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0}}
+      },
+      "meta": {"reason": "direct shipment from Plant A to Customer X, bypassing Central Warehouse"}
+    }
+  ]
+}
+Note: "bypass Y" or "no longer go through Y" means removing BOTH the
+edge INTO Y and the edge OUT of Y for that material, not just adding
+the new direct edge. Leaving the old edges in place creates redundant,
+stale routing even though it wouldn't fail validation.
 """

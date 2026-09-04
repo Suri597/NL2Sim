@@ -1,0 +1,15 @@
+Here's what you need to know to run our production floor.
+
+Two starting inputs come from outside: a base compound supplied by Baseline Chem, and a solvent supplied by Pure Solvents. Base compound arrives in batches of 25,000-35,000 units with a constant 3-day lead time at 15 per unit. Solvent arrives in batches of 15,000-20,000 units with a constant 2-day lead time at 22 per unit. Both start at zero stock.
+
+The reaction step happens at ReactorCore, combining the base compound and solvent into what we just call "intermediate X" internally. That reaction takes a constant 2.5 days per cycle. Zero starting stock on all three materials there.
+
+From intermediate X, two separate finishing lines take over. LineA finishes it into ProductAlpha, a 2-day process. LineB finishes the same intermediate into ProductBeta instead, a 3-day process. Both lines start at zero for everything.
+
+ProductAlpha gets staged at AlphaStock before shipping, currently holding 40,000 units. ProductBeta gets staged separately at BetaStock, currently holding 35,000 units.
+
+On the customer side: SingleBuyer only ever wants ProductAlpha, ordering every 6 days in batches of 5,000-9,000 units, 2-day delivery, priced at 60 per unit, paid back in 18 days. BetaOnly only wants ProductBeta, ordering every 9 days, 6,000-10,000 units, 3-day delivery, 75 per unit, paid back in 22 days. DualBuyer is different -- they take both product lines: ProductAlpha on a 10-day cycle in 3,000-6,000 unit batches, and separately ProductBeta on a 12-day cycle in 4,000-7,000 unit batches, both with 4-day delivery, ProductAlpha priced at 60 and ProductBeta at 75, payment terms 20 days for both.
+
+Lost sales apply across the board if we're short.
+
+For the sim: 200-day horizon, daily steps, no warm-up, 10 replications, 95% confidence intervals on inventory and cash please.

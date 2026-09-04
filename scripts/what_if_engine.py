@@ -252,19 +252,55 @@ def _resolve_edge(cfg: Dict[str, Any], relation: Dict[str, Any]) -> Dict[str, An
     raise WhatIfError(f"Edge not found: {src} → {dst} ({mat})")
 
 
+_ENTITY_TYPE_TO_SECTION = {
+    "raw_material": "raw_materials",
+    "intermediate_material": "intermediate_materials",
+    "product": "products",
+    "inventory": "inventory",
+    "supplier": "supplier",
+    "resource": "resource",
+    "facility": "facility",
+    "customer": "customer",
+    "edge": "edges",
+    "node": "nodes",
+}
+
+
 def _entity_section(entity_type: str) -> str:
-    return {
-        "raw_material": "raw_materials",
-        "intermediate_material": "intermediate_materials",
-        "product": "products",
-        "inventory": "inventory",
-        "supplier": "supplier",
-        "resource": "resource",
-        "facility": "facility",
-        "customer": "customer",
-        "edge": "edges",
-        "node": "nodes",
-    }[entity_type]
+    """
+    Maps entity_type -> the config section it lives in.
+
+    Auto-corrects the common singular/plural confusion (e.g. "products"
+    instead of "product") -- this is the SAME failure pattern already
+    seen and specifically handled elsewhere in this system for JSON
+    field values (verification_layer1.py's repair_invalid_enum_value),
+    now showing up here too: an LLM that correctly understands the
+    STRUCTURE of a change but uses the section name instead of the
+    singular entity_type value. Since section names ARE the plural
+    form of every entity_type here except "inventory"/"supplier"/
+    "resource"/"facility"/"customer" (already identical either way) and
+    "edge"/"node" (irregular -- "edges"/"nodes"), stripping a trailing
+    "s" and re-checking covers this unambiguously without needing a
+    hardcoded list of every possible typo.
+
+    Raises a clear, actionable WhatIfError (not a raw KeyError) when
+    entity_type genuinely isn't recognized -- a bare KeyError's string
+    representation is just the missing key itself (e.g. "'products'"),
+    which gives no indication anything is wrong with entity_type
+    specifically, let alone what the valid values are.
+    """
+    if entity_type in _ENTITY_TYPE_TO_SECTION:
+        return _ENTITY_TYPE_TO_SECTION[entity_type]
+
+    if isinstance(entity_type, str) and entity_type.endswith("s"):
+        singular = entity_type[:-1]
+        if singular in _ENTITY_TYPE_TO_SECTION:
+            return _ENTITY_TYPE_TO_SECTION[singular]
+
+    raise WhatIfError(
+        f"Unknown entity_type: {entity_type!r} -- must be one of: "
+        f"{', '.join(sorted(_ENTITY_TYPE_TO_SECTION.keys()))}"
+    )
 
 
 def _set_by_path(obj: Dict[str, Any], path: str, value: Any) -> None:

@@ -42,21 +42,21 @@ from openai import AzureOpenAI  # the official Azure OpenAI Python library
 # Your Azure OpenAI API key.
 # Find it in: Azure Portal → Your OpenAI Resource → Keys and Endpoint → KEY 1
 # AZURE_OPENAI_API_KEY = "YOUR_API_KEY_HERE"
+AZURE_OPENAI_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY", "")
 
-
-
+os.environ.get("AZURE_FINETUNED_MODEL", "")
 # Your Azure OpenAI endpoint URL.
 # Find it in: Azure Portal → Your OpenAI Resource → Keys and Endpoint → Endpoint
 # It looks like: https://your-resource-name.openai.azure.com/
-
+AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
 
 
 # The API version — do not change this unless instructed.
-
+AZURE_API_VERSION = os.environ.get("AZURE_API_VERSION", "")
 
 # The name of your .jsonl file to upload.
 # Make sure this file is in the SAME folder as this script.
-TRAINING_FILE_NAME = "9defcf91_val_60samples.jsonl"
+TRAINING_FILE_NAME = os.environ.get("TRAINING_FILE_NAME", "")
 
 
 # ==============================================================================
