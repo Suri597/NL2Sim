@@ -14,6 +14,18 @@ Usage (imported):
     results = run_simulation(config)
 
 Assumptions communicated to user at runtime — see ASSUMPTIONS block below.
+
+[FIX] changes in this version (search for the tag):
+  1. normalize_config accepted only inventory type "raw_materials" (plural),
+     but the validator's canonical value is "raw_material" (singular) and
+     the repair loop auto-corrects to it. Every repaired config therefore
+     lost its procurement scheme (set to type "none") and no supplier
+     order was ever placed. Both spellings are now accepted.
+  2. gamma and erlang were offered by the validator and the repair menu
+     but raised "Unsupported distribution" here. Both are now sampled.
+  3. _param_values read parameters in dict insertion order, so a config
+     with {"b": ..., "a": ...} silently swapped them. a-e keys are now
+     read in key order; any other key naming keeps insertion order.
 """
 
 from __future__ import annotations
@@ -90,11 +102,26 @@ def _lower(x: Any) -> Any:
     return x.lower().strip() if isinstance(x, str) else x
 
 
+_PARAM_KEY_ORDER = ("a", "b", "c", "d", "e")
+
+
 def _param_values(params: Dict[str, Any]) -> List[float]:
+    """
+    [FIX] Returns parameter values in a/b/c/d/e KEY order when the keys
+    are a-e (the schema's naming), so {"b": 5, "a": 1} is read as a=1,
+    b=5 rather than in insertion order. Any other key naming keeps its
+    insertion order, exactly as before. A non-dict (e.g. the "missing"
+    placeholder) yields no values instead of crashing.
+    """
+    if not isinstance(params, dict):
+        return []
+    keys = list(params.keys())
+    if keys and all(k in _PARAM_KEY_ORDER for k in keys):
+        keys = sorted(keys, key=_PARAM_KEY_ORDER.index)
     out = []
-    for v in (params or {}).values():
+    for k in keys:
         try:
-            out.append(float(v))
+            out.append(float(params[k]))
         except (TypeError, ValueError):
             out.append(0.0)
     return out
@@ -147,6 +174,22 @@ def sample_distribution(spec: Optional[Dict[str, Any]],
         if k <= 0 or lam <= 0:
             return 0.0
         return max(0.0, rng.weibullvariate(lam, k))
+
+    # [FIX] gamma: a = shape (k), b = scale (theta); mean = shape * scale.
+    if d == "gamma":
+        shape, scale = getn(2, 1.0)
+        if shape <= 0 or scale <= 0:
+            return 0.0
+        return max(0.0, rng.gammavariate(shape, scale))
+
+    # [FIX] erlang: a = k (number of phases, rounded to a whole number >= 1),
+    # b = scale (mean time per phase); mean = k * scale.
+    if d == "erlang":
+        k, scale = getn(2, 1.0)
+        k = max(1, int(round(k)))
+        if scale <= 0:
+            return 0.0
+        return max(0.0, rng.gammavariate(float(k), scale))
 
     if d == "lognormal":
         mean, sd = getn(2)
@@ -286,7 +329,11 @@ def normalize_config(cfg: Dict[str, Any]) -> Dict[str, Any]:
         ps       = item.get("procurement_scheme", {}) or {}
         ps_type  = ps.get("type", "")
 
-        if inv_type == "raw_materials" and not _is_missing(ps_type):
+        # [FIX] The validator's canonical value is "raw_material" (singular)
+        # and the repair loop auto-corrects to it; the old check accepted
+        # only "raw_materials", so every repaired config fell into the else
+        # branch below and lost its procurement scheme. Accept both.
+        if inv_type in ("raw_material", "raw_materials") and not _is_missing(ps_type):
             if ps_type == "periodic_supply":
                 if _is_missing(ps.get("distribution")):
                     ps["distribution"] = "constant"

@@ -22,6 +22,14 @@ and printed as-is, since they encode real structural logic that must
 stay exact. Only the sentence framing the choice is LLM-authored; the
 choices are still deterministic. Each call passes the original template
 text as fallback_text, so a failed API call still shows something usable.
+
+[LABELS] PARAMETER NAMES IN PROMPTS: distribution parameters are stored as
+a/b/c in the JSON, but every prompt for one now names the distribution and
+what the parameter means (e.g. "Normal distribution parameter: standard
+deviation", "Triangular distribution parameter: mode (most likely value)",
+"Inventory threshold parameter: reorder point (s)"). This is display only -- the JSON keys are unchanged.
+See PARAM_DISPLAY_NAMES; meanings are taken from simulate.py
+sample_distribution(), which is the source of truth for what a/b/c mean.
 """
 
 from __future__ import annotations
@@ -347,6 +355,122 @@ def _lookup_field_type(normalized_location: str) -> str | None:
 
 DISTRIBUTION_TYPES = list(DISTRIBUTION_PARAM_COUNTS.keys())
 
+
+# ----------------------------------------------------------------------
+# [LABELS] Parameter display names -- prompts only, never written to JSON
+# ----------------------------------------------------------------------
+# The JSON keys stay a/b/c. These names describe what each key MEANS for
+# the chosen distribution, confirmed against simulate.py
+# sample_distribution() and interarrival_time():
+#   exponential: a is the MEAN (sampled as expovariate(1 / a)).
+#   poisson:     a is the mean count; for customer arrivals,
+#                interarrival_time() treats a as an arrival RATE.
+#   weibull:     a = shape (k), b = scale.
+#   lognormal:   a and b are the mean and standard deviation of the VALUE
+#                itself, not mu/sigma of its log (the engine converts).
+#   triangular:  a = minimum, b = maximum, c = mode (NOT min/mode/max).
+#   gamma:       a = shape (k), b = scale; mean = shape * scale.
+#   erlang:      a = number of phases (k, whole number), b = mean time per
+#                phase; mean = k * scale.
+# [LABELS-3] gamma and erlang are sampled by simulate.py as of its [FIX]
+# version, so they now have proper labels too.
+PARAM_DISPLAY_NAMES = {
+    "constant":    {"a": "value"},
+    "exponential": {"a": "mean"},
+    "poisson":     {"a": "mean (lambda)"},
+    "uniform":     {"a": "minimum", "b": "maximum"},
+    "normal":      {"a": "mean", "b": "standard deviation"},
+    "weibull":     {"a": "shape (k)", "b": "scale"},
+    "lognormal":   {"a": "mean", "b": "standard deviation"},
+    "triangular":  {"a": "minimum", "b": "maximum", "c": "mode (most likely value)"},
+    "gamma":       {"a": "shape (k)", "b": "scale"},                              # [LABELS-3]
+    "erlang":      {"a": "number of phases (k, whole number)", "b": "mean time per phase"},   # [LABELS-3]
+}
+
+# Fields where a poisson "a" is read as a rate, not a mean count.
+POISSON_RATE_FIELDS = {"customer.arrival_time"}
+
+# procurement_scheme of type inventory_threshold: simulate.py _sS_params().
+THRESHOLD_PARAM_NAMES = {"a": "reorder point (s)", "b": "order-up-to level (S)"}
+
+# Extra context shown next to the distribution menu for fields whose
+# meaning isn't obvious from the field name alone (simulate.py
+# raw_procurement_loop: the periodic_supply scheme's distribution is the
+# ORDER QUANTITY, and procurement_arrival is the time between orders).
+DISTRIBUTION_FIELD_NOTES = {
+    "inventory.procurement_scheme": "order quantity per periodic delivery",
+    "inventory.procurement_arrival": "time between periodic deliveries",
+}
+
+_PARAM_LOCATION_RE = re.compile(r"^(?P<owner>.+)\.parameters\.(?P<key>[a-e])$")
+
+
+def param_display_label(dist_value, pkey: str, field_normalized: str = None) -> str:
+    """
+    e.g. param_display_label("normal", "b")
+         -> "Normal distribution parameter: standard deviation".
+    [LABELS-2] The word "parameter" always follows the distribution name, so
+    a label like "minimum" is never shown on its own. Unknown distributions
+    or keys fall back to the key itself ("Distribution parameter: a").
+    """
+    dist = dist_value.strip().lower() if isinstance(dist_value, str) else ""
+    name = PARAM_DISPLAY_NAMES.get(dist, {}).get(pkey)
+    if dist == "poisson" and pkey == "a" and field_normalized in POISSON_RATE_FIELDS:
+        name = "arrival rate (lambda, per time unit)"
+    if name is None:
+        name = pkey
+    prefix = f"{dist.capitalize()} distribution" if dist else "Distribution"
+    return f"{prefix} parameter: {name}"   # [LABELS-2]
+
+
+def threshold_display_label(pkey: str) -> str:
+    """e.g. threshold_display_label("a") -> "Inventory threshold parameter: reorder point (s)"."""
+    return f"Inventory threshold parameter: {THRESHOLD_PARAM_NAMES.get(pkey, pkey)}"   # [LABELS-2]
+
+
+def param_label_from_config(config: dict, location: str) -> Optional[str]:
+    """
+    For a location ending in .parameters.<key>, reads the distribution (or
+    the inventory_threshold scheme type) ALREADY in the config next to it
+    and returns the display label. Returns None when the location isn't a
+    parameter, or the distribution isn't known yet -- callers then fall
+    back to the plain breadcrumb. Never raises.
+
+    Only valid when the distribution is already stored in the config.
+    Where a prompt chooses the distribution in the same step
+    (_prompt_for_distribution, _build_procurement_scheme,
+    repair_procurement_scheme_field), the label is passed explicitly
+    instead, since the config may still hold the old or missing value.
+    """
+    match = _PARAM_LOCATION_RE.match(location or "")
+    if not match:
+        return None
+    owner_location = match.group("owner")
+    key = match.group("key")
+    try:
+        node = config
+        for step in _parse_location_steps(owner_location):
+            node = node[step]
+    except Exception:
+        return None
+    if not isinstance(node, dict):
+        return None
+
+    if "procurement_scheme" in owner_location and node.get("type") == "inventory_threshold":
+        return threshold_display_label(key)
+
+    dist = node.get("distribution")
+    if isinstance(dist, str) and dist.strip().lower() in DISTRIBUTION_PARAM_COUNTS:
+        return param_display_label(dist, key, normalize_location(owner_location))
+    return None
+
+
+def param_owner_location(location: str) -> str:
+    """'x.parameters.b' -> 'x'; any other location is returned unchanged."""
+    match = _PARAM_LOCATION_RE.match(location or "")
+    return match.group("owner") if match else location
+
+
 QUANTITY_BASED_DISTRIBUTION_FIELDS = {"customer.demand"}
 
 # Fields where "Instant" (constant, a=0) is dangerous even though they're
@@ -482,7 +606,8 @@ SCALAR_SELECT_CANDIDATE_FNS = {
 SCALAR_SELECT_ALLOW_NONE = {"facility.operation.resource_required"}
 
 
-def _prompt_for_value(location: str, expected_kind: str, enum_values: list = None, config: dict = None):
+def _prompt_for_value(location: str, expected_kind: str, enum_values: list = None, config: dict = None,
+                      display_label: str = None):
     """
     Prompts the user for a value at the given location, validating it
     against expected_kind ("str" / "num" / "bool") before accepting it.
@@ -491,13 +616,28 @@ def _prompt_for_value(location: str, expected_kind: str, enum_values: list = Non
     The prompt text is generated via generate_question() (LLM-framed),
     with describe_location()'s breadcrumb text as fallback_text in case
     the API call fails.
+
+    [LABELS] display_label: optional human name for a distribution
+    parameter (e.g. "Normal distribution parameter: mean"). When given, it replaces
+    the "Parameters -> A" tail of the breadcrumb. When not given and the
+    location is a parameter, the label is inferred from the distribution
+    already stored in the config (param_label_from_config). Display only;
+    the value is still stored under the original a/b/c key.
     """
+    if display_label is None and config is not None:          # [LABELS]
+        display_label = param_label_from_config(config, location)
+
     fallback_text = f"Missing required field '{location}'."
     if config is not None:
         try:
-            fallback_text = f"{describe_location(config, location)}:"
+            if display_label:                                  # [LABELS]
+                fallback_text = f"{describe_location(config, param_owner_location(location))} -> {display_label}:"
+            else:
+                fallback_text = f"{describe_location(config, location)}:"
         except Exception:
             pass
+    elif display_label:                                        # [LABELS]
+        fallback_text = f"{display_label}:"
     # When enum_values is given, the actual input is always "Enter number:"
     # (a menu selection) regardless of expected_kind -- so the question
     # should be phrased for that, not for expected_kind's raw type.
@@ -569,12 +709,23 @@ def _prompt_for_distribution(location: str, config: dict = None, allow_instant: 
     The prompt text is generated via generate_question() (LLM-framed),
     with describe_location()'s output as fallback_text.
 
+    [LABELS] Each parameter prompt names the chosen distribution and the
+    parameter's meaning (e.g. "Triangular distribution parameter: maximum"), and
+    fields whose meaning isn't obvious get a short note next to the menu
+    (DISTRIBUTION_FIELD_NOTES).
+
     Returns (distribution_name, parameters_dict).
     """
+    normalized_field = normalize_location(location)                   # [LABELS]
+    field_note = DISTRIBUTION_FIELD_NOTES.get(normalized_field)       # [LABELS]
+
     fallback_text = f"Missing required field '{location}'."
     if config is not None:
         try:
-            fallback_text = f"{describe_location(config, location)}:"
+            if field_note:                                            # [LABELS]
+                fallback_text = f"{describe_location(config, location)} ({field_note}):"
+            else:
+                fallback_text = f"{describe_location(config, location)}:"
         except Exception:
             pass
     prompt_prefix = f"  {generate_question(config or {}, location, description=_CURRENT_DESCRIPTION, fallback_text=fallback_text, answer_type='num')}"
@@ -603,7 +754,10 @@ def _prompt_for_distribution(location: str, config: dict = None, allow_instant: 
     params = {}
     for i, pkey in enumerate(PARAM_KEYS):
         if i < param_count:
-            params[pkey] = _prompt_for_value(f"{location}.parameters.{pkey}", "num", config=config)
+            params[pkey] = _prompt_for_value(
+                f"{location}.parameters.{pkey}", "num", config=config,
+                display_label=param_display_label(dist_value, pkey, normalized_field),   # [LABELS]
+            )
     return dist_value, params
 
 
@@ -850,7 +1004,10 @@ def _build_procurement_scheme(config: dict, location: str):
     elif type_val == "inventory_threshold":
         params = {}
         for pkey in ("a", "b"):
-            params[pkey] = _prompt_for_value(f"{location}.parameters.{pkey}", "num", config=config)
+            params[pkey] = _prompt_for_value(
+                f"{location}.parameters.{pkey}", "num", config=config,
+                display_label=threshold_display_label(pkey),   # [LABELS]
+            )
         obj["parameters"] = params
 
     return obj
@@ -2458,7 +2615,10 @@ def repair_procurement_scheme_field(config: dict, issue: ValidationIssue) -> dic
                 if i < param_count:
                     val = old_params.get(pkey)
                     if val is None or val == "missing":
-                        val = _prompt_for_value(f"{ps_location}.parameters.{pkey}", "num", config=config)
+                        val = _prompt_for_value(
+                            f"{ps_location}.parameters.{pkey}", "num", config=config,
+                            display_label=param_display_label(dist_value, pkey, "inventory.procurement_scheme"),   # [LABELS]
+                        )
                     params[pkey] = val
         else:
             dist_value, params = _prompt_for_distribution(ps_location, config=config, allow_instant=False)
@@ -2474,7 +2634,10 @@ def repair_procurement_scheme_field(config: dict, issue: ValidationIssue) -> dic
         for pkey in ("a", "b"):
             val = old_params.get(pkey)
             if val is None or val == "missing":
-                val = _prompt_for_value(f"{ps_location}.parameters.{pkey}", "num", config=config)
+                val = _prompt_for_value(
+                    f"{ps_location}.parameters.{pkey}", "num", config=config,
+                    display_label=threshold_display_label(pkey),   # [LABELS]
+                )
             params[pkey] = val
         new_obj["parameters"] = params
 
@@ -2510,6 +2673,10 @@ def repair_transfer_time_default_instant(config: dict, issue: ValidationIssue) -
 def repair_scalar_missing_field(config: dict, issue: ValidationIssue) -> dict:
     """
     Repairs a MISSING_REQUIRED_VALUE issue on a plain scalar field.
+
+    [LABELS] A missing single parameter (e.g. customer[0].demand.parameters.b
+    when the distribution is already set) gets its display label through
+    _prompt_for_value, which reads the stored distribution from the config.
     """
     if issue.defect_type != DefectType.MISSING_REQUIRED_VALUE:
         raise ValueError(
