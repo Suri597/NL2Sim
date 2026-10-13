@@ -97,7 +97,7 @@ from verification_layer1 import check_field_requirements, LAYER as LAYER1_NAME
 # ----------------------------------------------------------------------
 
 BATCH_QUESTIONS = True      # False = original one-question-per-cycle loop
-USE_LLM_PHRASING = False    # False = deterministic fallback text in repair.py prompts
+USE_LLM_PHRASING = True    # False = deterministic fallback text in repair.py prompts
 
 
 # ----------------------------------------------------------------------
@@ -346,10 +346,19 @@ def describe_round(config: dict, batch: list) -> list:
 
 
 def format_round_preview(config: dict, batch: list) -> str:
-    """All questions of the round, grouped, for printing before answering."""
+    """
+    All questions of the round, grouped, for printing before answering.
+    [NL-PREVIEW] Shows each question in natural language when
+    USE_LLM_PHRASING is on, otherwise the deterministic label and what's
+    needed (as before).
+    """
     lines = ["  These questions are independent of each other and belong to this round:"]
-    for item in describe_round(config, batch):
-        lines.append(f"    Q{item['number']}. {item['label']} -- {item['need']}")
+    for item, issue in zip(describe_round(config, batch), batch):
+        question = _preview_question(config, issue)   # [NL-PREVIEW]
+        if question:
+            lines.append(f"    Q{item['number']}. {question}")
+        else:
+            lines.append(f"    Q{item['number']}. {item['label']} -- {item['need']}")
     return "\n".join(lines)
 
 
@@ -383,7 +392,58 @@ def apply_phrasing_mode() -> None:
 
     repair.generate_question = _ORIGINAL_GENERATE_QUESTION if USE_LLM_PHRASING else _fallback_only
 
+def _preview_question(config: dict, issue) -> str | None:
+    """
+    [NL-PREVIEW] Natural-language text for one preview line, or None when
+    USE_LLM_PHRASING is off (the preview then shows the label instead).
 
+    Calls generate_question with the same (location, fallback_text) that
+    repair.py will use when it prompts for this issue. llm_humanize caches
+    by (location shape, entity name, fallback_text), so the later prompt
+    gets the identical question from the cache, with no second call.
+    The mirrored prompt shapes:
+      - a distribution parameter: "<owner breadcrumb> -> <parameter label>:"
+      - a missing distribution (X or X.distribution): repair.py prompts at
+        X, with the field note for procurement fields
+      - everything else: "<breadcrumb>:"
+    If a repair prompts with a different text than predicted here, the
+    only cost is one extra call and possibly slightly different wording.
+    """
+    if not USE_LLM_PHRASING or _ORIGINAL_GENERATE_QUESTION is None:
+        return None
+    import repair
+
+    location = issue.location
+    try:
+        normalized = repair.normalize_location(location)
+        param_label = repair.param_label_from_config(config, location)
+        if param_label:
+            owner = repair.param_owner_location(location)
+            fallback = f"{repair.describe_location(config, owner)} -> {param_label}:"
+            answer_type = "num"
+        else:
+            is_dist = normalized.endswith(".distribution")
+            if not is_dist and "procurement_scheme" not in location:
+                fspec = repair.find_spec_node(normalized) or {}
+                is_dist = bool(fspec.get("is_distribution"))
+            if is_dist and normalized.endswith(".distribution"):
+                location = location[: -len(".distribution")]
+                normalized = normalized[: -len(".distribution")]
+            note = repair.DISTRIBUTION_FIELD_NOTES.get(normalized) if is_dist else None
+            crumb = repair.describe_location(config, location)
+            fallback = f"{crumb} ({note}):" if note else f"{crumb}:"
+            # Menus (enums, distributions, procurement type) are answered with
+            # a number, exactly as repair.py passes answer_type for them.
+            kind = repair._lookup_field_type(repair.normalize_location(issue.location))
+            menu = is_dist or repair._lookup_enum_values(repair.normalize_location(issue.location)) \
+                or "procurement_scheme" in issue.location
+            answer_type = "num" if menu else (kind or "str")
+        return _ORIGINAL_GENERATE_QUESTION(
+            config, location, description=getattr(repair, "_CURRENT_DESCRIPTION", ""),
+            fallback_text=fallback, answer_type=answer_type,
+        )
+    except Exception:
+        return None
 # ----------------------------------------------------------------------
 # Run statistics (for evaluating batching against the old loop)
 # ----------------------------------------------------------------------
